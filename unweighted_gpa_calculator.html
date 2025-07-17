@@ -395,63 +395,63 @@
     </script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-calculator"></i>
-                Grade Calculator
-            </a>
-            <button class="mobile-menu-btn" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
-                <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-                <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> Unweighted GPA</a></li>
-            </ul>
-        </div>
-    </nav>
+  <nav class="navbar">
+      <div class="nav-container">
+          <a href="index.html" class="logo">
+              <i class="fas fa-calculator"></i>
+              Grade Calculator
+          </a>
+          <button class="mobile-menu-btn" onclick="toggleMenu()">
+              <i class="fas fa-bars"></i>
+          </button>
+          <ul class="nav-links">
+              <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
+              <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
+              <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> Unweighted GPA</a></li>
+          </ul>
+      </div>
+  </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>Unweighted GPA Calculator</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-                Calculate your unweighted GPA based on your percentage grades using a standard 4.0 scale.
-            </p>
-            
-            <div class="form-group">
-                <label for="numClasses">Number of Classes</label>
-                <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
-            </div>
-            
-            <div class="btn-group">
-                <button id="generateInputsBtn">
-                    <i class="fas fa-plus-circle"></i> Generate Grade Inputs
-                </button>
-            </div>
+  <div class="container">
+      <div class="card">
+          <h2>Unweighted GPA Calculator</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+              Calculate your unweighted GPA based on your percentage grades using a standard 4.0 scale.
+          </p>
+          
+          <div class="form-group">
+              <label for="numClasses">Number of Classes</label>
+              <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
+          </div>
+          
+          <div class="btn-group">
+              <button id="generateInputsBtn">
+                  <i class="fas fa-plus-circle"></i> Generate Grade Inputs
+              </button>
+          </div>
 
-            <div id="gradeInputsContainer" class="input-row" style="flex-direction: column;">
-                <!-- Dynamic grade inputs will be added here -->
-            </div>
-            
-            <div class="btn-group">
-                <button id="calculateGpaBtn">
-                    <i class="fas fa-calculator"></i> Calculate Unweighted GPA
-                </button>
-                <button class="btn-clear" id="clearGpaFieldsBtn">
-                    <i class="fas fa-trash-alt"></i> Clear All Fields
-                </button>
-            </div>
-            
-            <div class="result-section">
-                <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
-            </div>
-        </div>
-    </div>
-    <footer class="footer">
-        <div class="container">
-            <p>Created by Advaith S, 2025</p>
-        </div>
-    </footer>
+          <div id="gradeInputsContainer" class="input-row" style="flex-direction: column;">
+              <!-- Dynamic grade inputs will be added here -->
+          </div>
+          
+          <div class="btn-group">
+              <button id="calculateGpaBtn">
+                  <i class="fas fa-calculator"></i> Calculate Unweighted GPA
+              </button>
+              <button class="btn-clear" id="clearGpaFieldsBtn">
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
+              </button>
+          </div>
+          
+          <div class="result-section">
+              <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
+          </div>
+      </div>
+  </div>
+  <footer class="footer">
+      <div class="container">
+          <p>Created by Advaith S, 2025</p>
+      </div>
+  </footer>
 </body>
 </html>
