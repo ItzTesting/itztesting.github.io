@@ -451,12 +451,9 @@
         // Popup logic
         const popupOverlay = document.getElementById('welcomePopup');
         const popupCloseBtn = document.getElementById('closePopupBtn');
-        const hasVisited = sessionStorage.getItem('hasVisitedIndex');
-
-        if (!hasVisited) {
-            popupOverlay.classList.add('active');
-            sessionStorage.setItem('hasVisitedIndex', 'true');
-        }
+        
+        // Always show the popup when the page loads
+        popupOverlay.classList.add('active');
 
         popupCloseBtn.addEventListener('click', () => {
             popupOverlay.classList.remove('active');
@@ -1092,7 +1089,7 @@
     </footer>
 
     <!-- Welcome Popup -->
-    <div id="welcomePopup" class="popup-overlay">
+    <div id="welcomePopup" class="popup-overlay active">
         <div class="popup-content">
             <h2>Welcome to the Grade Calculator!</h2>
             <p>
