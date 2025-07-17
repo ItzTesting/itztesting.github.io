@@ -424,18 +424,20 @@ gtag('config', 'G-LNMT1VXJW1');
         margin-bottom: 1.5rem;
     }
 
-    .popup-close-btn {
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        display: block; /* Added for centering */
-        margin: 0 auto; /* Added for centering */
-    }
+   .popup-close-btn {
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: block;
+    margin: 20px auto 0 auto; /* Top margin to separate from text */
+    max-width: fit-content; /* Shrinks button to content width */
+    text-align: center;
+}
 
     .popup-close-btn:hover {
         background-color: var(--accent-hover);
