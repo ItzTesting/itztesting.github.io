@@ -374,6 +374,70 @@
             display: none;
             margin-top: 0.5rem;
         }
+
+        /* Popup styles */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .popup-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .popup-content {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .popup-overlay.active .popup-content {
+            transform: translateY(0);
+        }
+
+        .popup-content h2 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+        }
+
+        .popup-content p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .popup-close-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .popup-close-btn:hover {
+            background-color: var(--accent-hover);
+        }
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -383,6 +447,20 @@
         // Add event listeners to buttons
         document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
         document.getElementById('clearBtn').addEventListener('click', clearFields);
+
+        // Popup logic
+        const popupOverlay = document.getElementById('welcomePopup');
+        const popupCloseBtn = document.getElementById('closePopupBtn');
+        const hasVisited = localStorage.getItem('hasVisitedIndex');
+
+        if (!hasVisited) {
+            popupOverlay.classList.add('active');
+            localStorage.setItem('hasVisitedIndex', 'true');
+        }
+
+        popupCloseBtn.addEventListener('click', () => {
+            popupOverlay.classList.remove('active');
+        });
     });
 
     function toggleMenu() {
@@ -1012,5 +1090,18 @@
             <p>Created by Advaith S, 2025</p>
         </div>
     </footer>
+
+    <!-- Welcome Popup -->
+    <div id="welcomePopup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Welcome to the Grade Calculator!</h2>
+            <p>
+                This tool helps you calculate your final grades and unweighted GPA.
+                Explore the different calculators using the navigation bar above.
+                We hope this helps you stay on top of your academic goals!
+            </p>
+            <button id="closePopupBtn" class="popup-close-btn">Got It!</button>
+        </div>
+    </div>
 </body>
 </html>
