@@ -451,11 +451,11 @@
         // Popup logic
         const popupOverlay = document.getElementById('welcomePopup');
         const popupCloseBtn = document.getElementById('closePopupBtn');
-        const hasVisited = localStorage.getItem('hasVisitedIndex');
+        const hasVisited = sessionStorage.getItem('hasVisitedIndex');
 
         if (!hasVisited) {
             popupOverlay.classList.add('active');
-            localStorage.setItem('hasVisitedIndex', 'true');
+            sessionStorage.setItem('hasVisitedIndex', 'true');
         }
 
         popupCloseBtn.addEventListener('click', () => {
