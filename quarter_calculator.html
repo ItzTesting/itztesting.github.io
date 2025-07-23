@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googlegtagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
 <script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-gtag('config', 'G-LNMT1VXJW1');
+  gtag('config', 'G-LNMT1VXJW1');
 </script>
 
 <meta charset="UTF-8">
@@ -592,14 +592,8 @@ gtag('config', 'G-LNMT1VXJW1');
               // where totalWeight can be arbitrary. For simplicity, I'll keep it as is,
               // but a more robust solution might require knowing the 'total possible weight'
               // if not all assignments are entered.
-              let remainingWeight = 100 - totalWeight; // This assumes a target total weight of 100
+              // For now, I'll just indicate if the desired grade is met or not.
               if (!isGroupView && totalWeight > 0) { // If in single view and some weights are entered
-                  // If totalWeight is not 100, this calculation becomes more complex.
-                  // For now, I'll assume the user will adjust weights to sum to 100 or interpret
-                  // the result as a weighted average of entered items.
-                  // A more accurate "needed grade" for remaining would require knowing the total
-                  // weight of *all* assignments, not just entered ones.
-                  // For now, I'll just indicate if the desired grade is met or not.
                   if (quarterGrade >= desiredGrade) {
                       desiredGradeStatusElement.innerText = "Desired grade achieved with current inputs!";
                       desiredGradeStatusElement.style.color = "var(--accent-color)";
@@ -608,6 +602,7 @@ gtag('config', 'G-LNMT1VXJW1');
                       desiredGradeStatusElement.style.color = "#f44336";
                   }
               } else { // Original logic for grouped view or if totalWeight is 0 in single view
+                  let remainingWeight = 100 - totalWeight;
                   let maxPossibleGrade = (totalWeightedSum + (remainingWeight * 100)) / 100;
                   let minPossibleGrade = (totalWeightedSum + (remainingWeight * 0)) / 100;
 
@@ -769,7 +764,7 @@ gtag('config', 'G-LNMT1VXJW1');
           <div class="category-section">
               <div class="category-header">
                   <h3>Assignments</h3>
-                  <!-- Removed the single weight input here, as weights are now per assignment -->
+                  <!-- The overall weight input for "Assignments" category is now removed -->
               </div>
               <div id="assignmentsAssignments" class="assignment-inputs">
                   <!-- Single assignment inputs will be added here -->
@@ -805,4 +800,4 @@ gtag('config', 'G-LNMT1VXJW1');
   </div>
 </footer>
 </body>
-</html
+</html>
