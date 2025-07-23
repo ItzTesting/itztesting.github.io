@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -16,558 +16,582 @@ gtag('config', 'G-LNMT1VXJW1');
 <title>Quarter Grade Calculator</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-    :root {
-        --primary-bg: #1a1a1a;
-        --secondary-bg: #2E2E2E;
-        --input-bg: #3B3B3B;
-        --text-color: #F1F1F1;
-        --text-secondary: #D1D1D1;
-        --accent-color: #4CAF50;
-        --accent-hover: #45a049;
-        --link-color: #64B5F6;
-        --border-color: #555;
-        --card-bg: #333333;
-        --nav-bg: #222222;
-        --highlight-bg: rgba(76, 175, 80, 0.15);
-    }
+  :root {
+      --primary-bg: #1a1a1a;
+      --secondary-bg: #2E2E2E;
+      --input-bg: #3B3B3B;
+      --text-color: #F1F1F1;
+      --text-secondary: #D1D1D1;
+      --accent-color: #4CAF50;
+      --accent-hover: #45a049;
+      --link-color: #64B5F6;
+      --border-color: #555;
+      --card-bg: #333333;
+      --nav-bg: #222222;
+      --highlight-bg: rgba(76, 175, 80, 0.15);
+  }
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
+  * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+  }
 
-    body {
-        background-color: var(--primary-bg);
-        color: var(--text-color);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        padding-bottom: 2rem;
-    }
+  body {
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      padding-bottom: 2rem;
+  }
 
-    .navbar {
-        background-color: var(--nav-bg);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
+  .navbar {
+      background-color: var(--nav-bg);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+  }
 
-    .container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
+  .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+  }
 
-    .nav-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-    }
+  .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+  }
 
-    .logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--text-color);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-    }
+  .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text-color);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+  }
 
-    .logo i {
-        margin-right: 0.5rem;
-        color: var(--accent-color);
-    }
+  .logo i {
+      margin-right: 0.5rem;
+      color: var(--accent-color);
+  }
 
-    .nav-links {
-        display: flex;
-        list-style: none;
-    }
+  .nav-links {
+      display: flex;
+      list-style: none;
+  }
 
-    .nav-links li {
-        margin-left: 1.5rem;
-    }
+  .nav-links li {
+      margin-left: 1.5rem;
+  }
 
-    .nav-links a {
-        color: var(--text-color);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s;
-        display: flex;
-        align-items: center;
-    }
+  .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+      display: flex;
+      align-items: center;
+  }
 
-    .nav-links a:hover {
-        color: var(--accent-color);
-    }
+  .nav-links a:hover {
+      color: var(--accent-color);
+  }
 
-    .nav-links a.active {
-        color: var(--accent-color);
-        font-weight: 600;
-    }
+  .nav-links a.active {
+      color: var(--accent-color);
+      font-weight: 600;
+  }
 
-    .nav-links a i {
-        margin-right: 0.5rem;
-    }
+  .nav-links a i {
+      margin-right: 0.5rem;
+  }
 
-    .mobile-menu-btn {
-        display: none;
-        background: none;
-        border: none;
-        color: var(--text-color);
-        font-size: 1.5rem;
-        cursor: pointer;
-    }
+  .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-color);
+      font-size: 1.5rem;
+      cursor: pointer;
+  }
 
-    .card {
-        background-color: var(--card-bg);
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        padding: 2rem;
-        margin: 2rem 0;
-    }
+  .card {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      padding: 2rem;
+      margin: 2rem 0;
+  }
 
-    h2 {
-        color: var(--text-color);
-        margin-bottom: 1.5rem;
-        font-weight: 600;
-        text-align: center;
-        font-size: 1.8rem;
-    }
+  h2 {
+      color: var(--text-color);
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.8rem;
+  }
 
-    h3 {
-        color: var(--text-color);
-        margin: 1rem 0;
-        font-weight: 500;
-    }
+  h3 {
+      color: var(--text-color);
+      margin: 1rem 0;
+      font-weight: 500;
+  }
 
-    .form-group {
-        margin-bottom: 1rem;
-    }
+  .form-group {
+      margin-bottom: 1rem;
+  }
 
-    label {
-        display: block;
-        color: var(--text-secondary);
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-    }
+  label {
+      display: block;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+  }
 
-    input, select {
-        background-color: var(--input-bg);
-        color: var(--text-color);
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        padding: 0.75rem;
-        width: 100%;
-        font-size: 1rem;
-        transition: border-color 0.3s;
-    }
+  input, select {
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+      border-radius: 5px;
+      padding: 0.75rem;
+      width: 100%;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+  }
 
-    input:focus, select:focus {
-        outline: none;
-        border-color: var(--accent-color);
-    }
+  input:focus, select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+  }
 
-    .input-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
+  .input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+  }
 
-    .input-group {
-        flex: 1;
-        min-width: 200px;
-    }
+  .input-group {
+      flex: 1;
+      min-width: 200px;
+  }
 
-    .btn-group {
-        display: flex;
-        gap: 1rem;
-        margin: 1.5rem 0;
-        flex-wrap: wrap;
-    }
+  .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+  }
 
-    button {
-        cursor: pointer;
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: background-color 0.3s;
-        flex: 1;
-        min-width: 150px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+  button {
+      cursor: pointer;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: background-color 0.3s;
+      flex: 1;
+      min-width: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  }
 
-    button:hover {
-        background-color: var(--accent-hover);
-    }
+  button:hover {
+      background-color: var(--accent-hover);
+  }
 
-    button i {
-        margin-right: 0.5rem;
-    }
+  button i {
+      margin-right: 0.5rem;
+  }
 
-    .btn-clear {
-        background-color: #f44336;
-    }
+  .btn-clear {
+      background-color: #f44336;
+  }
 
-    .btn-clear:hover {
-        background-color: #d32f2f;
-    }
+  .btn-clear:hover {
+      background-color: #d32f2f;
+  }
 
-    .result-section {
-        background-color: var(--secondary-bg);
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-top: 1.5rem;
-    }
+  .result-section {
+      background-color: var(--secondary-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+  }
 
-    .result-section h3 {
-        margin-top: 0;
-        color: var(--accent-color);
-    }
+  .result-section h3 {
+      margin-top: 0;
+      color: var(--accent-color);
+  }
 
-    .footer {
-        text-align: center;
-        padding: 1rem 0;
-        margin-top: 2rem;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-    }
+  .footer {
+      text-align: center;
+      padding: 1rem 0;
+      margin-top: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+  }
 
-    /* Specific styles for Quarter Calculator */
-    .category-section {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 1.5rem;
-        background-color: var(--secondary-bg);
-        margin-bottom: 1.5rem;
-    }
+  /* Specific styles for Quarter Calculator */
+  .category-section {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      background-color: var(--secondary-bg);
+      margin-bottom: 1.5rem;
+  }
 
-    .category-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }
+  .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+  }
 
-    .category-header h3 {
-        margin: 0;
-        color: var(--accent-color);
-    }
+  .category-header h3 {
+      margin: 0;
+      color: var(--accent-color);
+  }
 
-    .category-header .input-group {
-        flex: none;
-        width: 120px; /* Fixed width for weight input */
-        margin-left: 1rem;
-    }
+  .category-header .input-group {
+      flex: none;
+      width: 120px; /* Fixed width for weight input */
+      margin-left: 1rem;
+  }
 
-    .assignment-inputs {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+  .assignment-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+  }
 
-    .assignment-input-row {
-        display: flex;
-        gap: 1rem;
-        align-items: flex-end;
-        flex-wrap: wrap;
-    }
+  /* New styles for class inputs (adapted from GPA calculator) */
+  .class-input-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      align-items: flex-end; /* Align items at the bottom */
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      background-color: var(--secondary-bg);
+  }
 
-    .assignment-input-row .input-group {
-        flex: 1;
-        min-width: 150px;
-    }
+  .class-input-group {
+      flex: 1;
+      min-width: 150px; /* Adjust as needed */
+  }
 
-    .remove-assignment-btn {
-        background-color: #f44336;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 0.5rem 1rem;
-        font-size: 0.9rem;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        flex-shrink: 0;
-        min-width: auto;
-    }
+  .class-input-group label {
+      white-space: nowrap; /* Prevent label from wrapping */
+  }
 
-    .remove-assignment-btn:hover {
-        background-color: #d32f2f;
-    }
+  .remove-class-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      flex-shrink: 0; /* Prevent button from shrinking */
+      min-width: auto; /* Override min-width from general button style */
+  }
+
+  .remove-class-btn:hover {
+      background-color: #d32f2f;
+  }
 </style>
 <script>
-    let categoryCounters = {
-        'homework': 0,
-        'quizzes': 0,
-        'tests': 0,
-        'projects': 0
-    };
+  let categoryCounters = {
+      'homework': 0,
+      'quizzes': 0,
+      'tests': 0,
+      'projects': 0
+  };
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add event listeners for Quarter Calculator
-        document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
-        document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
+  document.addEventListener('DOMContentLoaded', function() {
+      // Add event listeners for Quarter Calculator
+      document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
+      document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
 
-        // Add initial assignment input for each category
-        addAssignmentInput('homework');
-        addAssignmentInput('quizzes');
-        addAssignmentInput('tests');
-        addAssignmentInput('projects');
+      // Add initial assignment input for each category
+      addAssignmentInput('homework');
+      addAssignmentInput('quizzes');
+      addAssignmentInput('tests');
+      addAssignmentInput('projects');
 
-        // Add event listeners for "Add Assignment" buttons
-        document.getElementById('addHomeworkBtn').addEventListener('click', () => addAssignmentInput('homework'));
-        document.getElementById('addQuizzesBtn').addEventListener('click', () => addAssignmentInput('quizzes'));
-        document.getElementById('addTestsBtn').addEventListener('click', () => addAssignmentInput('tests'));
-        document.getElementById('addProjectsBtn').addEventListener('click', () => addAssignmentInput('projects'));
-    });
+      // Add event listeners for "Add Assignment" buttons
+      document.getElementById('addHomeworkBtn').addEventListener('click', () => addAssignmentInput('homework'));
+      document.getElementById('addQuizzesBtn').addEventListener('click', () => addAssignmentInput('quizzes'));
+      document.getElementById('addTestsBtn').addEventListener('click', () => addAssignmentInput('tests'));
+      document.getElementById('addProjectsBtn').addEventListener('click', () => addAssignmentInput('projects'));
+  });
 
-    function toggleMenu() {
-        const navLinks = document.querySelector('.nav-links');
-        navLinks.classList.toggle('active');
-    }
+  function toggleMenu() {
+      const navLinks = document.querySelector('.nav-links');
+      navLinks.classList.toggle('active');
+  }
 
-    function addAssignmentInput(category) {
-        categoryCounters[category]++;
-        const container = document.getElementById(`${category}Assignments`);
+  function addAssignmentInput(category) {
+      categoryCounters[category]++;
+      const container = document.getElementById(`${category}Assignments`);
 
-        const assignmentRow = document.createElement('div');
-        assignmentRow.classList.add('assignment-input-row');
-        assignmentRow.setAttribute('data-assignment-id', categoryCounters[category]);
+      const assignmentRow = document.createElement('div');
+      assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
+      assignmentRow.setAttribute('data-assignment-id', categoryCounters[category]);
 
-        const gradeInputGroup = document.createElement('div');
-        gradeInputGroup.classList.add('input-group');
-        const gradeLabel = document.createElement('label');
-        gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
-        gradeLabel.innerText = `Grade ${categoryCounters[category]} (%)`;
-        const gradeInput = document.createElement('input');
-        gradeInput.setAttribute('type', 'number');
-        gradeInput.setAttribute('id', `${category}Grade${categoryCounters[category]}`);
-        gradeInput.setAttribute('min', '0');
-        gradeInput.setAttribute('max', '100');
-        gradeInput.setAttribute('placeholder', 'Enter grade');
-        gradeInputGroup.appendChild(gradeLabel);
-        gradeInputGroup.appendChild(gradeInput);
-        assignmentRow.appendChild(gradeInputGroup);
+      // Assignment Grade (%) input
+      const gradeInputGroup = document.createElement('div');
+      gradeInputGroup.classList.add('class-input-group'); // Use GPA calculator's input group style
+      const gradeLabel = document.createElement('label');
+      gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
+      gradeLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} Grade ${categoryCounters[category]} (%)`;
+      const gradeInput = document.createElement('input');
+      gradeInput.setAttribute('type', 'number');
+      gradeInput.setAttribute('id', `${category}Grade${categoryCounters[category]}`);
+      gradeInput.setAttribute('min', '0');
+      gradeInput.setAttribute('max', '100');
+      gradeInput.setAttribute('placeholder', 'Enter grade');
+      gradeInput.classList.add('assignment-grade-input'); // Add a specific class for this calculator
+      gradeInputGroup.appendChild(gradeLabel);
+      gradeInputGroup.appendChild(gradeInput);
+      assignmentRow.appendChild(gradeInputGroup);
 
-        const removeButton = document.createElement('button');
-        removeButton.classList.add('remove-assignment-btn');
-        removeButton.innerText = 'Remove';
-        removeButton.onclick = function() {
-            assignmentRow.remove();
-            // No need to re-number assignments within a category for simplicity,
-            // as their IDs are unique and not sequential after removal.
-            calculateQuarterGrade(); // Recalculate after removal
-        };
-        assignmentRow.appendChild(removeButton);
+      // Remove Assignment button
+      const removeButton = document.createElement('button');
+      removeButton.classList.add('remove-class-btn'); // Use GPA calculator's remove button style
+      removeButton.innerText = 'Remove';
+      removeButton.onclick = function() {
+          assignmentRow.remove();
+          calculateQuarterGrade(); // Recalculate after removal
+      };
+      assignmentRow.appendChild(removeButton);
 
-        container.appendChild(assignmentRow);
-    }
+      container.appendChild(assignmentRow);
+  }
 
-    function calculateQuarterGrade() {
-        const categories = ['homework', 'quizzes', 'tests', 'projects'];
-        let totalWeightedSum = 0;
-        let totalWeight = 0;
-        let resultText = "";
+  function calculateQuarterGrade() {
+      const categories = ['homework', 'quizzes', 'tests', 'projects'];
+      let totalWeightedSum = 0;
+      let totalWeight = 0;
+      let resultText = "";
 
-        categories.forEach(category => {
-            const weightInput = document.getElementById(`${category}Weight`);
-            const categoryWeight = parseFloat(weightInput.value) || 0;
-            
-            const assignmentInputs = document.querySelectorAll(`#${category}Assignments input[type="number"]`);
-            let categoryGrades = [];
-            assignmentInputs.forEach(input => {
-                const grade = parseFloat(input.value);
-                if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                    categoryGrades.push(grade);
-                }
-            });
+      categories.forEach(category => {
+          const weightInput = document.getElementById(`${category}Weight`);
+          const categoryWeight = parseFloat(weightInput.value) || 0;
+          
+          const assignmentInputs = document.querySelectorAll(`#${category}Assignments input[type="number"]`);
+          let categoryGrades = [];
+          assignmentInputs.forEach(input => {
+              const grade = parseFloat(input.value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                  categoryGrades.push(grade);
+              }
+          });
 
-            if (categoryGrades.length > 0) {
-                const categoryAverage = categoryGrades.reduce((sum, grade) => sum + grade, 0) / categoryGrades.length;
-                totalWeightedSum += categoryAverage * categoryWeight;
-                totalWeight += categoryWeight;
-            }
-        });
+          if (categoryGrades.length > 0) {
+              const categoryAverage = categoryGrades.reduce((sum, grade) => sum + grade, 0) / categoryGrades.length;
+              totalWeightedSum += categoryAverage * categoryWeight;
+              totalWeight += categoryWeight;
+          }
+      });
 
-        let quarterGrade = 0;
-        if (totalWeight > 0) {
-            quarterGrade = totalWeightedSum / totalWeight;
-            resultText = `Your Quarter Grade: ${quarterGrade.toFixed(2)}%`;
-        } else {
-            resultText = "Please enter grades and weights to calculate.";
-        }
+      let quarterGrade = 0;
+      if (totalWeight > 0) {
+          quarterGrade = totalWeightedSum / totalWeight;
+          resultText = `Your Quarter Grade: ${quarterGrade.toFixed(2)}%`;
+      } else {
+          resultText = "Please enter grades and weights to calculate.";
+      }
 
-        document.getElementById('quarterResult').innerText = resultText;
+      document.getElementById('quarterResult').innerText = resultText;
 
-        // Optional: Calculate needed grade if desired grade is provided
-        const desiredGrade = parseFloat(document.getElementById('desiredQuarterGrade').value);
-        if (!isNaN(desiredGrade) && desiredGrade > 0 && totalWeight < 100) {
-            // This part would be more complex as it depends on which categories are missing.
-            // For simplicity, we'll just indicate if it's possible to reach the desired grade
-            // if all remaining weights are filled with 100%.
-            let remainingWeight = 100 - totalWeight;
-            let maxPossibleGrade = (totalWeightedSum + (remainingWeight * 100)) / 100;
+      // Optional: Calculate needed grade if desired grade is provided
+      const desiredGrade = parseFloat(document.getElementById('desiredQuarterGrade').value);
+      const desiredGradeStatusElement = document.getElementById('desiredGradeStatus');
+      desiredGradeStatusElement.innerText = ""; // Clear previous status
 
-            if (maxPossibleGrade < desiredGrade) {
-                document.getElementById('quarterNeededGrade').innerText = "It might not be possible to achieve your desired grade.";
-            } else {
-                document.getElementById('quarterNeededGrade').innerText = ""; // Clear if possible
-            }
-        } else {
-            document.getElementById('quarterNeededGrade').innerText = "";
-        }
-    }
+      if (!isNaN(desiredGrade) && desiredGrade > 0) {
+          if (totalWeight === 100) {
+              if (quarterGrade >= desiredGrade) {
+                  desiredGradeStatusElement.innerText = "Desired grade achieved!";
+                  desiredGradeStatusElement.style.color = "var(--accent-color)";
+              } else {
+                  desiredGradeStatusElement.innerText = "Desired grade not met with current inputs.";
+                  desiredGradeStatusElement.style.color = "#f44336";
+              }
+          } else if (totalWeight < 100) {
+              let remainingWeight = 100 - totalWeight;
+              let maxPossibleGrade = (totalWeightedSum + (remainingWeight * 100)) / 100;
+              let minPossibleGrade = (totalWeightedSum + (remainingWeight * 0)) / 100;
 
-    function clearQuarterFields() {
-        document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
-        document.querySelectorAll('.category-section .assignment-inputs').forEach(container => {
-            container.innerHTML = ''; // Clear all dynamic inputs
-        });
-        document.getElementById('desiredQuarterGrade').value = '';
-        document.getElementById('quarterResult').innerText = '';
-        document.getElementById('quarterNeededGrade').innerText = '';
+              if (desiredGrade > maxPossibleGrade) {
+                  desiredGradeStatusElement.innerText = "Not possible to achieve desired grade.";
+                  desiredGradeStatusElement.style.color = "#f44336";
+              } else if (desiredGrade <= minPossibleGrade) {
+                  desiredGradeStatusElement.innerText = "Desired grade already achieved!";
+                  desiredGradeStatusElement.style.color = "var(--accent-color)";
+              } else {
+                  // Calculate what average is needed for remaining assignments
+                  let neededAvgForRemaining = (desiredGrade * 100 - totalWeightedSum) / remainingWeight;
+                  desiredGradeStatusElement.innerText = `You need an average of ${neededAvgForRemaining.toFixed(2)}% on remaining assignments.`;
+                  desiredGradeStatusElement.style.color = "var(--text-secondary)";
+              }
+          }
+      }
+  }
 
-        // Reset counters and add initial inputs
-        categoryCounters = {
-            'homework': 0,
-            'quizzes': 0,
-            'tests': 0,
-            'projects': 0
-        };
-        addAssignmentInput('homework');
-        addAssignmentInput('quizzes');
-        addAssignmentInput('tests');
-        addAssignmentInput('projects');
-    }
+  function clearQuarterFields() {
+      document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
+      document.querySelectorAll('.category-section .assignment-inputs').forEach(container => {
+          container.innerHTML = ''; // Clear all dynamic inputs
+      });
+      document.getElementById('desiredGradeStatus').innerText = ''; // Clear the new status element
+
+      // Reset counters and add initial inputs
+      categoryCounters = {
+          'homework': 0,
+          'quizzes': 0,
+          'tests': 0,
+          'projects': 0
+      };
+      addAssignmentInput('homework');
+      addAssignmentInput('quizzes');
+      addAssignmentInput('tests');
+      addAssignmentInput('projects');
+  }
 </script>
 </head>
 <body>
 <nav class="navbar">
-    <div class="nav-container">
-        <a href="index.html" class="logo">
-            <i class="fas fa-calculator"></i>
-            Grade Calculator
-        </a>
-        <button class="mobile-menu-btn" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </button>
-        <ul class="nav-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
-            <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-            <li><a href="quarter_calculator.html" class="active"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
-            <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
-        </ul>
-    </div>
+  <div class="nav-container">
+      <a href="index.html" class="logo">
+          <i class="fas fa-calculator"></i>
+          Grade Calculator
+      </a>
+      <button class="mobile-menu-btn" onclick="toggleMenu()">
+          <i class="fas fa-bars"></i>
+      </button>
+      <ul class="nav-links">
+          <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
+          <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
+          <li><a href="quarter_calculator.html" class="active"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
+          <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
+      </ul>
+  </div>
 </nav>
 
 <div class="container">
-    <div class="card">
-        <h2>Quarter Grade Calculator</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-            Calculate your quarter grade by entering grades for different assignment categories and their weights.
-        </p>
-        
-        <div class="form-group">
-            <label for="desiredQuarterGrade">Desired Quarter Grade (%) (Optional)</label>
-            <input type="number" id="desiredQuarterGrade" min="0" max="100" placeholder="Enter your target grade">
-        </div>
+  <div class="card">
+      <h2>Quarter Grade Calculator</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+          Calculate your quarter grade by entering grades for different assignment categories and their weights.
+      </p>
+      
+      <!-- Homework Category -->
+      <div class="category-section">
+          <div class="category-header">
+              <h3>Homework</h3>
+              <div class="input-group">
+                  <label for="homeworkWeight">Weight (%)</label>
+                  <input type="number" id="homeworkWeight" min="0" max="100" value="20" placeholder="e.g., 20">
+              </div>
+          </div>
+          <div id="homeworkAssignments" class="assignment-inputs">
+              <!-- Homework assignment inputs will be added here -->
+          </div>
+          <button id="addHomeworkBtn" style="margin-top: 1rem;">
+              <i class="fas fa-plus-circle"></i> Add Homework Grade
+          </button>
+      </div>
 
-        <!-- Homework Category -->
-        <div class="category-section">
-            <div class="category-header">
-                <h3>Homework</h3>
-                <div class="input-group">
-                    <label for="homeworkWeight">Weight (%)</label>
-                    <input type="number" id="homeworkWeight" min="0" max="100" value="20" placeholder="e.g., 20">
-                </div>
-            </div>
-            <div id="homeworkAssignments" class="assignment-inputs">
-                <!-- Homework assignment inputs will be added here -->
-            </div>
-            <button id="addHomeworkBtn" class="btn-group" style="margin-top: 1rem;">
-                <i class="fas fa-plus-circle"></i> Add Homework Grade
-            </button>
-        </div>
+      <!-- Quizzes Category -->
+      <div class="category-section">
+          <div class="category-header">
+              <h3>Quizzes</h3>
+              <div class="input-group">
+                  <label for="quizzesWeight">Weight (%)</label>
+                  <input type="number" id="quizzesWeight" min="0" max="100" value="30" placeholder="e.g., 30">
+              </div>
+          </div>
+          <div id="quizzesAssignments" class="assignment-inputs">
+              <!-- Quizzes assignment inputs will be added here -->
+          </div>
+          <button id="addQuizzesBtn" style="margin-top: 1rem;">
+              <i class="fas fa-plus-circle"></i> Add Quiz Grade
+          </button>
+      </div>
 
-        <!-- Quizzes Category -->
-        <div class="category-section">
-            <div class="category-header">
-                <h3>Quizzes</h3>
-                <div class="input-group">
-                    <label for="quizzesWeight">Weight (%)</label>
-                    <input type="number" id="quizzesWeight" min="0" max="100" value="30" placeholder="e.g., 30">
-                </div>
-            </div>
-            <div id="quizzesAssignments" class="assignment-inputs">
-                <!-- Quizzes assignment inputs will be added here -->
-            </div>
-            <button id="addQuizzesBtn" class="btn-group" style="margin-top: 1rem;">
-                <i class="fas fa-plus-circle"></i> Add Quiz Grade
-            </button>
-        </div>
+      <!-- Tests Category -->
+      <div class="category-section">
+          <div class="category-header">
+              <h3>Tests</h3>
+              <div class="input-group">
+                  <label for="testsWeight">Weight (%)</label>
+                  <input type="number" id="testsWeight" min="0" max="100" value="40" placeholder="e.g., 40">
+              </div>
+          </div>
+          <div id="testsAssignments" class="assignment-inputs">
+              <!-- Tests assignment inputs will be added here -->
+          </div>
+          <button id="addTestsBtn" style="margin-top: 1rem;">
+              <i class="fas fa-plus-circle"></i> Add Test Grade
+          </button>
+      </div>
 
-        <!-- Tests Category -->
-        <div class="category-section">
-            <div class="category-header">
-                <h3>Tests</h3>
-                <div class="input-group">
-                    <label for="testsWeight">Weight (%)</label>
-                    <input type="number" id="testsWeight" min="0" max="100" value="40" placeholder="e.g., 40">
-                </div>
-            </div>
-            <div id="testsAssignments" class="assignment-inputs">
-                <!-- Tests assignment inputs will be added here -->
-            </div>
-            <button id="addTestsBtn" class="btn-group" style="margin-top: 1rem;">
-                <i class="fas fa-plus-circle"></i> Add Test Grade
-            </button>
-        </div>
-
-        <!-- Projects Category -->
-        <div class="category-section">
-            <div class="category-header">
-                <h3>Projects</h3>
-                <div class="input-group">
-                    <label for="projectsWeight">Weight (%)</label>
-                    <input type="number" id="projectsWeight" min="0" max="100" value="10" placeholder="e.g., 10">
-                </div>
-            </div>
-            <div id="projectsAssignments" class="assignment-inputs">
-                <!-- Projects assignment inputs will be added here -->
-            </div>
-            <button id="addProjectsBtn" class="btn-group" style="margin-top: 1rem;">
-                <i class="fas fa-plus-circle"></i> Add Project Grade
-            </button>
-        </div>
-        
-        <div class="btn-group">
-            <button id="calculateQuarterBtn">
-                <i class="fas fa-calculator"></i> Calculate Quarter Grade
-            </button>
-            <button class="btn-clear" id="clearQuarterFieldsBtn">
-                <i class="fas fa-trash-alt"></i> Clear All Fields
-            </button>
-        </div>
-        
-        <div class="result-section">
-            <h3><span id="quarterResult"></span></h3>
-            <h3 id="quarterNeededGrade" style="color: #f44336;"></h3>
-        </div>
-    </div>
+      <!-- Projects Category -->
+      <div class="category-section">
+          <div class="category-header">
+              <h3>Projects</h3>
+              <div class="input-group">
+                  <label for="projectsWeight">Weight (%)</label>
+                  <input type="number" id="projectsWeight" min="0" max="100" value="10" placeholder="e.g., 10">
+              </div>
+          </div>
+          <div id="projectsAssignments" class="assignment-inputs">
+              <!-- Projects assignment inputs will be added here -->
+          </div>
+          <button id="addProjectsBtn" style="margin-top: 1rem;">
+              <i class="fas fa-plus-circle"></i> Add Project Grade
+          </button>
+      </div>
+      
+      <div class="btn-group">
+          <button id="calculateQuarterBtn">
+              <i class="fas fa-calculator"></i> Calculate Quarter Grade
+          </button>
+          <button class="btn-clear" id="clearQuarterFieldsBtn">
+              <i class="fas fa-trash-alt"></i> Clear All Fields
+          </button>
+      </div>
+      
+      <div class="result-section">
+          <h3><span id="quarterResult"></span></h3>
+          <div class="form-group">
+              <label for="desiredQuarterGrade">Desired Quarter Grade (%) (Optional)</label>
+              <input type="number" id="desiredQuarterGrade" min="0" max="100" placeholder="Enter your target grade">
+          </div>
+          <h3 id="quarterNeededGrade" style="color: var(--text-secondary);">Desired Grade Status: <span id="desiredGradeStatus"></span></h3>
+      </div>
+  </div>
 </div>
 <footer class="footer">
-    <div class="container">
-        <p>Created by Advaith S, 2025</p>
-    </div>
+  <div class="container">
+      <p>Created by Advaith S, 2025</p>
+  </div>
 </footer>
 </body>
 </html>
