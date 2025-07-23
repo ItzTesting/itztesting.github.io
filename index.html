@@ -357,7 +357,7 @@
         .checkbox-container {
             display: flex;
             align-items: center;
-            margin-top: 0.5rem;
+            /* Removed margin-top from here as it's now on ap-final-option */
         }
 
         .checkbox-container input[type="checkbox"] {
@@ -370,9 +370,15 @@
             margin-bottom: 0;
         }
 
+        /* Updated styles for ap-final-option to match theme */
         .ap-final-option {
-            display: none;
-            margin-top: 0.5rem;
+            display: none; /* Controlled by JS */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem; /* Increased padding for better spacing */
+            background-color: var(--secondary-bg); /* Match other sections */
+            margin-top: 1rem; /* Add margin above to separate from class type dropdown */
+            margin-bottom: 1rem; /* Add margin below if it's a distinct block */
         }
     </style>
     <script>
@@ -904,12 +910,13 @@
                         <option value="CP">CP/Honors</option>
                         <option value="AP">AP</option>
                     </select>
-                    <div id="apFinalOption" class="ap-final-option">
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="apHasFinal" onchange="updateAPFinalField()">
-                            <label for="apHasFinal">This AP class has a final exam/project</label>
-                        </div>
-                    </div>
+                </div>
+            </div>
+            
+            <div id="apFinalOption" class="ap-final-option">
+                <div class="checkbox-container">
+                    <input type="checkbox" id="apHasFinal" onchange="updateAPFinalField()">
+                    <label for="apHasFinal">This AP class has a final exam/project</label>
                 </div>
             </div>
             
