@@ -276,7 +276,7 @@ gtag('config', 'G-LNMT1VXJW1');
   }
 
   /* Styles for assignment inputs (matching GPA calculator's class inputs) */
-  .class-input-row { /* Renamed from .assignment-input-row */
+  .class-input-row {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
@@ -285,19 +285,19 @@ gtag('config', 'G-LNMT1VXJW1');
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 1rem;
-      background-color: var(--secondary-bg); /* Changed to match GPA calculator */
+      background-color: var(--secondary-bg);
   }
 
-  .class-input-group { /* Renamed from .assignment-input-group */
+  .class-input-group {
       flex: 1;
       min-width: 150px; /* Adjust as needed */
   }
 
-  .class-input-group label { /* Renamed from .assignment-input-group label */
+  .class-input-group label {
       white-space: nowrap; /* Prevent label from wrapping */
   }
 
-  .remove-class-btn { /* Renamed from .remove-assignment-btn */
+  .remove-class-btn {
       background-color: #f44336;
       color: white;
       border: none;
@@ -324,16 +324,16 @@ gtag('config', 'G-LNMT1VXJW1');
   }
 
   /* Style for hidden assignment name input group (matching GPA calculator's class name input group) */
-  .class-name-input-group { /* Renamed from .assignment-name-input-group */
+  .class-name-input-group {
       display: none; /* Hidden by default */
   }
 </style>
 <script>
   let categoryCounters = {
-      'homework': 0,
-      'quizzes': 0,
-      'tests': 0,
-      'projects': 0
+      'learnerTasks': 0,
+      'assessments': 0,
+      'custom': 0,
+      'assignments': 0 // New counter for single assignments view
   };
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -342,21 +342,34 @@ gtag('config', 'G-LNMT1VXJW1');
       document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
 
       // Add event listeners for "Add Assignment" buttons
-      document.getElementById('addHomeworkBtn').addEventListener('click', () => addAssignmentInput('homework'));
-      document.getElementById('addQuizzesBtn').addEventListener('click', () => addAssignmentInput('quizzes'));
-      document.getElementById('addTestsBtn').addEventListener('click', () => addAssignmentInput('tests'));
-      document.getElementById('addProjectsBtn').addEventListener('click', () => addAssignmentInput('projects'));
+      document.getElementById('addLearnerTasksBtn').addEventListener('click', () => addAssignmentInput('learnerTasks'));
+      document.getElementById('addAssessmentsBtn').addEventListener('click', () => addAssignmentInput('assessments'));
+      document.getElementById('addCustomBtn').addEventListener('click', () => addAssignmentInput('custom'));
+      document.getElementById('addAssignmentBtn').addEventListener('click', () => addAssignmentInput('assignments')); // New button for single view
 
       // Add event listener for the "Show Assignment Names" checkbox
       document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
+      // Add event listener for the "Group View" checkbox
+      document.getElementById('groupViewToggle').addEventListener('change', toggleGroupView);
 
-      // Initial visibility check for assignment names
+      // Initial visibility check for assignment names and group view
+      toggleGroupView(); // Call this first to set initial state
       toggleAssignmentNamesVisibility();
   });
 
   function toggleMenu() {
       const navLinks = document.querySelector('.nav-links');
       navLinks.classList.toggle('active');
+  }
+
+  function toggleGroupView() {
+      const isGroupView = document.getElementById('groupViewToggle').checked;
+      document.getElementById('groupedCategories').style.display = isGroupView ? 'block' : 'none';
+      document.getElementById('singleAssignmentCategory').style.display = isGroupView ? 'none' : 'block';
+      
+      // Clear all fields and recalculate when view changes
+      clearQuarterFields(false); // Pass false to prevent re-toggling group view
+      calculateQuarterGrade(); // Recalculate based on new view
   }
 
   function addAssignmentInput(category) {
@@ -377,7 +390,7 @@ gtag('config', 'G-LNMT1VXJW1');
       }
       const nameLabel = document.createElement('label');
       nameLabel.setAttribute('for', `${category}Name${categoryCounters[category]}`);
-      nameLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} ${categoryCounters[category]} Name`;
+      nameLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Name`;
       const nameInput = document.createElement('input');
       nameInput.setAttribute('type', 'text');
       nameInput.setAttribute('id', `${category}Name${categoryCounters[category]}`);
@@ -392,7 +405,7 @@ gtag('config', 'G-LNMT1VXJW1');
       gradeInputGroup.classList.add('class-input-group'); // Use GPA calculator's input group style
       const gradeLabel = document.createElement('label');
       gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
-      gradeLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} ${categoryCounters[category]} Grade (%)`;
+      gradeLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Grade (%)`;
       const gradeInput = document.createElement('input');
       gradeInput.setAttribute('type', 'number');
       gradeInput.setAttribute('id', `${category}Grade${categoryCounters[category]}`);
@@ -420,7 +433,7 @@ gtag('config', 'G-LNMT1VXJW1');
   }
 
   function updateAssignmentNumbers(category) {
-      const assignmentRows = document.querySelectorAll(`#${category}Assignments .class-input-row`); // Updated selector
+      const assignmentRows = document.querySelectorAll(`#${category}Assignments .class-input-row`);
       const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       assignmentRows.forEach((row, index) => {
@@ -428,13 +441,13 @@ gtag('config', 'G-LNMT1VXJW1');
           const categoryName = row.getAttribute('data-category');
 
           // Update labels and IDs for name input
-          const nameInputGroup = row.querySelector('.class-name-input-group'); // Updated selector
+          const nameInputGroup = row.querySelector('.class-name-input-group');
           const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
           const nameInput = row.querySelector(`input[id^="${categoryName}Name"]`);
           if (nameLabel && nameInput) {
               nameLabel.setAttribute('for', `${categoryName}Name${assignmentNum}`);
               nameInput.setAttribute('id', `${categoryName}Name${assignmentNum}`);
-              nameLabel.innerText = `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} ${assignmentNum} Name`;
+              nameLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Name`;
           }
 
           // Update labels and IDs for grade input
@@ -444,7 +457,7 @@ gtag('config', 'G-LNMT1VXJW1');
               gradeLabel.setAttribute('for', `${categoryName}Grade${assignmentNum}`);
               gradeInput.setAttribute('id', `${categoryName}Grade${assignmentNum}`);
               if (!showAssignmentNames) {
-                  gradeLabel.innerText = `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} ${assignmentNum} Grade (%)`;
+                  gradeLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Grade (%)`;
               } else {
                   // If names are shown, the grade label should just be "Grade (%)"
                   gradeLabel.innerText = `Grade (%)`;
@@ -455,43 +468,74 @@ gtag('config', 'G-LNMT1VXJW1');
 
   function toggleAssignmentNamesVisibility() {
       const showNames = document.getElementById('showAssignmentNamesCheckbox').checked;
-      const nameInputGroups = document.querySelectorAll('.class-name-input-group'); // Updated selector
+      const nameInputGroups = document.querySelectorAll('.class-name-input-group');
       nameInputGroups.forEach(group => {
           group.style.display = showNames ? 'block' : 'none';
       });
 
-      // Update grade labels based on visibility
-      const categories = ['homework', 'quizzes', 'tests', 'projects'];
-      categories.forEach(category => {
-          updateAssignmentNumbers(category); // This function now handles label updates based on checkbox state
+      // Update grade labels based on visibility for all categories
+      const allCategories = ['learnerTasks', 'assessments', 'custom', 'assignments'];
+      allCategories.forEach(category => {
+          updateAssignmentNumbers(category);
       });
   }
 
+  function formatCategoryName(category) {
+      // Convert camelCase to Title Case with spaces
+      if (category === 'assignments') {
+          return 'Assignment'; // Special case for the single category
+      }
+      return category.replace(/([A-Z])/g, ' $1')
+                     .replace(/^./, function(str){ return str.toUpperCase(); });
+  }
+
   function calculateQuarterGrade() {
-      const categories = ['homework', 'quizzes', 'tests', 'projects'];
+      const isGroupView = document.getElementById('groupViewToggle').checked;
       let totalWeightedSum = 0;
       let totalWeight = 0;
       let resultText = "";
 
-      categories.forEach(category => {
-          const weightInput = document.getElementById(`${category}Weight`);
-          const categoryWeight = parseFloat(weightInput.value) || 0;
-          
-          const assignmentInputs = document.querySelectorAll(`#${category}Assignments input.assignment-grade-input`);
-          let categoryGrades = [];
+      if (isGroupView) {
+          const categories = ['learnerTasks', 'assessments', 'custom'];
+          categories.forEach(category => {
+              const weightInput = document.getElementById(`${category}Weight`);
+              const categoryWeight = parseFloat(weightInput.value) || 0;
+              
+              const assignmentInputs = document.querySelectorAll(`#${category}Assignments input.assignment-grade-input`);
+              let categoryGrades = [];
+              assignmentInputs.forEach(input => {
+                  const grade = parseFloat(input.value);
+                  if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                      categoryGrades.push(grade);
+                  }
+              });
+
+              if (categoryGrades.length > 0) {
+                  const categoryAverage = categoryGrades.reduce((sum, grade) => sum + grade, 0) / categoryGrades.length;
+                  totalWeightedSum += categoryAverage * categoryWeight;
+                  totalWeight += categoryWeight;
+              }
+          });
+      } else {
+          // Single "Assignments" category view
+          const weightInput = document.getElementById('assignmentsWeight');
+          const assignmentsWeight = parseFloat(weightInput.value) || 0;
+
+          const assignmentInputs = document.querySelectorAll(`#assignmentsAssignments input.assignment-grade-input`);
+          let assignmentGrades = [];
           assignmentInputs.forEach(input => {
               const grade = parseFloat(input.value);
               if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                  categoryGrades.push(grade);
+                  assignmentGrades.push(grade);
               }
           });
 
-          if (categoryGrades.length > 0) {
-              const categoryAverage = categoryGrades.reduce((sum, grade) => sum + grade, 0) / categoryGrades.length;
-              totalWeightedSum += categoryAverage * categoryWeight;
-              totalWeight += categoryWeight;
+          if (assignmentGrades.length > 0) {
+              const assignmentsAverage = assignmentGrades.reduce((sum, grade) => sum + grade, 0) / assignmentGrades.length;
+              totalWeightedSum += assignmentsAverage * assignmentsWeight;
+              totalWeight += assignmentsWeight;
           }
-      });
+      }
 
       let quarterGrade = 0;
       if (totalWeight > 0) {
@@ -538,25 +582,40 @@ gtag('config', 'G-LNMT1VXJW1');
       }
   }
 
-  function clearQuarterFields() {
+  function clearQuarterFields(shouldToggleGroupView = true) {
+      // Clear all number and text inputs in all category sections
       document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
-      document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = ''); // Clear text inputs too
-      document.querySelectorAll('.category-section .assignment-inputs').forEach(container => {
-          container.innerHTML = ''; // Clear all dynamic inputs
+      document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = '');
+      
+      // Clear all dynamic assignment inputs
+      document.querySelectorAll('.assignment-inputs').forEach(container => {
+          container.innerHTML = '';
       });
+
+      // Clear desired grade and results
       document.getElementById('desiredQuarterGrade').value = '';
       document.getElementById('quarterResult').innerText = '';
-      document.getElementById('desiredGradeStatus').innerText = ''; // Clear the new status element
+      document.getElementById('desiredGradeStatus').innerText = '';
 
-      // Reset counters
+      // Reset all counters
       categoryCounters = {
-          'homework': 0,
-          'quizzes': 0,
-          'tests': 0,
-          'projects': 0
+          'learnerTasks': 0,
+          'assessments': 0,
+          'custom': 0,
+          'assignments': 0
       };
-      document.getElementById('showAssignmentNamesCheckbox').checked = false; // Reset checkbox
-      toggleAssignmentNamesVisibility(); // Update visibility
+      
+      // Reset checkboxes
+      document.getElementById('showAssignmentNamesCheckbox').checked = false;
+      if (shouldToggleGroupView) { // Only reset group view toggle if not called from toggleGroupView itself
+          document.getElementById('groupViewToggle').checked = true; // Default to group view ON
+      }
+      
+      // Update visibility based on reset checkbox states
+      toggleAssignmentNamesVisibility();
+      if (shouldToggleGroupView) {
+          toggleGroupView(); // Re-apply group view state
+      }
   }
 </script>
 </head>
@@ -586,78 +645,89 @@ gtag('config', 'G-LNMT1VXJW1');
           Calculate your quarter grade by entering grades for different assignment categories and their weights.
       </p>
       
-      <!-- New checkbox for showing assignment names -->
+      <!-- Group View Toggle -->
+      <div class="checkbox-option-container">
+          <input type="checkbox" id="groupViewToggle" checked>
+          <label for="groupViewToggle">Group View</label>
+      </div>
+
+      <!-- Show Assignment Names Toggle -->
       <div class="checkbox-option-container">
           <input type="checkbox" id="showAssignmentNamesCheckbox">
           <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
       </div>
 
-      <!-- Homework Category -->
-      <div class="category-section">
-          <div class="category-header">
-              <h3>Homework</h3>
-              <div class="input-group">
-                  <label for="homeworkWeight">Weight (%)</label>
-                  <input type="number" id="homeworkWeight" min="0" max="100" value="20" placeholder="e.g., 20">
+      <!-- Grouped Categories Section (Default) -->
+      <div id="groupedCategories">
+          <!-- Learner Tasks Category -->
+          <div class="category-section">
+              <div class="category-header">
+                  <h3>Learner Tasks</h3>
+                  <div class="input-group">
+                      <label for="learnerTasksWeight">Weight (%)</label>
+                      <input type="number" id="learnerTasksWeight" min="0" max="100" value="30" placeholder="e.g., 30">
+                  </div>
               </div>
+              <div id="learnerTasksAssignments" class="assignment-inputs">
+                  <!-- Learner Tasks assignment inputs will be added here -->
+              </div>
+              <button id="addLearnerTasksBtn" style="margin-top: 1rem;">
+                  <i class="fas fa-plus-circle"></i> Add Learner Task Grade
+              </button>
           </div>
-          <div id="homeworkAssignments" class="assignment-inputs">
-              <!-- Homework assignment inputs will be added here -->
+
+          <!-- Assessments Category -->
+          <div class="category-section">
+              <div class="category-header">
+                  <h3>Assessments</h3>
+                  <div class="input-group">
+                      <label for="assessmentsWeight">Weight (%)</label>
+                      <input type="number" id="assessmentsWeight" min="0" max="100" value="50" placeholder="e.g., 50">
+                  </div>
+              </div>
+              <div id="assessmentsAssignments" class="assignment-inputs">
+                  <!-- Assessments assignment inputs will be added here -->
+              </div>
+              <button id="addAssessmentsBtn" style="margin-top: 1rem;">
+                  <i class="fas fa-plus-circle"></i> Add Assessment Grade
+              </button>
           </div>
-          <button id="addHomeworkBtn" style="margin-top: 1rem;">
-              <i class="fas fa-plus-circle"></i> Add Homework Grade
-          </button>
+
+          <!-- Custom Category -->
+          <div class="category-section">
+              <div class="category-header">
+                  <h3>Custom</h3>
+                  <div class="input-group">
+                      <label for="customWeight">Weight (%)</label>
+                      <input type="number" id="customWeight" min="0" max="100" value="20" placeholder="e.g., 20">
+                  </div>
+              </div>
+              <div id="customAssignments" class="assignment-inputs">
+                  <!-- Custom assignment inputs will be added here -->
+              </div>
+              <button id="addCustomBtn" style="margin-top: 1rem;">
+                  <i class="fas fa-plus-circle"></i> Add Custom Grade
+              </button>
+          </div>
       </div>
 
-      <!-- Quizzes Category -->
-      <div class="category-section">
-          <div class="category-header">
-              <h3>Quizzes</h3>
-              <div class="input-group">
-                  <label for="quizzesWeight">Weight (%)</label>
-                  <input type="number" id="quizzesWeight" min="0" max="100" value="30" placeholder="e.g., 30">
+      <!-- Single Assignment Category Section (Hidden by Default) -->
+      <div id="singleAssignmentCategory" style="display: none;">
+          <div class="category-section">
+              <div class="category-header">
+                  <h3>Assignments</h3>
+                  <div class="input-group">
+                      <label for="assignmentsWeight">Weight (%)</label>
+                      <input type="number" id="assignmentsWeight" min="0" max="100" value="100" placeholder="e.g., 100">
+                  </div>
               </div>
-          </div>
-          <div id="quizzesAssignments" class="assignment-inputs">
-              <!-- Quizzes assignment inputs will be added here -->
-          </div>
-          <button id="addQuizzesBtn" style="margin-top: 1rem;">
-              <i class="fas fa-plus-circle"></i> Add Quiz Grade
-          </button>
-      </div>
-
-      <!-- Tests Category -->
-      <div class="category-section">
-          <div class="category-header">
-              <h3>Tests</h3>
-              <div class="input-group">
-                  <label for="testsWeight">Weight (%)</label>
-                  <input type="number" id="testsWeight" min="0" max="100" value="40" placeholder="e.g., 40">
+              <div id="assignmentsAssignments" class="assignment-inputs">
+                  <!-- Single assignment inputs will be added here -->
               </div>
+              <button id="addAssignmentBtn" style="margin-top: 1rem;">
+                  <i class="fas fa-plus-circle"></i> Add Assignment Grade
+              </button>
           </div>
-          <div id="testsAssignments" class="assignment-inputs">
-              <!-- Tests assignment inputs will be added here -->
-          </div>
-          <button id="addTestsBtn" style="margin-top: 1rem;">
-              <i class="fas fa-plus-circle"></i> Add Test Grade
-          </button>
-      </div>
-
-      <!-- Projects Category -->
-      <div class="category-section">
-          <div class="category-header">
-              <h3>Projects</h3>
-              <div class="input-group">
-                  <label for="projectsWeight">Weight (%)</label>
-                  <input type="number" id="projectsWeight" min="0" max="100" value="10" placeholder="e.g., 10">
-              </div>
-          </div>
-          <div id="projectsAssignments" class="assignment-inputs">
-              <!-- Projects assignment inputs will be added here -->
-          </div>
-          <button id="addProjectsBtn" style="margin-top: 1rem;">
-              <i class="fas fa-plus-circle"></i> Add Project Grade
-          </button>
       </div>
       
       <div class="btn-group">
