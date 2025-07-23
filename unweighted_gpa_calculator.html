@@ -326,6 +326,34 @@
         .remove-class-btn:hover {
             background-color: #d32f2f;
         }
+
+        /* Styles for the new checkbox container */
+        .checkbox-option-container {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: var(--secondary-bg);
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .checkbox-option-container input[type="checkbox"] {
+            width: auto; /* Override full width */
+            margin-bottom: 0; /* Remove default margin */
+        }
+
+        .checkbox-option-container label {
+            margin-bottom: 0; /* Remove default margin */
+            cursor: pointer;
+        }
+
+        /* Style for hidden class name input group */
+        .class-name-input-group {
+            display: none; /* Hidden by default */
+        }
     </style>
     <script>
         // Base GPA points for each letter grade
@@ -352,9 +380,10 @@
             document.getElementById('addClassBtn').addEventListener('click', addClassInput);
             document.getElementById('calculateGpaBtn').addEventListener('click', calculateAllGPAs);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
+            document.getElementById('showClassNamesCheckbox').addEventListener('change', toggleClassNamesVisibility);
 
-            // Add one class input row on initial load
-            // addClassInput(); // Removed this as per user request to have generateInputsBtn
+            // Initial check for class names visibility
+            toggleClassNamesVisibility();
         });
 
         function toggleMenu() {
@@ -365,10 +394,29 @@
         function addClassInput() {
             classCounter++;
             const gradeInputsContainer = document.getElementById('gradeInputsContainer');
+            const showClassNames = document.getElementById('showClassNamesCheckbox').checked;
 
             const classInputRow = document.createElement('div');
             classInputRow.classList.add('class-input-row');
             classInputRow.setAttribute('data-class-id', classCounter); // Add a data attribute for easy removal
+
+            // Class Name input (new)
+            const nameInputGroup = document.createElement('div');
+            nameInputGroup.classList.add('class-input-group', 'class-name-input-group');
+            if (showClassNames) {
+                nameInputGroup.style.display = 'block'; // Show if checkbox is checked
+            }
+            const nameLabel = document.createElement('label');
+            nameLabel.setAttribute('for', `className${classCounter}`);
+            nameLabel.innerText = `Class ${classCounter} Name`;
+            const nameInput = document.createElement('input');
+            nameInput.setAttribute('type', 'text');
+            nameInput.setAttribute('id', `className${classCounter}`);
+            nameInput.setAttribute('placeholder', `e.g., Algebra II`);
+            nameInput.classList.add('class-name-input');
+            nameInputGroup.appendChild(nameLabel);
+            nameInputGroup.appendChild(nameInput);
+            classInputRow.appendChild(nameInputGroup);
 
             // Class Grade (%) input
             const gradeInputGroup = document.createElement('div');
@@ -458,6 +506,7 @@
             for (let i = 0; i < numClasses; i++) {
                 addClassInput(); // Use the existing addClassInput to generate
             }
+            toggleClassNamesVisibility(); // Ensure visibility is correct after generation
         }
 
         function updateClassNumbers() {
@@ -465,18 +514,31 @@
             classRows.forEach((row, index) => {
                 const classNum = index + 1;
                 // Update labels
+                const nameLabel = row.querySelector(`label[for^="className"]`);
+                if (nameLabel) nameLabel.innerText = `Class ${classNum} Name`;
                 row.querySelector(`label[for^="classGrade"]`).innerText = `Class ${classNum} Grade (%)`;
                 row.querySelector(`label[for^="classLevel"]`).innerText = `Class ${classNum} Level`;
                 row.querySelector(`label[for^="classCredit"]`).innerText = `Class ${classNum} Credit`;
 
                 // Update IDs (important for calculation and future reference)
+                const nameInput = row.querySelector(`input[id^="className"]`);
+                if (nameInput) nameInput.id = `className${classNum}`;
                 row.querySelector(`input[id^="classGrade"]`).id = `classGrade${classNum}`;
                 row.querySelector(`select[id^="classLevel"]`).id = `classLevel${classNum}`;
                 row.querySelector(`input[id^="classCredit"]`).id = `classCredit${classNum}`;
 
                 // Update placeholders (optional, but good for consistency)
+                if (nameInput) nameInput.placeholder = `e.g., Algebra II`;
                 row.querySelector(`input[id^="classGrade"]`).placeholder = `Enter grade`;
                 row.querySelector(`input[id^="classCredit"]`).placeholder = `e.g., 1.0 or 0.5`;
+            });
+        }
+
+        function toggleClassNamesVisibility() {
+            const showClassNames = document.getElementById('showClassNamesCheckbox').checked;
+            const classNameInputGroups = document.querySelectorAll('.class-name-input-group');
+            classNameInputGroups.forEach(group => {
+                group.style.display = showClassNames ? 'block' : 'none';
             });
         }
 
@@ -612,6 +674,8 @@
             document.getElementById('weightedGpa4_67Result').innerText = '';
             document.getElementById('weightedGpa5_0Result').innerText = '';
             classCounter = 0; // Reset class counter
+            document.getElementById('showClassNamesCheckbox').checked = false; // Reset checkbox
+            toggleClassNamesVisibility(); // Update visibility
             // Do not add a default class here, let the user choose to generate or add.
         }
     </script>
@@ -629,7 +693,7 @@
           <ul class="nav-links">
               <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
               <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-              <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
+              <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
           </ul>
       </div>
   </nav>
@@ -650,6 +714,12 @@
               <button id="generateInputsBtn">
                   <i class="fas fa-plus-circle"></i> Generate Class Inputs
               </button>
+          </div>
+
+          <!-- New checkbox for showing class names -->
+          <div class="checkbox-option-container">
+              <input type="checkbox" id="showClassNamesCheckbox">
+              <label for="showClassNamesCheckbox">Show Class Names</label>
           </div>
 
           <div id="gradeInputsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
