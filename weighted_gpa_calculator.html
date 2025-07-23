@@ -10,10 +10,10 @@
 
   gtag('config', 'G-LNMT1VXJW1');
 </script>
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unweighted GPA Calculator</title>
+    <title>Weighted GPA Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -292,7 +292,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for GPA calculator
             document.getElementById('generateInputsBtn').addEventListener('click', generateGradeInputs);
-            document.getElementById('calculateGpaBtn').addEventListener('click', calculateUnweightedGPA);
+            document.getElementById('calculateGpaBtn').addEventListener('click', calculateWeightedGPA);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
         });
 
@@ -313,78 +313,129 @@
             }
 
             for (let i = 1; i <= numClasses; i++) {
-                const inputGroup = document.createElement('div');
-                inputGroup.classList.add('input-group');
+                const row = document.createElement('div');
+                row.classList.add('input-row');
 
-                const label = document.createElement('label');
-                label.setAttribute('for', `classGrade${i}`);
-                label.innerText = `Class ${i} Grade (%)`;
+                const gradeGroup = document.createElement('div');
+                gradeGroup.classList.add('input-group');
 
-                const input = document.createElement('input');
-                input.setAttribute('type', 'number');
-                input.setAttribute('id', `classGrade${i}`);
-                input.setAttribute('min', '0');
-                input.setAttribute('max', '110');
-                input.setAttribute('placeholder', `Enter grade for Class ${i}`);
-                input.classList.add('class-grade-input'); // Add a class for easy selection
+                const gradeLabel = document.createElement('label');
+                gradeLabel.setAttribute('for', `classGrade${i}`);
+                gradeLabel.innerText = `Class ${i} Grade (%)`;
 
-                inputGroup.appendChild(label);
-                inputGroup.appendChild(input);
-                gradeInputsContainer.appendChild(inputGroup);
+                const gradeInput = document.createElement('input');
+                gradeInput.setAttribute('type', 'number');
+                gradeInput.setAttribute('id', `classGrade${i}`);
+                gradeInput.setAttribute('min', '0');
+                gradeInput.setAttribute('max', '110');
+                gradeInput.setAttribute('placeholder', `Enter grade for Class ${i}`);
+                gradeInput.classList.add('class-grade-input');
+
+                gradeGroup.appendChild(gradeLabel);
+                gradeGroup.appendChild(gradeInput);
+
+                const typeGroup = document.createElement('div');
+                typeGroup.classList.add('input-group');
+
+                const typeLabel = document.createElement('label');
+                typeLabel.setAttribute('for', `classType${i}`);
+                typeLabel.innerText = `Class ${i} Type`;
+
+                const typeSelect = document.createElement('select');
+                typeSelect.setAttribute('id', `classType${i}`);
+                typeSelect.classList.add('class-type-select');
+
+                const optionCP = document.createElement('option');
+                optionCP.value = "CP";
+                optionCP.text = "CP";
+                typeSelect.appendChild(optionCP);
+
+                const optionHonors = document.createElement('option');
+                optionHonors.value = "Honors";
+                optionHonors.text = "Honors";
+                typeSelect.appendChild(optionHonors);
+
+                const optionAP = document.createElement('option');
+                optionAP.value = "AP";
+                optionAP.text = "AP";
+                typeSelect.appendChild(optionAP);
+
+                const optionCPHalf = document.createElement('option');
+                optionCPHalf.value = "CP Half Year";
+                optionCPHalf.text = "CP Half Year";
+                typeSelect.appendChild(optionCPHalf);
+
+                const optionHonorsHalf = document.createElement('option');
+                optionHonorsHalf.value = "Honors Half Year";
+                optionHonorsHalf.text = "Honors Half Year";
+                typeSelect.appendChild(optionHonorsHalf);
+
+                typeGroup.appendChild(typeLabel);
+                typeGroup.appendChild(typeSelect);
+
+                row.appendChild(gradeGroup);
+                row.appendChild(typeGroup);
+                gradeInputsContainer.appendChild(row);
             }
         }
 
-        function convertToGpa(percentage) {
-            if (percentage >= 93) {
-                return 4.0;
-            } else if (percentage >= 90) {
-                return 3.7;
-            } else if (percentage >= 87) {
-                return 3.3;
-            } else if (percentage >= 83) {
-                return 3.0;
-            } else if (percentage >= 80) {
-                return 2.7;
-            } else if (percentage >= 77) {
-                return 2.3;
-            } else if (percentage >= 73) {
-                return 2.0;
-            } else if (percentage >= 70) {
-                return 1.7;
-            } else if (percentage >= 67) {
-                return 1.3;
-            } else if (percentage >= 65) {
-                return 1.0;
+        function convertToGpa(percentage, classType) {
+            let gpa = 0;
+            if (percentage >= 93) gpa = 4.0;
+            else if (percentage >= 90) gpa = 3.7;
+            else if (percentage >= 87) gpa = 3.3;
+            else if (percentage >= 83) gpa = 3.0;
+            else if (percentage >= 80) gpa = 2.7;
+            else if (percentage >= 77) gpa = 2.3;
+            else if (percentage >= 73) gpa = 2.0;
+            else if (percentage >= 70) gpa = 1.7;
+            else if (percentage >= 67) gpa = 1.3;
+            else if (percentage >= 65) gpa = 1.0;
+
+            if (classType === "AP") {
+                return 4.67;
+            } else if (classType === "Honors") {
+                return 4.33;
             } else {
-                return 0.0;
-    }
-}
+                return 4.0;
+            }
+        }
 
-
-        function calculateUnweightedGPA() {
+        function calculateWeightedGPA() {
             const gradeInputs = document.querySelectorAll('.class-grade-input');
+            const typeSelects = document.querySelectorAll('.class-type-select');
             let totalGpaPoints = 0;
-            let numValidGrades = 0;
+            let totalCredits = 0;
 
             if (gradeInputs.length === 0) {
                 alert('Please generate class grade inputs first.');
                 return;
             }
 
-            gradeInputs.forEach(input => {
-                const percentage = parseFloat(input.value);
+            for (let i = 0; i < gradeInputs.length; i++) {
+                const percentage = parseFloat(gradeInputs[i].value);
+                const classType = typeSelects[i].value;
                 if (!isNaN(percentage) && percentage >= 0 && percentage <= 110) {
-                    totalGpaPoints += convertToGpa(percentage);
-                    numValidGrades++;
+                    let credits = 1.0;
+                    if (classType === "AP") {
+                        credits = 1.5;
+                    } else if (classType.includes("Half Year")) {
+                        credits = 0.5;
+                    }
+                    totalGpaPoints += convertToGpa(percentage, classType) * credits;
+                    totalCredits += credits;
                 }
-            });
-
-            let unweightedGPA = 0;
-            if (numValidGrades > 0) {
-                unweightedGPA = totalGpaPoints / numValidGrades;
             }
 
-            document.getElementById('gpaResult').innerText = unweightedGPA.toFixed(2);
+            let weightedGPA = 0;
+            if (totalCredits > 0) {
+                weightedGPA = totalGpaPoints / totalCredits;
+            }
+
+            const gpa5Scale = (weightedGPA / 4.67) * 5.0;
+
+            document.getElementById('gpaResult').innerText = weightedGPA.toFixed(2);
+            document.getElementById('gpa5ScaleResult').innerText = gpa5Scale.toFixed(2);
         }
 
         function clearGpaFields() {
@@ -408,25 +459,22 @@
                 <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
                 <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
                 <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> Unweighted GPA</a></li>
-                <li><a href="weighted_gpa_calculator.html"><i class="fas fa-balance-scale"></i> Weighted GPA</a></li>
             </ul>
         </div>
     </nav>
 
     <div class="container">
         <div class="card">
-            <h2>Unweighted GPA Calculator</h2>
+            <h2>Weighted GPA Calculator</h2>
             <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-                Calculate your unweighted GPA based on your percentage grades using a standard 4.0 scale.
-                <br>
-                Looking for a weighted GPA calculator? <a href="weighted_gpa_calculator.html">Click here</a>.
+                Calculate your weighted GPA based on your percentage grades and class type.
             </p>
-            
+
             <div class="form-group">
                 <label for="numClasses">Number of Classes</label>
                 <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
             </div>
-            
+
             <div class="btn-group">
                 <button id="generateInputsBtn">
                     <i class="fas fa-plus-circle"></i> Generate Grade Inputs
@@ -436,18 +484,19 @@
             <div id="gradeInputsContainer" class="input-row" style="flex-direction: column;">
                 <!-- Dynamic grade inputs will be added here -->
             </div>
-            
+
             <div class="btn-group">
                 <button id="calculateGpaBtn">
-                    <i class="fas fa-calculator"></i> Calculate Unweighted GPA
+                    <i class="fas fa-calculator"></i> Calculate Weighted GPA
                 </button>
                 <button class="btn-clear" id="clearGpaFieldsBtn">
                     <i class="fas fa-trash-alt"></i> Clear All Fields
                 </button>
             </div>
-            
+
             <div class="result-section">
-                <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
+                <h3>Your Weighted GPA (4.67 Scale): <span id="gpaResult"></span></h3>
+                <h3>Your Weighted GPA (5.0 Scale): <span id="gpa5ScaleResult"></span></h3>
             </div>
         </div>
     </div>
