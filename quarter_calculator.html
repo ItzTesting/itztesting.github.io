@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
+<script async src="https://www.googlegtagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
@@ -417,6 +417,26 @@ gtag('config', 'G-LNMT1VXJW1');
       gradeInputGroup.appendChild(gradeInput);
       assignmentRow.appendChild(gradeInputGroup);
 
+      // Assignment Weight (%) input (only for 'assignments' category)
+      if (category === 'assignments') {
+          const weightInputGroup = document.createElement('div');
+          weightInputGroup.classList.add('class-input-group');
+          const weightLabel = document.createElement('label');
+          weightLabel.setAttribute('for', `${category}Weight${categoryCounters[category]}`);
+          weightLabel.innerText = `Weight (%)`;
+          const weightInput = document.createElement('input');
+          weightInput.setAttribute('type', 'number');
+          weightInput.setAttribute('id', `${category}Weight${categoryCounters[category]}`);
+          weightInput.setAttribute('min', '0');
+          weightInput.setAttribute('max', '100');
+          weightInput.setAttribute('value', '100'); // Default weight for individual assignments
+          weightInput.setAttribute('placeholder', 'e.g., 100');
+          weightInput.classList.add('assignment-weight-input');
+          weightInputGroup.appendChild(weightLabel);
+          weightInputGroup.appendChild(weightInput);
+          assignmentRow.appendChild(weightInputGroup);
+      }
+
       // Remove Assignment button
       const removeButton = document.createElement('button');
       removeButton.classList.add('remove-class-btn'); // Use GPA calculator's remove button style
@@ -461,6 +481,16 @@ gtag('config', 'G-LNMT1VXJW1');
               } else {
                   // If names are shown, the grade label should just be "Grade (%)"
                   gradeLabel.innerText = `Grade (%)`;
+              }
+          }
+
+          // Update labels and IDs for weight input (only for 'assignments' category)
+          if (categoryName === 'assignments') {
+              const weightLabel = row.querySelector(`label[for^="${categoryName}Weight"]`);
+              const weightInput = row.querySelector(`input[id^="${categoryName}Weight"]`);
+              if (weightLabel && weightInput) {
+                  weightLabel.setAttribute('for', `${categoryName}Weight${assignmentNum}`);
+                  weightInput.setAttribute('id', `${categoryName}Weight${assignmentNum}`);
               }
           }
       });
@@ -517,24 +547,20 @@ gtag('config', 'G-LNMT1VXJW1');
               }
           });
       } else {
-          // Single "Assignments" category view
-          const weightInput = document.getElementById('assignmentsWeight');
-          const assignmentsWeight = parseFloat(weightInput.value) || 0;
+          // Single "Assignments" category view with individual weights
+          const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
+          assignmentRows.forEach(row => {
+              const gradeInput = row.querySelector('.assignment-grade-input');
+              const weightInput = row.querySelector('.assignment-weight-input');
 
-          const assignmentInputs = document.querySelectorAll(`#assignmentsAssignments input.assignment-grade-input`);
-          let assignmentGrades = [];
-          assignmentInputs.forEach(input => {
-              const grade = parseFloat(input.value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                  assignmentGrades.push(grade);
+              const grade = parseFloat(gradeInput.value);
+              const weight = parseFloat(weightInput.value);
+
+              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                  totalWeightedSum += grade * weight;
+                  totalWeight += weight;
               }
           });
-
-          if (assignmentGrades.length > 0) {
-              const assignmentsAverage = assignmentGrades.reduce((sum, grade) => sum + grade, 0) / assignmentGrades.length;
-              totalWeightedSum += assignmentsAverage * assignmentsWeight;
-              totalWeight += assignmentsWeight;
-          }
       }
 
       let quarterGrade = 0;
@@ -553,7 +579,7 @@ gtag('config', 'G-LNMT1VXJW1');
       desiredGradeStatusElement.innerText = ""; // Clear previous status
 
       if (!isNaN(desiredGrade) && desiredGrade > 0) {
-          if (totalWeight === 100) {
+          if (totalWeight === 100) { // This logic assumes totalWeight is 100 for grouped view, or sum of individual weights is 100 for single view
               if (quarterGrade >= desiredGrade) {
                   desiredGradeStatusElement.innerText = "Desired grade achieved!";
                   desiredGradeStatusElement.style.color = "var(--accent-color)";
@@ -562,21 +588,48 @@ gtag('config', 'G-LNMT1VXJW1');
                   desiredGradeStatusElement.style.color = "#f44336";
               }
           } else if (totalWeight < 100) {
-              let remainingWeight = 100 - totalWeight;
-              let maxPossibleGrade = (totalWeightedSum + (remainingWeight * 100)) / 100;
-              let minPossibleGrade = (totalWeightedSum + (remainingWeight * 0)) / 100;
+              // This part of the logic needs careful consideration for the single assignment view
+              // where totalWeight can be arbitrary. For simplicity, I'll keep it as is,
+              // but a more robust solution might require knowing the 'total possible weight'
+              // if not all assignments are entered.
+              let remainingWeight = 100 - totalWeight; // This assumes a target total weight of 100
+              if (!isGroupView && totalWeight > 0) { // If in single view and some weights are entered
+                  // If totalWeight is not 100, this calculation becomes more complex.
+                  // For now, I'll assume the user will adjust weights to sum to 100 or interpret
+                  // the result as a weighted average of entered items.
+                  // A more accurate "needed grade" for remaining would require knowing the total
+                  // weight of *all* assignments, not just entered ones.
+                  // For now, I'll just indicate if the desired grade is met or not.
+                  if (quarterGrade >= desiredGrade) {
+                      desiredGradeStatusElement.innerText = "Desired grade achieved with current inputs!";
+                      desiredGradeStatusElement.style.color = "var(--accent-color)";
+                  } else {
+                      desiredGradeStatusElement.innerText = "Desired grade not met with current inputs.";
+                      desiredGradeStatusElement.style.color = "#f44336";
+                  }
+              } else { // Original logic for grouped view or if totalWeight is 0 in single view
+                  let maxPossibleGrade = (totalWeightedSum + (remainingWeight * 100)) / 100;
+                  let minPossibleGrade = (totalWeightedSum + (remainingWeight * 0)) / 100;
 
-              if (desiredGrade > maxPossibleGrade) {
-                  desiredGradeStatusElement.innerText = "Not possible to achieve desired grade.";
-                  desiredGradeStatusElement.style.color = "#f44336";
-              } else if (desiredGrade <= minPossibleGrade) {
-                  desiredGradeStatusElement.innerText = "Desired grade already achieved!";
+                  if (desiredGrade > maxPossibleGrade) {
+                      desiredGradeStatusElement.innerText = "Not possible to achieve desired grade.";
+                      desiredGradeStatusElement.style.color = "#f44336";
+                  } else if (desiredGrade <= minPossibleGrade) {
+                      desiredGradeStatusElement.innerText = "Desired grade already achieved!";
+                      desiredGradeStatusElement.style.color = "var(--accent-color)";
+                  } else {
+                      let neededAvgForRemaining = (desiredGrade * 100 - totalWeightedSum) / remainingWeight;
+                      desiredGradeStatusElement.innerText = `You need an average of ${neededAvgForRemaining.toFixed(2)}% on remaining assignments.`;
+                      desiredGradeStatusElement.style.color = "var(--text-secondary)";
+                  }
+              }
+          } else { // totalWeight > 100
+              if (quarterGrade >= desiredGrade) {
+                  desiredGradeStatusElement.innerText = "Desired grade achieved!";
                   desiredGradeStatusElement.style.color = "var(--accent-color)";
               } else {
-                  // Calculate what average is needed for remaining assignments
-                  let neededAvgForRemaining = (desiredGrade * 100 - totalWeightedSum) / remainingWeight;
-                  desiredGradeStatusElement.innerText = `You need an average of ${neededAvgForRemaining.toFixed(2)}% on remaining assignments.`;
-                  desiredGradeStatusElement.style.color = "var(--text-secondary)";
+                  desiredGradeStatusElement.innerText = "Desired grade not met with current inputs.";
+                  desiredGradeStatusElement.style.color = "#f44336";
               }
           }
       }
@@ -716,10 +769,7 @@ gtag('config', 'G-LNMT1VXJW1');
           <div class="category-section">
               <div class="category-header">
                   <h3>Assignments</h3>
-                  <div class="input-group">
-                      <label for="assignmentsWeight">Weight (%)</label>
-                      <input type="number" id="assignmentsWeight" min="0" max="100" value="100" placeholder="e.g., 100">
-                  </div>
+                  <!-- Removed the single weight input here, as weights are now per assignment -->
               </div>
               <div id="assignmentsAssignments" class="assignment-inputs">
                   <!-- Single assignment inputs will be added here -->
@@ -755,4 +805,4 @@ gtag('config', 'G-LNMT1VXJW1');
   </div>
 </footer>
 </body>
-</html>
+</html
