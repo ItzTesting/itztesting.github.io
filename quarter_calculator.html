@@ -339,6 +339,27 @@
   .class-name-input-group {
       display: none; /* Hidden by default */
   }
+
+  /* New styles for overall weight inputs */
+  .overall-weights-section {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      background-color: var(--secondary-bg);
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+  }
+  .overall-weights-section .input-group {
+      flex: 1;
+      min-width: 180px;
+  }
+  .overall-weights-section label {
+      margin-bottom: 0.25rem;
+  }
 </style>
 <script>
   let categoryCounters = {
@@ -365,8 +386,9 @@
       document.getElementById('groupViewCheckbox').addEventListener('change', toggleGroupView);
 
       // Initial visibility check for assignment names and group view
-      toggleGroupView(); // Call this first to set initial state
       toggleAssignmentNamesVisibility();
+      toggleGroupView(); // Call this first to set initial state
+      toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
   });
 
   function toggleMenu() {
@@ -378,7 +400,8 @@
       const isGroupView = document.getElementById('groupViewCheckbox').checked;
       document.getElementById('groupedCategories').style.display = isGroupView ? 'block' : 'none';
       document.getElementById('singleAssignmentCategory').style.display = isGroupView ? 'none' : 'block';
-      
+      document.getElementById('overallWeightsSection').style.display = isGroupView ? 'none' : 'flex'; // Show/hide overall weights
+
       clearQuarterFields(false); // Pass false to prevent re-toggling group view
       calculateQuarterGrade(); // Recalculate based on new view
   }
@@ -386,7 +409,6 @@
   function addAssignmentInput(category) {
       categoryCounters[category]++;
       const container = document.getElementById(`${category}Assignments`);
-      // Read the state directly from the checkbox's checked attribute
       const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       const assignmentRow = document.createElement('div');
@@ -394,11 +416,11 @@
       assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
       assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
 
-      // Assignment Name input (new)
+      // Assignment Name input
       const nameInputGroup = document.createElement('div');
-      nameInputGroup.classList.add('class-input-group', 'class-name-input-group'); // Use GPA calculator's input group style
+      nameInputGroup.classList.add('class-input-group', 'class-name-input-group');
       if (showAssignmentNames) {
-          nameInputGroup.style.display = 'block'; // Show if checkbox is checked
+          nameInputGroup.style.display = 'block';
       }
       const nameLabel = document.createElement('label');
       nameLabel.setAttribute('for', `${category}Name${categoryCounters[category]}`);
@@ -407,14 +429,14 @@
       nameInput.setAttribute('type', 'text');
       nameInput.setAttribute('id', `${category}Name${categoryCounters[category]}`);
       nameInput.setAttribute('placeholder', `e.g., Chapter 1 Quiz`);
-      nameInput.classList.add('assignment-name-input'); // Keep this class for specific targeting if needed
+      nameInput.classList.add('assignment-name-input');
       nameInputGroup.appendChild(nameLabel);
       nameInputGroup.appendChild(nameInput);
       assignmentRow.appendChild(nameInputGroup);
 
       // Assignment Grade (%) input
       const gradeInputGroup = document.createElement('div');
-      gradeInputGroup.classList.add('class-input-group'); // Use GPA calculator's input group style
+      gradeInputGroup.classList.add('class-input-group');
       const gradeLabel = document.createElement('label');
       gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
       gradeLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Grade (%)`;
@@ -424,13 +446,57 @@
       gradeInput.setAttribute('min', '0');
       gradeInput.setAttribute('max', '100');
       gradeInput.setAttribute('placeholder', 'Enter grade');
-      gradeInput.classList.add('assignment-grade-input'); // Add a specific class for this calculator
+      gradeInput.classList.add('assignment-grade-input');
       gradeInputGroup.appendChild(gradeLabel);
       gradeInputGroup.appendChild(gradeInput);
       assignmentRow.appendChild(gradeInputGroup);
 
-      // Assignment Weight (%) input (only for 'assignments' and 'custom' categories)
-      if (category === 'assignments' || category === 'custom') {
+      // Assignment Type/Weight input (dynamic for 'assignments' category)
+      if (category === 'assignments') {
+          const typeInputGroup = document.createElement('div');
+          typeInputGroup.classList.add('class-input-group');
+          const typeLabel = document.createElement('label');
+          typeLabel.setAttribute('for', `${category}Type${categoryCounters[category]}`);
+          typeLabel.innerText = `Assignment Type`;
+          const typeSelect = document.createElement('select');
+          typeSelect.setAttribute('id', `${category}Type${categoryCounters[category]}`);
+          typeSelect.classList.add('assignment-type-select');
+          const types = ["Learner Tasks", "Assessments", "Custom"];
+          types.forEach(type => {
+              const option = document.createElement('option');
+              option.value = type;
+              option.innerText = type;
+              typeSelect.appendChild(option);
+          });
+          typeSelect.value = "Learner Tasks"; // Default type
+          typeSelect.onchange = function() {
+              toggleCustomWeightInput(assignmentRow, typeSelect.value);
+              calculateQuarterGrade(); // Recalculate when type changes
+          };
+          typeInputGroup.appendChild(typeLabel);
+          typeInputGroup.appendChild(typeSelect);
+          assignmentRow.appendChild(typeInputGroup);
+
+          // Custom Weight input (initially hidden)
+          const customWeightInputGroup = document.createElement('div');
+          customWeightInputGroup.classList.add('class-input-group', 'custom-weight-input-group');
+          customWeightInputGroup.style.display = 'none'; // Hidden by default
+          const customWeightLabel = document.createElement('label');
+          customWeightLabel.setAttribute('for', `${category}CustomWeight${categoryCounters[category]}`);
+          customWeightLabel.innerText = `Custom Weight (%)`;
+          const customWeightInput = document.createElement('input');
+          customWeightInput.setAttribute('type', 'number');
+          customWeightInput.setAttribute('id', `${category}CustomWeight${categoryCounters[category]}`);
+          customWeightInput.setAttribute('min', '0');
+          customWeightInput.setAttribute('max', '100');
+          customWeightInput.setAttribute('value', '100'); // Default custom weight
+          customWeightInput.setAttribute('placeholder', 'e.g., 100');
+          customWeightInput.classList.add('assignment-custom-weight-input');
+          customWeightInputGroup.appendChild(customWeightLabel);
+          customWeightInputGroup.appendChild(customWeightInput);
+          assignmentRow.appendChild(customWeightInputGroup);
+
+      } else if (category === 'custom') { // Only for 'custom' category in group view
           const weightInputGroup = document.createElement('div');
           weightInputGroup.classList.add('class-input-group');
           const weightLabel = document.createElement('label');
@@ -451,17 +517,24 @@
 
       // Remove Assignment button
       const removeButton = document.createElement('button');
-      removeButton.classList.add('remove-class-btn'); // Use GPA calculator's remove button style
+      removeButton.classList.add('remove-class-btn');
       removeButton.innerText = 'Remove';
       removeButton.onclick = function() {
           assignmentRow.remove();
-          updateAssignmentNumbers(category); // Re-number assignments within this category
-          calculateQuarterGrade(); // Recalculate after removal
+          updateAssignmentNumbers(category);
+          calculateQuarterGrade();
       };
       assignmentRow.appendChild(removeButton);
 
       container.appendChild(assignmentRow);
-      updateAssignmentNumbers(category); // Re-number assignments after adding
+      updateAssignmentNumbers(category);
+  }
+
+  function toggleCustomWeightInput(assignmentRow, selectedType) {
+      const customWeightGroup = assignmentRow.querySelector('.custom-weight-input-group');
+      if (customWeightGroup) {
+          customWeightGroup.style.display = selectedType === 'Custom' ? 'block' : 'none';
+      }
   }
 
   function updateAssignmentNumbers(category) {
@@ -474,7 +547,7 @@
 
           // Update labels and IDs for name input
           const nameInputGroup = row.querySelector('.class-name-input-group');
-          if (nameInputGroup) { // Ensure the group exists before trying to set display
+          if (nameInputGroup) {
               nameInputGroup.style.display = showAssignmentNames ? 'block' : 'none';
           }
           const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
@@ -498,8 +571,25 @@
               }
           }
 
-          // Update labels and IDs for weight input (only for 'assignments' and 'custom' categories)
-          if (categoryName === 'assignments' || categoryName === 'custom') {
+          // Update labels and IDs for weight/type input
+          if (categoryName === 'assignments') {
+              const typeLabel = row.querySelector(`label[for^="${categoryName}Type"]`);
+              const typeSelect = row.querySelector(`select[id^="${categoryName}Type"]`);
+              if (typeLabel && typeSelect) {
+                  typeLabel.setAttribute('for', `${categoryName}Type${assignmentNum}`);
+                  typeSelect.setAttribute('id', `${categoryName}Type${assignmentNum}`);
+              }
+              const customWeightLabel = row.querySelector(`label[for^="${categoryName}CustomWeight"]`);
+              const customWeightInput = row.querySelector(`input[id^="${categoryName}CustomWeight"]`);
+              if (customWeightLabel && customWeightInput) {
+                  customWeightLabel.setAttribute('for', `${categoryName}CustomWeight${assignmentNum}`);
+                  customWeightInput.setAttribute('id', `${categoryName}CustomWeight${assignmentNum}`);
+              }
+              // Ensure custom weight input visibility is correct on re-numbering
+              const selectedType = typeSelect ? typeSelect.value : '';
+              toggleCustomWeightInput(row, selectedType);
+
+          } else if (categoryName === 'custom') {
               const weightLabel = row.querySelector(`label[for^="${categoryName}Weight"]`);
               const weightInput = row.querySelector(`input[id^="${categoryName}Weight"]`);
               if (weightLabel && weightInput) {
@@ -524,9 +614,8 @@
   }
 
   function formatCategoryName(category) {
-      // Convert camelCase to Title Case with spaces
       if (category === 'assignments') {
-          return 'Assignment'; // Special case for the single category
+          return 'Assignment';
       }
       return category.replace(/([A-Z])/g, ' $1')
                      .replace(/^./, function(str){ return str.toUpperCase(); });
@@ -539,7 +628,7 @@
       let resultText = "";
 
       if (isGroupView) {
-          const categories = ['learnerTasks', 'assessments']; // Only these two have overall weights now
+          const categories = ['learnerTasks', 'assessments'];
           categories.forEach(category => {
               const weightInput = document.getElementById(`${category}Weight`);
               const categoryWeight = parseFloat(weightInput.value) || 0;
@@ -560,7 +649,6 @@
               }
           });
 
-          // Handle 'custom' category separately for individual weights
           const customAssignmentRows = document.querySelectorAll(`#customAssignments .class-input-row`);
           customAssignmentRows.forEach(row => {
               const gradeInput = row.querySelector('.assignment-grade-input');
@@ -575,21 +663,44 @@
               }
           });
 
-      } else {
-          // Single "Assignments" category view with individual weights
+      } else { // Single Assignment Category View
+          const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+          const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+          let learnerTaskGrades = [];
+          let assessmentGrades = [];
+          let customWeightedSum = 0;
+          let customTotalWeight = 0;
+
           const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
           assignmentRows.forEach(row => {
               const gradeInput = row.querySelector('.assignment-grade-input');
-              const weightInput = row.querySelector('.assignment-weight-input');
+              const typeSelect = row.querySelector('.assignment-type-select');
+              const customWeightInput = row.querySelector('.assignment-custom-weight-input');
 
               const grade = parseFloat(gradeInput.value);
-              const weight = parseFloat(weightInput.value);
+              const assignmentType = typeSelect ? typeSelect.value : '';
 
-              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
-                  totalWeightedSum += grade * weight;
-                  totalWeight += weight;
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                  if (assignmentType === 'Learner Tasks') {
+                      learnerTaskGrades.push(grade);
+                  } else if (assignmentType === 'Assessments') {
+                      assessmentGrades.push(grade);
+                  } else if (assignmentType === 'Custom') {
+                      const customWeight = parseFloat(customWeightInput.value);
+                      if (!isNaN(customWeight) && customWeight >= 0) {
+                          customWeightedSum += grade * customWeight;
+                          customTotalWeight += customWeight;
+                      }
+                  }
               }
           });
+
+          let avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+          let avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+
+          totalWeightedSum = (avgLearnerTasks * learnerTaskOverallWeight) + (avgAssessments * assessmentOverallWeight) + customWeightedSum;
+          totalWeight = learnerTaskOverallWeight + assessmentOverallWeight + customTotalWeight;
       }
 
       let quarterGrade = 0;
@@ -602,15 +713,11 @@
 
       document.getElementById('quarterResult').innerText = resultText;
 
-      // Optional: Calculate needed grade if desired grade is provided
       const desiredGrade = parseFloat(document.getElementById('desiredQuarterGrade').value);
       const desiredGradeStatusElement = document.getElementById('desiredGradeStatus');
-      desiredGradeStatusElement.innerText = ""; // Clear previous status
+      desiredGradeStatusElement.innerText = "";
 
       if (!isNaN(desiredGrade) && desiredGrade > 0) {
-          // This logic for desired grade calculation needs to be more robust
-          // given the mixed weight calculation. For now, I'll simplify it
-          // to just check if the desired grade is met or not with current inputs.
           if (totalWeight > 0) {
               if (quarterGrade >= desiredGrade) {
                   desiredGradeStatusElement.innerText = "Desired grade achieved!";
@@ -627,21 +734,21 @@
   }
 
   function clearQuarterFields(shouldToggleGroupView = true) {
-      // Clear all number and text inputs in all category sections
       document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
       document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = '');
       
-      // Clear all dynamic assignment inputs
       document.querySelectorAll('.assignment-inputs').forEach(container => {
           container.innerHTML = '';
       });
 
-      // Clear desired grade and results
       document.getElementById('desiredQuarterGrade').value = '';
       document.getElementById('quarterResult').innerText = '';
       document.getElementById('desiredGradeStatus').innerText = '';
 
-      // Reset all counters
+      // Clear overall weight inputs
+      document.getElementById('overallLearnerTaskWeight').value = '';
+      document.getElementById('overallAssessmentWeight').value = '';
+
       categoryCounters = {
           'learnerTasks': 0,
           'assessments': 0,
@@ -649,13 +756,9 @@
           'assignments': 0
       };
       
-      // Reset checkboxes to their default states
-      document.getElementById('showAssignmentNamesCheckbox').checked = false;
-      if (shouldToggleGroupView) {
-          document.getElementById('groupViewCheckbox').checked = true; // Default to group view ON
-      }
+      document.getElementById('groupViewCheckbox').checked = false; // Default to group view OFF
+      document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to assignment names ON
       
-      // Re-apply visibility based on reset checkbox states
       toggleAssignmentNamesVisibility();
       if (shouldToggleGroupView) {
           toggleGroupView();
@@ -691,14 +794,26 @@
       
       <!-- Group View Checkbox -->
       <div class="checkbox-option-container">
-          <input type="checkbox" id="groupViewCheckbox" checked>
+          <input type="checkbox" id="groupViewCheckbox">
           <label for="groupViewCheckbox">Group View</label>
       </div>
 
       <!-- Show Assignment Names Checkbox -->
       <div class="checkbox-option-container">
-          <input type="checkbox" id="showAssignmentNamesCheckbox">
+          <input type="checkbox" id="showAssignmentNamesCheckbox" checked>
           <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
+      </div>
+
+      <!-- Overall Weights Section (visible when Group View is OFF) -->
+      <div id="overallWeightsSection" class="overall-weights-section" style="display: none;">
+          <div class="input-group">
+              <label for="overallLearnerTaskWeight">Learner Task Weight (%)</label>
+              <input type="number" id="overallLearnerTaskWeight" min="0" max="100" placeholder="e.g., 20">
+          </div>
+          <div class="input-group">
+              <label for="overallAssessmentWeight">Assessment Weight (%)</label>
+              <input type="number" id="overallAssessmentWeight" min="0" max="100" placeholder="e.g., 80">
+          </div>
       </div>
 
       <!-- Grouped Categories Section (Default) -->
