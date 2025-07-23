@@ -291,7 +291,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for GPA calculator
-            document.getElementById('addClassBtn').addEventListener('click', addClassInput);
+            document.getElementById('generateInputsBtn').addEventListener('click', generateGradeInputs);
             document.getElementById('calculateGpaBtn').addEventListener('click', calculateWeightedGPA);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
         });
@@ -301,6 +301,27 @@
         function toggleMenu() {
             const navLinks = document.querySelector('.nav-links');
             navLinks.classList.toggle('active');
+        }
+
+        function generateGradeInputs() {
+            const numClasses = parseInt(document.getElementById('numClasses').value);
+            const gradeInputsContainer = document.getElementById('gradeInputsContainer');
+            gradeInputsContainer.innerHTML = ''; // Clear previous inputs
+            classCounter = 0;
+
+            if (isNaN(numClasses) || numClasses <= 0) {
+                alert('Please enter a valid number of classes.');
+                return;
+            }
+
+            for (let i = 0; i < numClasses; i++) {
+                addClassInput();
+            }
+
+            const addClassBtn = document.createElement('button');
+            addClassBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Class';
+            addClassBtn.addEventListener('click', addClassInput);
+            gradeInputsContainer.appendChild(addClassBtn);
         }
 
         function addClassInput() {
@@ -375,7 +396,13 @@
 
             row.appendChild(gradeGroup);
             row.appendChild(typeGroup);
-            gradeInputsContainer.appendChild(row);
+
+            const existingAddButton = gradeInputsContainer.querySelector('button');
+            if (existingAddButton) {
+                gradeInputsContainer.insertBefore(row, existingAddButton);
+            } else {
+                gradeInputsContainer.appendChild(row);
+            }
         }
 
         function convertToGpa(percentage, classType) {
@@ -474,9 +501,14 @@
                 Calculate your weighted GPA based on your percentage grades and class type.
             </p>
 
+            <div class="form-group">
+                <label for="numClasses">Number of Classes</label>
+                <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
+            </div>
+
             <div class="btn-group">
-                <button id="addClassBtn">
-                    <i class="fas fa-plus-circle"></i> Add Class
+                <button id="generateInputsBtn">
+                    <i class="fas fa-plus-circle"></i> Generate Grade Inputs
                 </button>
             </div>
 
