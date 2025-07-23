@@ -655,14 +655,14 @@
       
       // Reset checkboxes
       document.getElementById('showAssignmentNamesCheckbox').checked = false;
-      if (shouldToggleGroupView) { // Only reset group view toggle if not called from toggleGroupView itself
+      if (shouldToggleGroupView) {
           document.getElementById('groupViewToggle').checked = true; // Default to group view ON
       }
       
       // Update visibility based on reset checkbox states
       toggleAssignmentNamesVisibility();
       if (shouldToggleGroupView) {
-          toggleGroupView(); // Re-apply group view state
+          toggleGroupView();
       }
   }
 </script>
