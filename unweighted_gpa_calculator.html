@@ -348,12 +348,13 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for GPA calculator
+            document.getElementById('generateInputsBtn').addEventListener('click', generateGradeInputs);
             document.getElementById('addClassBtn').addEventListener('click', addClassInput);
             document.getElementById('calculateGpaBtn').addEventListener('click', calculateAllGPAs);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
 
             // Add one class input row on initial load
-            addClassInput();
+            // addClassInput(); // Removed this as per user request to have generateInputsBtn
         });
 
         function toggleMenu() {
@@ -440,19 +441,41 @@
             updateClassNumbers(); // Re-number classes after adding
         }
 
+        function generateGradeInputs() {
+            const numClasses = parseInt(document.getElementById('numClasses').value);
+            const gradeInputsContainer = document.getElementById('gradeInputsContainer');
+            gradeInputsContainer.innerHTML = ''; // Clear previous inputs
+            document.getElementById('gpaResult').innerText = ''; // Clear previous unweighted result
+            document.getElementById('weightedGpa4_67Result').innerText = ''; // Clear previous weighted result
+            document.getElementById('weightedGpa5_0Result').innerText = ''; // Clear previous weighted result
+            classCounter = 0; // Reset class counter before generating new ones
+
+            if (isNaN(numClasses) || numClasses <= 0) {
+                alert('Please enter a valid number of classes (1 or more).');
+                return;
+            }
+
+            for (let i = 0; i < numClasses; i++) {
+                addClassInput(); // Use the existing addClassInput to generate
+            }
+        }
+
         function updateClassNumbers() {
             const classRows = document.querySelectorAll('.class-input-row');
             classRows.forEach((row, index) => {
                 const classNum = index + 1;
+                // Update labels
                 row.querySelector(`label[for^="classGrade"]`).innerText = `Class ${classNum} Grade (%)`;
-                row.querySelector(`input[id^="classGrade"]`).id = `classGrade${classNum}`;
-                row.querySelector(`input[id^="classGrade"]`).placeholder = `Enter grade`;
-
                 row.querySelector(`label[for^="classLevel"]`).innerText = `Class ${classNum} Level`;
-                row.querySelector(`select[id^="classLevel"]`).id = `classLevel${classNum}`;
-
                 row.querySelector(`label[for^="classCredit"]`).innerText = `Class ${classNum} Credit`;
+
+                // Update IDs (important for calculation and future reference)
+                row.querySelector(`input[id^="classGrade"]`).id = `classGrade${classNum}`;
+                row.querySelector(`select[id^="classLevel"]`).id = `classLevel${classNum}`;
                 row.querySelector(`input[id^="classCredit"]`).id = `classCredit${classNum}`;
+
+                // Update placeholders (optional, but good for consistency)
+                row.querySelector(`input[id^="classGrade"]`).placeholder = `Enter grade`;
                 row.querySelector(`input[id^="classCredit"]`).placeholder = `e.g., 1.0 or 0.5`;
             });
         }
@@ -532,25 +555,23 @@
         }
 
         function calculateAllGPAs() {
-            const gradeInputs = document.querySelectorAll('.class-grade-input');
-            const levelSelects = document.querySelectorAll('.class-level-select');
-            const creditInputs = document.querySelectorAll('.class-credit-input');
-
+            const classRows = document.querySelectorAll('.class-input-row');
+            
             let unweightedTotalGpaPoints = 0;
             let unweightedNumValidGrades = 0;
             let weightedClasses = [];
 
-            if (gradeInputs.length === 0) {
+            if (classRows.length === 0) {
                 document.getElementById('gpaResult').innerText = '0.00';
                 document.getElementById('weightedGpa4_67Result').innerText = '0.00';
                 document.getElementById('weightedGpa5_0Result').innerText = '0.00';
                 return;
             }
 
-            gradeInputs.forEach((input, index) => {
-                const percentage = parseFloat(input.value);
-                const level = levelSelects[index].value;
-                const credit = parseFloat(creditInputs[index].value);
+            classRows.forEach((row) => {
+                const percentage = parseFloat(row.querySelector('.class-grade-input').value);
+                const level = row.querySelector('.class-level-select').value;
+                const credit = parseFloat(row.querySelector('.class-credit-input').value);
 
                 // Validate inputs
                 if (isNaN(percentage) || percentage < 0 || percentage > 110) {
@@ -585,12 +606,13 @@
         }
 
         function clearGpaFields() {
+            document.getElementById('numClasses').value = ''; // Clear the number of classes input
             document.getElementById('gradeInputsContainer').innerHTML = '';
             document.getElementById('gpaResult').innerText = '';
             document.getElementById('weightedGpa4_67Result').innerText = '';
             document.getElementById('weightedGpa5_0Result').innerText = '';
             classCounter = 0; // Reset class counter
-            addClassInput(); // Add one blank class input after clearing
+            // Do not add a default class here, let the user choose to generate or add.
         }
     </script>
 </head>
@@ -619,6 +641,17 @@
               Calculate your unweighted and weighted GPA based on your percentage grades, class level, and credits.
           </p>
           
+          <div class="form-group">
+              <label for="numClasses">Number of Classes to Generate</label>
+              <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
+          </div>
+          
+          <div class="btn-group">
+              <button id="generateInputsBtn">
+                  <i class="fas fa-plus-circle"></i> Generate Class Inputs
+              </button>
+          </div>
+
           <div id="gradeInputsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
               <!-- Dynamic grade, level, and credit inputs will be added here -->
           </div>
@@ -649,3 +682,4 @@
   </footer>
 </body>
 </html>
+</merged_code>
