@@ -275,8 +275,8 @@ gtag('config', 'G-LNMT1VXJW1');
       gap: 1rem;
   }
 
-  /* New styles for assignment inputs (adapted from GPA calculator) */
-  .assignment-input-row {
+  /* Styles for assignment inputs (matching GPA calculator's class inputs) */
+  .class-input-row { /* Renamed from .assignment-input-row */
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
@@ -285,19 +285,19 @@ gtag('config', 'G-LNMT1VXJW1');
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 1rem;
-      background-color: var(--primary-bg); /* Slightly different background for nested cards */
+      background-color: var(--secondary-bg); /* Changed to match GPA calculator */
   }
 
-  .assignment-input-group {
+  .class-input-group { /* Renamed from .assignment-input-group */
       flex: 1;
       min-width: 150px; /* Adjust as needed */
   }
 
-  .assignment-input-group label {
+  .class-input-group label { /* Renamed from .assignment-input-group label */
       white-space: nowrap; /* Prevent label from wrapping */
   }
 
-  .remove-assignment-btn {
+  .remove-class-btn { /* Renamed from .remove-assignment-btn */
       background-color: #f44336;
       color: white;
       border: none;
@@ -310,11 +310,7 @@ gtag('config', 'G-LNMT1VXJW1');
       min-width: auto;
   }
 
-  .remove-assignment-btn:hover {
-      background-color: #d32f2f;
-  }
-
-  /* Styles for the new checkbox container */
+  /* Styles for the new checkbox container (already consistent) */
   .checkbox-option-container {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -327,18 +323,8 @@ gtag('config', 'G-LNMT1VXJW1');
       gap: 0.5rem;
   }
 
-  .checkbox-option-container input[type="checkbox"] {
-      width: auto; /* Override full width */
-      margin-bottom: 0; /* Remove default margin */
-  }
-
-  .checkbox-option-container label {
-      margin-bottom: 0; /* Remove default margin */
-      cursor: pointer;
-  }
-
-  /* Style for hidden assignment name input group */
-  .assignment-name-input-group {
+  /* Style for hidden assignment name input group (matching GPA calculator's class name input group) */
+  .class-name-input-group { /* Renamed from .assignment-name-input-group */
       display: none; /* Hidden by default */
   }
 </style>
@@ -379,13 +365,13 @@ gtag('config', 'G-LNMT1VXJW1');
       const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       const assignmentRow = document.createElement('div');
-      assignmentRow.classList.add('assignment-input-row');
+      assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
       assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
       assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
 
       // Assignment Name input (new)
       const nameInputGroup = document.createElement('div');
-      nameInputGroup.classList.add('assignment-input-group', 'assignment-name-input-group');
+      nameInputGroup.classList.add('class-input-group', 'class-name-input-group'); // Use GPA calculator's input group style
       if (showAssignmentNames) {
           nameInputGroup.style.display = 'block'; // Show if checkbox is checked
       }
@@ -396,14 +382,14 @@ gtag('config', 'G-LNMT1VXJW1');
       nameInput.setAttribute('type', 'text');
       nameInput.setAttribute('id', `${category}Name${categoryCounters[category]}`);
       nameInput.setAttribute('placeholder', `e.g., Chapter 1 Quiz`);
-      nameInput.classList.add('assignment-name-input');
+      nameInput.classList.add('assignment-name-input'); // Keep this class for specific targeting if needed
       nameInputGroup.appendChild(nameLabel);
       nameInputGroup.appendChild(nameInput);
       assignmentRow.appendChild(nameInputGroup);
 
       // Assignment Grade (%) input
       const gradeInputGroup = document.createElement('div');
-      gradeInputGroup.classList.add('assignment-input-group');
+      gradeInputGroup.classList.add('class-input-group'); // Use GPA calculator's input group style
       const gradeLabel = document.createElement('label');
       gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
       gradeLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} ${categoryCounters[category]} Grade (%)`;
@@ -413,14 +399,14 @@ gtag('config', 'G-LNMT1VXJW1');
       gradeInput.setAttribute('min', '0');
       gradeInput.setAttribute('max', '100');
       gradeInput.setAttribute('placeholder', 'Enter grade');
-      gradeInput.classList.add('assignment-grade-input');
+      gradeInput.classList.add('assignment-grade-input'); // Add a specific class for this calculator
       gradeInputGroup.appendChild(gradeLabel);
       gradeInputGroup.appendChild(gradeInput);
       assignmentRow.appendChild(gradeInputGroup);
 
       // Remove Assignment button
       const removeButton = document.createElement('button');
-      removeButton.classList.add('remove-assignment-btn');
+      removeButton.classList.add('remove-class-btn'); // Use GPA calculator's remove button style
       removeButton.innerText = 'Remove';
       removeButton.onclick = function() {
           assignmentRow.remove();
@@ -434,7 +420,7 @@ gtag('config', 'G-LNMT1VXJW1');
   }
 
   function updateAssignmentNumbers(category) {
-      const assignmentRows = document.querySelectorAll(`#${category}Assignments .assignment-input-row`);
+      const assignmentRows = document.querySelectorAll(`#${category}Assignments .class-input-row`); // Updated selector
       const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       assignmentRows.forEach((row, index) => {
@@ -442,7 +428,7 @@ gtag('config', 'G-LNMT1VXJW1');
           const categoryName = row.getAttribute('data-category');
 
           // Update labels and IDs for name input
-          const nameInputGroup = row.querySelector('.assignment-name-input-group');
+          const nameInputGroup = row.querySelector('.class-name-input-group'); // Updated selector
           const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
           const nameInput = row.querySelector(`input[id^="${categoryName}Name"]`);
           if (nameLabel && nameInput) {
@@ -469,7 +455,7 @@ gtag('config', 'G-LNMT1VXJW1');
 
   function toggleAssignmentNamesVisibility() {
       const showNames = document.getElementById('showAssignmentNamesCheckbox').checked;
-      const nameInputGroups = document.querySelectorAll('.assignment-name-input-group');
+      const nameInputGroups = document.querySelectorAll('.class-name-input-group'); // Updated selector
       nameInputGroups.forEach(group => {
           group.style.display = showNames ? 'block' : 'none';
       });
