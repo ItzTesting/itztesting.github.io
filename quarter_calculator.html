@@ -365,7 +365,6 @@
       document.getElementById('groupViewCheckbox').addEventListener('change', toggleGroupView);
 
       // Initial visibility check for assignment names and group view
-      // Set initial states based on checked attributes
       toggleGroupView(); // Call this first to set initial state
       toggleAssignmentNamesVisibility();
   });
@@ -430,8 +429,8 @@
       gradeInputGroup.appendChild(gradeInput);
       assignmentRow.appendChild(gradeInputGroup);
 
-      // Assignment Weight (%) input (only for 'assignments' category)
-      if (category === 'assignments') {
+      // Assignment Weight (%) input (only for 'assignments' and 'custom' categories)
+      if (category === 'assignments' || category === 'custom') {
           const weightInputGroup = document.createElement('div');
           weightInputGroup.classList.add('class-input-group');
           const weightLabel = document.createElement('label');
@@ -499,8 +498,8 @@
               }
           }
 
-          // Update labels and IDs for weight input (only for 'assignments' category)
-          if (categoryName === 'assignments') {
+          // Update labels and IDs for weight input (only for 'assignments' and 'custom' categories)
+          if (categoryName === 'assignments' || categoryName === 'custom') {
               const weightLabel = row.querySelector(`label[for^="${categoryName}Weight"]`);
               const weightInput = row.querySelector(`input[id^="${categoryName}Weight"]`);
               if (weightLabel && weightInput) {
@@ -540,7 +539,7 @@
       let resultText = "";
 
       if (isGroupView) {
-          const categories = ['learnerTasks', 'assessments', 'custom'];
+          const categories = ['learnerTasks', 'assessments']; // Only these two have overall weights now
           categories.forEach(category => {
               const weightInput = document.getElementById(`${category}Weight`);
               const categoryWeight = parseFloat(weightInput.value) || 0;
@@ -560,6 +559,22 @@
                   totalWeight += categoryWeight;
               }
           });
+
+          // Handle 'custom' category separately for individual weights
+          const customAssignmentRows = document.querySelectorAll(`#customAssignments .class-input-row`);
+          customAssignmentRows.forEach(row => {
+              const gradeInput = row.querySelector('.assignment-grade-input');
+              const weightInput = row.querySelector('.assignment-weight-input');
+
+              const grade = parseFloat(gradeInput.value);
+              const weight = parseFloat(weightInput.value);
+
+              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                  totalWeightedSum += grade * weight;
+                  totalWeight += weight;
+              }
+          });
+
       } else {
           // Single "Assignments" category view with individual weights
           const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
@@ -593,7 +608,10 @@
       desiredGradeStatusElement.innerText = ""; // Clear previous status
 
       if (!isNaN(desiredGrade) && desiredGrade > 0) {
-          if (totalWeight === 100) { // This logic assumes totalWeight is 100 for grouped view, or sum of individual weights is 100 for single view
+          // This logic for desired grade calculation needs to be more robust
+          // given the mixed weight calculation. For now, I'll simplify it
+          // to just check if the desired grade is met or not with current inputs.
+          if (totalWeight > 0) {
               if (quarterGrade >= desiredGrade) {
                   desiredGradeStatusElement.innerText = "Desired grade achieved!";
                   desiredGradeStatusElement.style.color = "var(--accent-color)";
@@ -601,45 +619,9 @@
                   desiredGradeStatusElement.innerText = "Desired grade not met with current inputs.";
                   desiredGradeStatusElement.style.color = "#f44336";
               }
-          } else if (totalWeight < 100) {
-              // This part of the logic needs careful consideration for the single assignment view
-              // where totalWeight can be arbitrary. For simplicity, I'll keep it as is,
-              // but a more robust solution might require knowing the 'total possible weight'
-              // if not all assignments are entered.
-              // For now, I'll just indicate if the desired grade is met or not.
-              if (!isGroupView && totalWeight > 0) { // If in single view and some weights are entered
-                  if (quarterGrade >= desiredGrade) {
-                      desiredGradeStatusElement.innerText = "Desired grade achieved with current inputs!";
-                      desiredGradeStatusElement.style.color = "var(--accent-color)";
-                  } else {
-                      desiredGradeStatusElement.innerText = "Desired grade not met with current inputs.";
-                      desiredGradeStatusElement.style.color = "#f44336";
-                  }
-              } else { // Original logic for grouped view or if totalWeight is 0 in single view
-                  let remainingWeight = 100 - totalWeight;
-                  let maxPossibleGrade = (totalWeightedSum + (remainingWeight * 100)) / 100;
-                  let minPossibleGrade = (totalWeightedSum + (remainingWeight * 0)) / 100;
-
-                  if (desiredGrade > maxPossibleGrade) {
-                      desiredGradeStatusElement.innerText = "Not possible to achieve desired grade.";
-                      desiredGradeStatusElement.style.color = "#f44336";
-                  } else if (desiredGrade <= minPossibleGrade) {
-                      desiredGradeStatusElement.innerText = "Desired grade already achieved!";
-                      desiredGradeStatusElement.style.color = "var(--accent-color)";
-                  } else {
-                      let neededAvgForRemaining = (desiredGrade * 100 - totalWeightedSum) / remainingWeight;
-                      desiredGradeStatusElement.innerText = `You need an average of ${neededAvgForRemaining.toFixed(2)}% on remaining assignments.`;
-                      desiredGradeStatusElement.style.color = "var(--text-secondary)";
-                  }
-              }
-          } else { // totalWeight > 100
-              if (quarterGrade >= desiredGrade) {
-                  desiredGradeStatusElement.innerText = "Desired grade achieved!";
-                  desiredGradeStatusElement.style.color = "var(--accent-color)";
-              } else {
-                  desiredGradeStatusElement.innerText = "Desired grade not met with current inputs.";
-                  desiredGradeStatusElement.style.color = "#f44336";
-              }
+          } else {
+              desiredGradeStatusElement.innerText = "Enter grades to check desired grade status.";
+              desiredGradeStatusElement.style.color = "var(--text-secondary)";
           }
       }
   }
@@ -759,10 +741,7 @@
           <div class="category-section">
               <div class="category-header">
                   <h3>Custom</h3>
-                  <div class="input-group">
-                      <label for="customWeight">Weight (%)</label>
-                      <input type="number" id="customWeight" min="0" max="100" value="20" placeholder="e.g., 20">
-                  </div>
+                  <!-- Removed the overall weight input for Custom category -->
               </div>
               <div id="customAssignments" class="assignment-inputs">
                   <!-- Custom assignment inputs will be added here -->
