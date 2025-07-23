@@ -291,47 +291,40 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for GPA calculator
-            document.getElementById('generateInputsBtn').addEventListener('click', generateGradeInputs);
+            document.getElementById('addClassBtn').addEventListener('click', addClassInput);
             document.getElementById('calculateGpaBtn').addEventListener('click', calculateUnweightedGPA);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
         });
+
+        let classCounter = 0;
 
         function toggleMenu() {
             const navLinks = document.querySelector('.nav-links');
             navLinks.classList.toggle('active');
         }
 
-        function generateGradeInputs() {
-            const numClasses = parseInt(document.getElementById('numClasses').value);
+        function addClassInput() {
+            classCounter++;
             const gradeInputsContainer = document.getElementById('gradeInputsContainer');
-            gradeInputsContainer.innerHTML = ''; // Clear previous inputs
-            document.getElementById('gpaResult').innerText = ''; // Clear previous result
 
-            if (isNaN(numClasses) || numClasses <= 0) {
-                alert('Please enter a valid number of classes.');
-                return;
-            }
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('input-group');
 
-            for (let i = 1; i <= numClasses; i++) {
-                const inputGroup = document.createElement('div');
-                inputGroup.classList.add('input-group');
+            const label = document.createElement('label');
+            label.setAttribute('for', `classGrade${classCounter}`);
+            label.innerText = `Class ${classCounter} Grade (%)`;
 
-                const label = document.createElement('label');
-                label.setAttribute('for', `classGrade${i}`);
-                label.innerText = `Class ${i} Grade (%)`;
+            const input = document.createElement('input');
+            input.setAttribute('type', 'number');
+            input.setAttribute('id', `classGrade${classCounter}`);
+            input.setAttribute('min', '0');
+            input.setAttribute('max', '110');
+            input.setAttribute('placeholder', `Enter grade for Class ${classCounter}`);
+            input.classList.add('class-grade-input'); // Add a class for easy selection
 
-                const input = document.createElement('input');
-                input.setAttribute('type', 'number');
-                input.setAttribute('id', `classGrade${i}`);
-                input.setAttribute('min', '0');
-                input.setAttribute('max', '110');
-                input.setAttribute('placeholder', `Enter grade for Class ${i}`);
-                input.classList.add('class-grade-input'); // Add a class for easy selection
-
-                inputGroup.appendChild(label);
-                inputGroup.appendChild(input);
-                gradeInputsContainer.appendChild(inputGroup);
-            }
+            inputGroup.appendChild(label);
+            inputGroup.appendChild(input);
+            gradeInputsContainer.appendChild(inputGroup);
         }
 
         function convertToGpa(percentage) {
@@ -366,18 +359,20 @@
             let totalGpaPoints = 0;
             let numValidGrades = 0;
 
-            if (gradeInputs.length === 0) {
-                alert('Please generate class grade inputs first.');
-                return;
-            }
-
             gradeInputs.forEach(input => {
-                const percentage = parseFloat(input.value);
-                if (!isNaN(percentage) && percentage >= 0 && percentage <= 110) {
-                    totalGpaPoints += convertToGpa(percentage);
-                    numValidGrades++;
+                if (input.value) {
+                    const percentage = parseFloat(input.value);
+                    if (!isNaN(percentage) && percentage >= 0 && percentage <= 110) {
+                        totalGpaPoints += convertToGpa(percentage);
+                        numValidGrades++;
+                    }
                 }
             });
+
+            if (numValidGrades === 0) {
+                alert('Please add and fill out at least one class.');
+                return;
+            }
 
             let unweightedGPA = 0;
             if (numValidGrades > 0) {
@@ -422,14 +417,9 @@
                 Looking for a weighted GPA calculator? <a href="weighted_gpa_calculator.html">Click here</a>.
             </p>
             
-            <div class="form-group">
-                <label for="numClasses">Number of Classes</label>
-                <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
-            </div>
-            
             <div class="btn-group">
-                <button id="generateInputsBtn">
-                    <i class="fas fa-plus-circle"></i> Generate Grade Inputs
+                <button id="addClassBtn">
+                    <i class="fas fa-plus-circle"></i> Add Class
                 </button>
             </div>
 

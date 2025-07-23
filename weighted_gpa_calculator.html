@@ -291,92 +291,91 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for GPA calculator
-            document.getElementById('generateInputsBtn').addEventListener('click', generateGradeInputs);
+            document.getElementById('addClassBtn').addEventListener('click', addClassInput);
             document.getElementById('calculateGpaBtn').addEventListener('click', calculateWeightedGPA);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
         });
+
+        let classCounter = 0;
 
         function toggleMenu() {
             const navLinks = document.querySelector('.nav-links');
             navLinks.classList.toggle('active');
         }
 
-        function generateGradeInputs() {
-            const numClasses = parseInt(document.getElementById('numClasses').value);
+        function addClassInput() {
+            classCounter++;
             const gradeInputsContainer = document.getElementById('gradeInputsContainer');
-            gradeInputsContainer.innerHTML = ''; // Clear previous inputs
-            document.getElementById('gpaResult').innerText = ''; // Clear previous result
 
-            if (isNaN(numClasses) || numClasses <= 0) {
-                alert('Please enter a valid number of classes.');
-                return;
-            }
+            const row = document.createElement('div');
+            row.classList.add('input-row');
 
-            for (let i = 1; i <= numClasses; i++) {
-                const row = document.createElement('div');
-                row.classList.add('input-row');
+            const gradeGroup = document.createElement('div');
+            gradeGroup.classList.add('input-group');
 
-                const gradeGroup = document.createElement('div');
-                gradeGroup.classList.add('input-group');
+            const gradeLabel = document.createElement('label');
+            gradeLabel.setAttribute('for', `classGrade${classCounter}`);
+            gradeLabel.innerText = `Class ${classCounter} Grade (%)`;
 
-                const gradeLabel = document.createElement('label');
-                gradeLabel.setAttribute('for', `classGrade${i}`);
-                gradeLabel.innerText = `Class ${i} Grade (%)`;
+            const gradeInput = document.createElement('input');
+            gradeInput.setAttribute('type', 'number');
+            gradeInput.setAttribute('id', `classGrade${classCounter}`);
+            gradeInput.setAttribute('min', '0');
+            gradeInput.setAttribute('max', '110');
+            gradeInput.setAttribute('placeholder', `Enter grade for Class ${classCounter}`);
+            gradeInput.classList.add('class-grade-input');
 
-                const gradeInput = document.createElement('input');
-                gradeInput.setAttribute('type', 'number');
-                gradeInput.setAttribute('id', `classGrade${i}`);
-                gradeInput.setAttribute('min', '0');
-                gradeInput.setAttribute('max', '110');
-                gradeInput.setAttribute('placeholder', `Enter grade for Class ${i}`);
-                gradeInput.classList.add('class-grade-input');
+            gradeGroup.appendChild(gradeLabel);
+            gradeGroup.appendChild(gradeInput);
 
-                gradeGroup.appendChild(gradeLabel);
-                gradeGroup.appendChild(gradeInput);
+            const typeGroup = document.createElement('div');
+            typeGroup.classList.add('input-group');
 
-                const typeGroup = document.createElement('div');
-                typeGroup.classList.add('input-group');
+            const typeLabel = document.createElement('label');
+            typeLabel.setAttribute('for', `classType${classCounter}`);
+            typeLabel.innerText = `Class ${classCounter} Type`;
 
-                const typeLabel = document.createElement('label');
-                typeLabel.setAttribute('for', `classType${i}`);
-                typeLabel.innerText = `Class ${i} Type`;
+            const typeSelect = document.createElement('select');
+            typeSelect.setAttribute('id', `classType${classCounter}`);
+            typeSelect.classList.add('class-type-select');
 
-                const typeSelect = document.createElement('select');
-                typeSelect.setAttribute('id', `classType${i}`);
-                typeSelect.classList.add('class-type-select');
+            const optionCP = document.createElement('option');
+            optionCP.value = "CP";
+            optionCP.text = "CP";
+            typeSelect.appendChild(optionCP);
 
-                const optionCP = document.createElement('option');
-                optionCP.value = "CP";
-                optionCP.text = "CP";
-                typeSelect.appendChild(optionCP);
+            const optionHonors = document.createElement('option');
+            optionHonors.value = "Honors";
+            optionHonors.text = "Honors";
+            typeSelect.appendChild(optionHonors);
+            typeSelect.value = "Honors";
 
-                const optionHonors = document.createElement('option');
-                optionHonors.value = "Honors";
-                optionHonors.text = "Honors";
-                typeSelect.appendChild(optionHonors);
+            const optionAP = document.createElement('option');
+            optionAP.value = "AP";
+            optionAP.text = "AP";
+            typeSelect.appendChild(optionAP);
 
-                const optionAP = document.createElement('option');
-                optionAP.value = "AP";
-                optionAP.text = "AP";
-                typeSelect.appendChild(optionAP);
+            const optionCPHalf = document.createElement('option');
+            optionCPHalf.value = "CP Half Year";
+            optionCPHalf.text = "CP Half Year";
+            typeSelect.appendChild(optionCPHalf);
 
-                const optionCPHalf = document.createElement('option');
-                optionCPHalf.value = "CP Half Year";
-                optionCPHalf.text = "CP Half Year";
-                typeSelect.appendChild(optionCPHalf);
+            const optionHonorsHalf = document.createElement('option');
+            optionHonorsHalf.value = "Honors Half Year";
+            optionHonorsHalf.text = "Honors Half Year";
+            typeSelect.appendChild(optionHonorsHalf);
 
-                const optionHonorsHalf = document.createElement('option');
-                optionHonorsHalf.value = "Honors Half Year";
-                optionHonorsHalf.text = "Honors Half Year";
-                typeSelect.appendChild(optionHonorsHalf);
+            const optionAPHalf = document.createElement('option');
+            optionAPHalf.value = "AP Half Year";
+            optionAPHalf.text = "AP Half Year";
+            typeSelect.appendChild(optionAPHalf);
 
-                typeGroup.appendChild(typeLabel);
-                typeGroup.appendChild(typeSelect);
+            typeGroup.appendChild(typeLabel);
+            typeGroup.appendChild(typeSelect);
 
-                row.appendChild(gradeGroup);
-                row.appendChild(typeGroup);
-                gradeInputsContainer.appendChild(row);
-            }
+            row.appendChild(gradeGroup);
+            row.appendChild(typeGroup);
+            gradeInputsContainer.appendChild(row);
         }
 
         function convertToGpa(percentage, classType) {
@@ -392,9 +391,9 @@
             else if (percentage >= 67) gpa = 1.3;
             else if (percentage >= 65) gpa = 1.0;
 
-            if (classType === "AP") {
+            if (classType.includes("AP")) {
                 return 4.67;
-            } else if (classType === "Honors") {
+            } else if (classType.includes("Honors")) {
                 return 4.33;
             } else {
                 return 4.0;
@@ -406,25 +405,30 @@
             const typeSelects = document.querySelectorAll('.class-type-select');
             let totalGpaPoints = 0;
             let totalCredits = 0;
-
-            if (gradeInputs.length === 0) {
-                alert('Please generate class grade inputs first.');
-                return;
-            }
+            let numClasses = 0;
 
             for (let i = 0; i < gradeInputs.length; i++) {
                 const percentage = parseFloat(gradeInputs[i].value);
-                const classType = typeSelects[i].value;
-                if (!isNaN(percentage) && percentage >= 0 && percentage <= 110) {
-                    let credits = 1.0;
-                    if (classType === "AP") {
-                        credits = 1.5;
-                    } else if (classType.includes("Half Year")) {
-                        credits = 0.5;
+                if (gradeInputs[i].value) {
+                    numClasses++;
+                    const classType = typeSelects[i].value;
+                    if (!isNaN(percentage) && percentage >= 0 && percentage <= 110) {
+                        let credits = 1.0;
+                        if (classType.includes("AP")) {
+                            credits = 1.5;
+                        }
+                        if (classType.includes("Half Year")) {
+                            credits = 0.5;
+                        }
+                        totalGpaPoints += convertToGpa(percentage, classType) * credits;
+                        totalCredits += credits;
                     }
-                    totalGpaPoints += convertToGpa(percentage, classType) * credits;
-                    totalCredits += credits;
                 }
+            }
+
+            if (numClasses === 0) {
+                alert('Please add and fill out at least one class.');
+                return;
             }
 
             let weightedGPA = 0;
@@ -470,14 +474,9 @@
                 Calculate your weighted GPA based on your percentage grades and class type.
             </p>
 
-            <div class="form-group">
-                <label for="numClasses">Number of Classes</label>
-                <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
-            </div>
-
             <div class="btn-group">
-                <button id="generateInputsBtn">
-                    <i class="fas fa-plus-circle"></i> Generate Grade Inputs
+                <button id="addClassBtn">
+                    <i class="fas fa-plus-circle"></i> Add Class
                 </button>
             </div>
 
