@@ -275,8 +275,8 @@ gtag('config', 'G-LNMT1VXJW1');
       gap: 1rem;
   }
 
-  /* New styles for class inputs (adapted from GPA calculator) */
-  .class-input-row {
+  /* New styles for assignment inputs (adapted from GPA calculator) */
+  .assignment-input-row {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
@@ -285,19 +285,19 @@ gtag('config', 'G-LNMT1VXJW1');
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 1rem;
-      background-color: var(--secondary-bg);
+      background-color: var(--primary-bg); /* Slightly different background for nested cards */
   }
 
-  .class-input-group {
+  .assignment-input-group {
       flex: 1;
       min-width: 150px; /* Adjust as needed */
   }
 
-  .class-input-group label {
+  .assignment-input-group label {
       white-space: nowrap; /* Prevent label from wrapping */
   }
 
-  .remove-class-btn {
+  .remove-assignment-btn {
       background-color: #f44336;
       color: white;
       border: none;
@@ -306,12 +306,40 @@ gtag('config', 'G-LNMT1VXJW1');
       font-size: 0.9rem;
       cursor: pointer;
       transition: background-color 0.3s;
-      flex-shrink: 0; /* Prevent button from shrinking */
-      min-width: auto; /* Override min-width from general button style */
+      flex-shrink: 0;
+      min-width: auto;
   }
 
-  .remove-class-btn:hover {
+  .remove-assignment-btn:hover {
       background-color: #d32f2f;
+  }
+
+  /* Styles for the new checkbox container */
+  .checkbox-option-container {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      background-color: var(--secondary-bg);
+      margin-top: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+  }
+
+  .checkbox-option-container input[type="checkbox"] {
+      width: auto; /* Override full width */
+      margin-bottom: 0; /* Remove default margin */
+  }
+
+  .checkbox-option-container label {
+      margin-bottom: 0; /* Remove default margin */
+      cursor: pointer;
+  }
+
+  /* Style for hidden assignment name input group */
+  .assignment-name-input-group {
+      display: none; /* Hidden by default */
   }
 </style>
 <script>
@@ -327,17 +355,17 @@ gtag('config', 'G-LNMT1VXJW1');
       document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
       document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
 
-      // Add initial assignment input for each category
-      addAssignmentInput('homework');
-      addAssignmentInput('quizzes');
-      addAssignmentInput('tests');
-      addAssignmentInput('projects');
-
       // Add event listeners for "Add Assignment" buttons
       document.getElementById('addHomeworkBtn').addEventListener('click', () => addAssignmentInput('homework'));
       document.getElementById('addQuizzesBtn').addEventListener('click', () => addAssignmentInput('quizzes'));
       document.getElementById('addTestsBtn').addEventListener('click', () => addAssignmentInput('tests'));
       document.getElementById('addProjectsBtn').addEventListener('click', () => addAssignmentInput('projects'));
+
+      // Add event listener for the "Show Assignment Names" checkbox
+      document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
+
+      // Initial visibility check for assignment names
+      toggleAssignmentNamesVisibility();
   });
 
   function toggleMenu() {
@@ -348,39 +376,109 @@ gtag('config', 'G-LNMT1VXJW1');
   function addAssignmentInput(category) {
       categoryCounters[category]++;
       const container = document.getElementById(`${category}Assignments`);
+      const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       const assignmentRow = document.createElement('div');
-      assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
-      assignmentRow.setAttribute('data-assignment-id', categoryCounters[category]);
+      assignmentRow.classList.add('assignment-input-row');
+      assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
+      assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
+
+      // Assignment Name input (new)
+      const nameInputGroup = document.createElement('div');
+      nameInputGroup.classList.add('assignment-input-group', 'assignment-name-input-group');
+      if (showAssignmentNames) {
+          nameInputGroup.style.display = 'block'; // Show if checkbox is checked
+      }
+      const nameLabel = document.createElement('label');
+      nameLabel.setAttribute('for', `${category}Name${categoryCounters[category]}`);
+      nameLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} ${categoryCounters[category]} Name`;
+      const nameInput = document.createElement('input');
+      nameInput.setAttribute('type', 'text');
+      nameInput.setAttribute('id', `${category}Name${categoryCounters[category]}`);
+      nameInput.setAttribute('placeholder', `e.g., Chapter 1 Quiz`);
+      nameInput.classList.add('assignment-name-input');
+      nameInputGroup.appendChild(nameLabel);
+      nameInputGroup.appendChild(nameInput);
+      assignmentRow.appendChild(nameInputGroup);
 
       // Assignment Grade (%) input
       const gradeInputGroup = document.createElement('div');
-      gradeInputGroup.classList.add('class-input-group'); // Use GPA calculator's input group style
+      gradeInputGroup.classList.add('assignment-input-group');
       const gradeLabel = document.createElement('label');
       gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
-      gradeLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} Grade ${categoryCounters[category]} (%)`;
+      gradeLabel.innerText = `${category.charAt(0).toUpperCase() + category.slice(1)} ${categoryCounters[category]} Grade (%)`;
       const gradeInput = document.createElement('input');
       gradeInput.setAttribute('type', 'number');
       gradeInput.setAttribute('id', `${category}Grade${categoryCounters[category]}`);
       gradeInput.setAttribute('min', '0');
       gradeInput.setAttribute('max', '100');
       gradeInput.setAttribute('placeholder', 'Enter grade');
-      gradeInput.classList.add('assignment-grade-input'); // Add a specific class for this calculator
+      gradeInput.classList.add('assignment-grade-input');
       gradeInputGroup.appendChild(gradeLabel);
       gradeInputGroup.appendChild(gradeInput);
       assignmentRow.appendChild(gradeInputGroup);
 
       // Remove Assignment button
       const removeButton = document.createElement('button');
-      removeButton.classList.add('remove-class-btn'); // Use GPA calculator's remove button style
+      removeButton.classList.add('remove-assignment-btn');
       removeButton.innerText = 'Remove';
       removeButton.onclick = function() {
           assignmentRow.remove();
+          updateAssignmentNumbers(category); // Re-number assignments within this category
           calculateQuarterGrade(); // Recalculate after removal
       };
       assignmentRow.appendChild(removeButton);
 
       container.appendChild(assignmentRow);
+      updateAssignmentNumbers(category); // Re-number assignments after adding
+  }
+
+  function updateAssignmentNumbers(category) {
+      const assignmentRows = document.querySelectorAll(`#${category}Assignments .assignment-input-row`);
+      const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
+
+      assignmentRows.forEach((row, index) => {
+          const assignmentNum = index + 1;
+          const categoryName = row.getAttribute('data-category');
+
+          // Update labels and IDs for name input
+          const nameInputGroup = row.querySelector('.assignment-name-input-group');
+          const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
+          const nameInput = row.querySelector(`input[id^="${categoryName}Name"]`);
+          if (nameLabel && nameInput) {
+              nameLabel.setAttribute('for', `${categoryName}Name${assignmentNum}`);
+              nameInput.setAttribute('id', `${categoryName}Name${assignmentNum}`);
+              nameLabel.innerText = `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} ${assignmentNum} Name`;
+          }
+
+          // Update labels and IDs for grade input
+          const gradeLabel = row.querySelector(`label[for^="${categoryName}Grade"]`);
+          const gradeInput = row.querySelector(`input[id^="${categoryName}Grade"]`);
+          if (gradeLabel && gradeInput) {
+              gradeLabel.setAttribute('for', `${categoryName}Grade${assignmentNum}`);
+              gradeInput.setAttribute('id', `${categoryName}Grade${assignmentNum}`);
+              if (!showAssignmentNames) {
+                  gradeLabel.innerText = `${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)} ${assignmentNum} Grade (%)`;
+              } else {
+                  // If names are shown, the grade label should just be "Grade (%)"
+                  gradeLabel.innerText = `Grade (%)`;
+              }
+          }
+      });
+  }
+
+  function toggleAssignmentNamesVisibility() {
+      const showNames = document.getElementById('showAssignmentNamesCheckbox').checked;
+      const nameInputGroups = document.querySelectorAll('.assignment-name-input-group');
+      nameInputGroups.forEach(group => {
+          group.style.display = showNames ? 'block' : 'none';
+      });
+
+      // Update grade labels based on visibility
+      const categories = ['homework', 'quizzes', 'tests', 'projects'];
+      categories.forEach(category => {
+          updateAssignmentNumbers(category); // This function now handles label updates based on checkbox state
+      });
   }
 
   function calculateQuarterGrade() {
@@ -393,7 +491,7 @@ gtag('config', 'G-LNMT1VXJW1');
           const weightInput = document.getElementById(`${category}Weight`);
           const categoryWeight = parseFloat(weightInput.value) || 0;
           
-          const assignmentInputs = document.querySelectorAll(`#${category}Assignments input[type="number"]`);
+          const assignmentInputs = document.querySelectorAll(`#${category}Assignments input.assignment-grade-input`);
           let categoryGrades = [];
           assignmentInputs.forEach(input => {
               const grade = parseFloat(input.value);
@@ -456,22 +554,23 @@ gtag('config', 'G-LNMT1VXJW1');
 
   function clearQuarterFields() {
       document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
+      document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = ''); // Clear text inputs too
       document.querySelectorAll('.category-section .assignment-inputs').forEach(container => {
           container.innerHTML = ''; // Clear all dynamic inputs
       });
+      document.getElementById('desiredQuarterGrade').value = '';
+      document.getElementById('quarterResult').innerText = '';
       document.getElementById('desiredGradeStatus').innerText = ''; // Clear the new status element
 
-      // Reset counters and add initial inputs
+      // Reset counters
       categoryCounters = {
           'homework': 0,
           'quizzes': 0,
           'tests': 0,
           'projects': 0
       };
-      addAssignmentInput('homework');
-      addAssignmentInput('quizzes');
-      addAssignmentInput('tests');
-      addAssignmentInput('projects');
+      document.getElementById('showAssignmentNamesCheckbox').checked = false; // Reset checkbox
+      toggleAssignmentNamesVisibility(); // Update visibility
   }
 </script>
 </head>
@@ -501,6 +600,12 @@ gtag('config', 'G-LNMT1VXJW1');
           Calculate your quarter grade by entering grades for different assignment categories and their weights.
       </p>
       
+      <!-- New checkbox for showing assignment names -->
+      <div class="checkbox-option-container">
+          <input type="checkbox" id="showAssignmentNamesCheckbox">
+          <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
+      </div>
+
       <!-- Homework Category -->
       <div class="category-section">
           <div class="category-header">
@@ -584,7 +689,7 @@ gtag('config', 'G-LNMT1VXJW1');
               <label for="desiredQuarterGrade">Desired Quarter Grade (%) (Optional)</label>
               <input type="number" id="desiredQuarterGrade" min="0" max="100" placeholder="Enter your target grade">
           </div>
-          <h3 id="quarterNeededGrade" style="color: var(--text-secondary);">Desired Grade Status: <span id="desiredGradeStatus"></span></h3>
+          <h3 style="color: var(--text-secondary);">Desired Grade Status: <span id="desiredGradeStatus"></span></h3>
       </div>
   </div>
 </div>
