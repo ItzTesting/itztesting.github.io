@@ -310,7 +310,7 @@
       min-width: auto;
   }
 
-  /* Styles for the new checkbox container (already consistent) */
+  /* Styles for the checkbox option container (mimicking ap-final-option) */
   .checkbox-option-container {
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -320,50 +320,24 @@
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
-      gap: 1rem; /* Increased gap for better spacing */
-      justify-content: space-between; /* Push label to left, toggle to right */
+      gap: 0.5rem; /* Space between checkbox and label */
+  }
+
+  .checkbox-option-container input[type="checkbox"] {
+      width: auto; /* Override full width */
+      margin-bottom: 0; /* Remove default margin */
+      margin-right: 0.5rem; /* Space after checkbox */
   }
 
   .checkbox-option-container label {
-      flex-grow: 1; /* Allow label to take available space */
-      margin-bottom: 0; /* Ensure no extra margin */
+      margin-bottom: 0; /* Remove default margin */
+      cursor: pointer;
+      display: inline; /* Ensure label is inline with checkbox */
   }
 
   /* Style for hidden assignment name input group (matching GPA calculator's class name input group) */
   .class-name-input-group {
       display: none; /* Hidden by default */
-  }
-
-  /* Toggle Button Styles */
-  .toggle-button {
-      width: 50px; /* Width of the toggle switch */
-      height: 26px; /* Height of the toggle switch */
-      background-color: var(--input-bg); /* Off state background */
-      border-radius: 13px; /* Half of height for pill shape */
-      position: relative;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      flex-shrink: 0; /* Prevent shrinking in flex container */
-      border: 1px solid var(--border-color); /* Add a subtle border */
-  }
-
-  .toggle-button.toggled {
-      background-color: var(--accent-color); /* On state background */
-  }
-
-  .toggle-handle {
-      width: 20px; /* Size of the draggable circle */
-      height: 20px;
-      background-color: var(--text-color); /* Handle color */
-      border-radius: 50%;
-      position: absolute;
-      top: 2px; /* Center vertically */
-      left: 2px; /* Initial position (off state) */
-      transition: left 0.3s;
-  }
-
-  .toggle-button.toggled .toggle-handle {
-      left: calc(100% - 2px - 20px); /* Move to right (on state) */
   }
 </style>
 <script>
@@ -385,29 +359,15 @@
       document.getElementById('addCustomBtn').addEventListener('click', () => addAssignmentInput('custom'));
       document.getElementById('addAssignmentBtn').addEventListener('click', () => addAssignmentInput('assignments')); // New button for single view
 
-      // Add event listener for the "Show Assignment Names" toggle button
-      document.getElementById('showAssignmentNamesToggle').addEventListener('click', toggleAssignmentNamesVisibility);
-      // Add event listener for the "Group View" toggle button
-      document.getElementById('groupViewToggle').addEventListener('click', toggleGroupView);
+      // Add event listener for the "Show Assignment Names" checkbox
+      document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
+      // Add event listener for the "Group View" checkbox
+      document.getElementById('groupViewCheckbox').addEventListener('change', toggleGroupView);
 
       // Initial visibility check for assignment names and group view
-      // Set initial states based on data-toggled attributes
-      const initialGroupView = document.getElementById('groupViewToggle').getAttribute('data-toggled') === 'true';
-      const initialShowNames = document.getElementById('showAssignmentNamesToggle').getAttribute('data-toggled') === 'true';
-      
-      // Apply initial states without triggering full recalculation/clearing
-      document.getElementById('groupedCategories').style.display = initialGroupView ? 'block' : 'none';
-      document.getElementById('singleAssignmentCategory').style.display = initialGroupView ? 'none' : 'block';
-      
-      const nameInputGroups = document.querySelectorAll('.class-name-input-group');
-      nameInputGroups.forEach(group => {
-          group.style.display = initialShowNames ? 'block' : 'none';
-      });
-      // Update labels for existing inputs if any (e.g., after a page refresh with existing inputs)
-      const allCategories = ['learnerTasks', 'assessments', 'custom', 'assignments'];
-      allCategories.forEach(category => {
-          updateAssignmentNumbers(category);
-      });
+      // Set initial states based on checked attributes
+      toggleGroupView(); // Call this first to set initial state
+      toggleAssignmentNamesVisibility();
   });
 
   function toggleMenu() {
@@ -416,14 +376,7 @@
   }
 
   function toggleGroupView() {
-      const toggleElement = document.getElementById('groupViewToggle');
-      let isGroupView = toggleElement.getAttribute('data-toggled') === 'true';
-      isGroupView = !isGroupView; // Flip the state
-
-      toggleElement.setAttribute('data-toggled', isGroupView);
-      toggleElement.setAttribute('aria-checked', isGroupView); // Update ARIA attribute
-      toggleElement.classList.toggle('toggled', isGroupView);
-
+      const isGroupView = document.getElementById('groupViewCheckbox').checked;
       document.getElementById('groupedCategories').style.display = isGroupView ? 'block' : 'none';
       document.getElementById('singleAssignmentCategory').style.display = isGroupView ? 'none' : 'block';
       
@@ -434,8 +387,8 @@
   function addAssignmentInput(category) {
       categoryCounters[category]++;
       const container = document.getElementById(`${category}Assignments`);
-      // Read the state directly from the toggle button's data-toggled attribute
-      const showAssignmentNames = document.getElementById('showAssignmentNamesToggle').getAttribute('data-toggled') === 'true';
+      // Read the state directly from the checkbox's checked attribute
+      const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       const assignmentRow = document.createElement('div');
       assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
@@ -446,7 +399,7 @@
       const nameInputGroup = document.createElement('div');
       nameInputGroup.classList.add('class-input-group', 'class-name-input-group'); // Use GPA calculator's input group style
       if (showAssignmentNames) {
-          nameInputGroup.style.display = 'block'; // Show if toggle is on
+          nameInputGroup.style.display = 'block'; // Show if checkbox is checked
       }
       const nameLabel = document.createElement('label');
       nameLabel.setAttribute('for', `${category}Name${categoryCounters[category]}`);
@@ -514,7 +467,7 @@
 
   function updateAssignmentNumbers(category) {
       const assignmentRows = document.querySelectorAll(`#${category}Assignments .class-input-row`);
-      const showAssignmentNames = document.getElementById('showAssignmentNamesToggle').getAttribute('data-toggled') === 'true';
+      const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
       assignmentRows.forEach((row, index) => {
           const assignmentNum = index + 1;
@@ -559,14 +512,7 @@
   }
 
   function toggleAssignmentNamesVisibility() {
-      const toggleElement = document.getElementById('showAssignmentNamesToggle');
-      let showNames = toggleElement.getAttribute('data-toggled') === 'true';
-      showNames = !showNames; // Flip the state
-
-      toggleElement.setAttribute('data-toggled', showNames);
-      toggleElement.setAttribute('aria-checked', showNames); // Update ARIA attribute
-      toggleElement.classList.toggle('toggled', showNames);
-
+      const showNames = document.getElementById('showAssignmentNamesCheckbox').checked;
       const nameInputGroups = document.querySelectorAll('.class-name-input-group');
       nameInputGroups.forEach(group => {
           group.style.display = showNames ? 'block' : 'none';
@@ -588,7 +534,7 @@
   }
 
   function calculateQuarterGrade() {
-      const isGroupView = document.getElementById('groupViewToggle').getAttribute('data-toggled') === 'true';
+      const isGroupView = document.getElementById('groupViewCheckbox').checked;
       let totalWeightedSum = 0;
       let totalWeight = 0;
       let resultText = "";
@@ -721,20 +667,13 @@
           'assignments': 0
       };
       
-      // Reset toggle buttons to their default states
-      const showNamesToggle = document.getElementById('showAssignmentNamesToggle');
-      showNamesToggle.setAttribute('data-toggled', 'false');
-      showNamesToggle.setAttribute('aria-checked', 'false');
-      showNamesToggle.classList.remove('toggled');
-
+      // Reset checkboxes to their default states
+      document.getElementById('showAssignmentNamesCheckbox').checked = false;
       if (shouldToggleGroupView) {
-          const groupViewToggle = document.getElementById('groupViewToggle');
-          groupViewToggle.setAttribute('data-toggled', 'true'); // Default to group view ON
-          groupViewToggle.setAttribute('aria-checked', 'true');
-          groupViewToggle.classList.add('toggled');
+          document.getElementById('groupViewCheckbox').checked = true; // Default to group view ON
       }
       
-      // Re-apply visibility based on reset toggle states
+      // Re-apply visibility based on reset checkbox states
       toggleAssignmentNamesVisibility();
       if (shouldToggleGroupView) {
           toggleGroupView();
@@ -768,20 +707,16 @@
           Calculate your quarter grade by entering grades for different assignment categories and their weights.
       </p>
       
-      <!-- Group View Toggle -->
+      <!-- Group View Checkbox -->
       <div class="checkbox-option-container">
-          <label for="groupViewToggle">Group View</label>
-          <div id="groupViewToggle" class="toggle-button toggled" data-toggled="true" tabindex="0" role="switch" aria-checked="true">
-              <div class="toggle-handle"></div>
-          </div>
+          <input type="checkbox" id="groupViewCheckbox" checked>
+          <label for="groupViewCheckbox">Group View</label>
       </div>
 
-      <!-- Show Assignment Names Toggle -->
+      <!-- Show Assignment Names Checkbox -->
       <div class="checkbox-option-container">
-          <label for="showAssignmentNamesToggle">Show Assignment Names</label>
-          <div id="showAssignmentNamesToggle" class="toggle-button" data-toggled="false" tabindex="0" role="switch" aria-checked="false">
-              <div class="toggle-handle"></div>
-          </div>
+          <input type="checkbox" id="showAssignmentNamesCheckbox">
+          <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
       </div>
 
       <!-- Grouped Categories Section (Default) -->
