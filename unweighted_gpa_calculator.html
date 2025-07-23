@@ -13,7 +13,7 @@
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unweighted GPA Calculator</title>
+    <title>GPA Calculator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -287,12 +287,46 @@
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
+
+        /* New styles for class inputs */
+        .class-input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-end; /* Align items at the bottom */
+        }
+
+        .class-input-group {
+            flex: 1;
+            min-width: 150px; /* Adjust as needed */
+        }
+
+        .class-input-group label {
+            white-space: nowrap; /* Prevent label from wrapping */
+        }
     </style>
     <script>
+        // Base GPA points for each letter grade
+        const basePoints = {
+            "A": 4.0, "A-": 3.7,
+            "B+": 3.3, "B": 3.0, "B-": 2.7,
+            "C+": 2.3, "C": 2.0, "C-": 1.7,
+            "D+": 1.3, "D": 1.0, "D-": 0.7,
+            "F": 0.0
+        };
+
+        // Weight bump by course level
+        const levelBump = {
+            "AP": 0.67,
+            "Honors": 0.33,
+            "CP": 0.0
+        };
+
         document.addEventListener('DOMContentLoaded', function() {
             // Add event listeners for GPA calculator
             document.getElementById('generateInputsBtn').addEventListener('click', generateGradeInputs);
-            document.getElementById('calculateGpaBtn').addEventListener('click', calculateUnweightedGPA);
+            document.getElementById('calculateGpaBtn').addEventListener('click', calculateAllGPAs);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
         });
 
@@ -305,7 +339,9 @@
             const numClasses = parseInt(document.getElementById('numClasses').value);
             const gradeInputsContainer = document.getElementById('gradeInputsContainer');
             gradeInputsContainer.innerHTML = ''; // Clear previous inputs
-            document.getElementById('gpaResult').innerText = ''; // Clear previous result
+            document.getElementById('gpaResult').innerText = ''; // Clear previous unweighted result
+            document.getElementById('weightedGpa4_67Result').innerText = ''; // Clear previous weighted result
+            document.getElementById('weightedGpa5_0Result').innerText = ''; // Clear previous weighted result
 
             if (isNaN(numClasses) || numClasses <= 0) {
                 alert('Please enter a valid number of classes.');
@@ -313,24 +349,66 @@
             }
 
             for (let i = 1; i <= numClasses; i++) {
-                const inputGroup = document.createElement('div');
-                inputGroup.classList.add('input-group');
+                const classInputRow = document.createElement('div');
+                classInputRow.classList.add('class-input-row');
 
-                const label = document.createElement('label');
-                label.setAttribute('for', `classGrade${i}`);
-                label.innerText = `Class ${i} Grade (%)`;
+                // Class Grade (%) input
+                const gradeInputGroup = document.createElement('div');
+                gradeInputGroup.classList.add('class-input-group');
+                const gradeLabel = document.createElement('label');
+                gradeLabel.setAttribute('for', `classGrade${i}`);
+                gradeLabel.innerText = `Class ${i} Grade (%)`;
+                const gradeInput = document.createElement('input');
+                gradeInput.setAttribute('type', 'number');
+                gradeInput.setAttribute('id', `classGrade${i}`);
+                gradeInput.setAttribute('min', '0');
+                gradeInput.setAttribute('max', '110');
+                gradeInput.setAttribute('placeholder', `Enter grade`);
+                gradeInput.classList.add('class-grade-input'); // Add a class for easy selection
+                gradeInputGroup.appendChild(gradeLabel);
+                gradeInputGroup.appendChild(gradeInput);
+                classInputRow.appendChild(gradeInputGroup);
 
-                const input = document.createElement('input');
-                input.setAttribute('type', 'number');
-                input.setAttribute('id', `classGrade${i}`);
-                input.setAttribute('min', '0');
-                input.setAttribute('max', '110');
-                input.setAttribute('placeholder', `Enter grade for Class ${i}`);
-                input.classList.add('class-grade-input'); // Add a class for easy selection
+                // Class Level (CP, Honors, AP) select
+                const levelInputGroup = document.createElement('div');
+                levelInputGroup.classList.add('class-input-group');
+                const levelLabel = document.createElement('label');
+                levelLabel.setAttribute('for', `classLevel${i}`);
+                levelLabel.innerText = `Class ${i} Level`;
+                const levelSelect = document.createElement('select');
+                levelSelect.setAttribute('id', `classLevel${i}`);
+                levelSelect.classList.add('class-level-select');
+                const levels = ["CP", "Honors", "AP"];
+                levels.forEach(level => {
+                    const option = document.createElement('option');
+                    option.value = level;
+                    option.innerText = level;
+                    levelSelect.appendChild(option);
+                });
+                levelSelect.value = "Honors"; // Default to Honors
+                levelInputGroup.appendChild(levelLabel);
+                levelInputGroup.appendChild(levelSelect);
+                classInputRow.appendChild(levelInputGroup);
 
-                inputGroup.appendChild(label);
-                inputGroup.appendChild(input);
-                gradeInputsContainer.appendChild(inputGroup);
+                // Class Credit input
+                const creditInputGroup = document.createElement('div');
+                creditInputGroup.classList.add('class-input-group');
+                const creditLabel = document.createElement('label');
+                creditLabel.setAttribute('for', `classCredit${i}`);
+                creditLabel.innerText = `Class ${i} Credit`;
+                const creditInput = document.createElement('input');
+                creditInput.setAttribute('type', 'number');
+                creditInput.setAttribute('id', `classCredit${i}`);
+                creditInput.setAttribute('min', '0');
+                creditInput.setAttribute('step', '0.5'); // Allow half credits
+                creditInput.setAttribute('value', '1.0'); // Default to 1.0 credit
+                creditInput.setAttribute('placeholder', `e.g., 1.0 or 0.5`);
+                creditInput.classList.add('class-credit-input');
+                creditInputGroup.appendChild(creditLabel);
+                creditInputGroup.appendChild(creditInput);
+                classInputRow.appendChild(creditInputGroup);
+
+                gradeInputsContainer.appendChild(classInputRow);
             }
         }
 
@@ -357,101 +435,183 @@
                 return 1.0;
             } else {
                 return 0.0;
-    }
-}
+            }
+        }
 
+        function getLetterGrade(percentage) {
+            if (percentage >= 93) return "A";
+            if (percentage >= 90) return "A-";
+            if (percentage >= 87) return "B+";
+            if (percentage >= 83) return "B";
+            if (percentage >= 80) return "B-";
+            if (percentage >= 77) return "C+";
+            if (percentage >= 73) return "C";
+            if (percentage >= 70) return "C-";
+            if (percentage >= 67) return "D+";
+            if (percentage >= 65) return "D";
+            return "F";
+        }
 
-        function calculateUnweightedGPA() {
+        /**
+         * Calculates the weighted GPA on a 4.67 scale and converts it to a 5.0 scale.
+         * @param {Array} classes - List of class objects with fields: grade (letter), level, credit
+         * @returns {Object} - { gpa4_67, gpa5_0 }
+         */
+        function calculateWeightedGPA(classes) {
+            let totalQualityPoints = 0;
+            let totalCredits = 0;
+
+            for (const cls of classes) {
+                const { grade, level, credit } = cls;
+                const base = basePoints[grade];
+                const bump = levelBump[level];
+                
+                // Ensure base and bump are numbers before addition
+                const weightedGrade = (base !== undefined ? base : 0) + (bump !== undefined ? bump : 0);
+                
+                totalQualityPoints += weightedGrade * credit;
+                totalCredits += credit;
+            }
+
+            if (totalCredits === 0) {
+                return { gpa4_67: 0.0, gpa5_0: 0.0 };
+            }
+
+            const gpa4_67 = totalQualityPoints / totalCredits;
+            const gpa5_0 = (gpa4_67 / 4.67) * 5.0; // Convert to 5.0 scale
+
+            return {
+                gpa4_67: parseFloat(gpa4_67.toFixed(3)),
+                gpa5_0: parseFloat(gpa5_0.toFixed(3))
+            };
+        }
+
+        function calculateAllGPAs() {
+            const numClasses = parseInt(document.getElementById('numClasses').value);
+            if (isNaN(numClasses) || numClasses <= 0) {
+                alert('Please generate class grade inputs first.');
+                return;
+            }
+
             const gradeInputs = document.querySelectorAll('.class-grade-input');
-            let totalGpaPoints = 0;
-            let numValidGrades = 0;
+            const levelSelects = document.querySelectorAll('.class-level-select');
+            const creditInputs = document.querySelectorAll('.class-credit-input');
+
+            let unweightedTotalGpaPoints = 0;
+            let unweightedNumValidGrades = 0;
+            let weightedClasses = [];
 
             if (gradeInputs.length === 0) {
                 alert('Please generate class grade inputs first.');
                 return;
             }
 
-            gradeInputs.forEach(input => {
+            gradeInputs.forEach((input, index) => {
                 const percentage = parseFloat(input.value);
-                if (!isNaN(percentage) && percentage >= 0 && percentage <= 110) {
-                    totalGpaPoints += convertToGpa(percentage);
-                    numValidGrades++;
+                const level = levelSelects[index].value;
+                const credit = parseFloat(creditInputs[index].value);
+
+                // Validate inputs
+                if (isNaN(percentage) || percentage < 0 || percentage > 110) {
+                    // Skip invalid percentage, but don't alert for each one
+                    return; 
                 }
+                if (isNaN(credit) || credit <= 0) {
+                    // Skip invalid credit
+                    return;
+                }
+
+                // For Unweighted GPA
+                unweightedTotalGpaPoints += convertToGpa(percentage);
+                unweightedNumValidGrades++;
+
+                // For Weighted GPA
+                const letterGrade = getLetterGrade(percentage);
+                weightedClasses.push({ grade: letterGrade, level: level, credit: credit });
             });
 
+            // Calculate Unweighted GPA
             let unweightedGPA = 0;
-            if (numValidGrades > 0) {
-                unweightedGPA = totalGpaPoints / numValidGrades;
+            if (unweightedNumValidGrades > 0) {
+                unweightedGPA = unweightedTotalGpaPoints / unweightedNumValidGrades;
             }
-
             document.getElementById('gpaResult').innerText = unweightedGPA.toFixed(2);
+
+            // Calculate Weighted GPA
+            const weightedResult = calculateWeightedGPA(weightedClasses);
+            document.getElementById('weightedGpa4_67Result').innerText = weightedResult.gpa4_67.toFixed(2);
+            document.getElementById('weightedGpa5_0Result').innerText = weightedResult.gpa5_0.toFixed(2);
         }
 
         function clearGpaFields() {
             document.getElementById('numClasses').value = '';
             document.getElementById('gradeInputsContainer').innerHTML = '';
             document.getElementById('gpaResult').innerText = '';
+            document.getElementById('weightedGpa4_67Result').innerText = '';
+            document.getElementById('weightedGpa5_0Result').innerText = '';
         }
     </script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-calculator"></i>
-                Grade Calculator
-            </a>
-            <button class="mobile-menu-btn" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <ul class="nav-links">
-                <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
-                <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-                <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> Unweighted GPA</a></li>
-            </ul>
-        </div>
-    </nav>
+  <nav class="navbar">
+      <div class="nav-container">
+          <a href="index.html" class="logo">
+              <i class="fas fa-calculator"></i>
+              Grade Calculator
+          </a>
+          <button class="mobile-menu-btn" onclick="toggleMenu()">
+              <i class="fas fa-bars"></i>
+          </button>
+          <ul class="nav-links">
+              <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
+              <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
+              <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
+          </ul>
+      </div>
+  </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>Unweighted GPA Calculator</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-                Calculate your unweighted GPA based on your percentage grades using a standard 4.0 scale.
-            </p>
-            
-            <div class="form-group">
-                <label for="numClasses">Number of Classes</label>
-                <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
-            </div>
-            
-            <div class="btn-group">
-                <button id="generateInputsBtn">
-                    <i class="fas fa-plus-circle"></i> Generate Grade Inputs
-                </button>
-            </div>
+  <div class="container">
+      <div class="card">
+          <h2>GPA Calculator</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+              Calculate your unweighted and weighted GPA based on your percentage grades, class level, and credits.
+          </p>
+          
+          <div class="form-group">
+              <label for="numClasses">Number of Classes</label>
+              <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
+          </div>
+          
+          <div class="btn-group">
+              <button id="generateInputsBtn">
+                  <i class="fas fa-plus-circle"></i> Generate Class Inputs
+              </button>
+          </div>
 
-            <div id="gradeInputsContainer" class="input-row" style="flex-direction: column;">
-                <!-- Dynamic grade inputs will be added here -->
-            </div>
-            
-            <div class="btn-group">
-                <button id="calculateGpaBtn">
-                    <i class="fas fa-calculator"></i> Calculate Unweighted GPA
-                </button>
-                <button class="btn-clear" id="clearGpaFieldsBtn">
-                    <i class="fas fa-trash-alt"></i> Clear All Fields
-                </button>
-            </div>
-            
-            <div class="result-section">
-                <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
-            </div>
-        </div>
-    </div>
-    <footer class="footer">
-        <div class="container">
-            <p>Created by Advaith S, 2025</p>
-        </div>
-    </footer>
+          <div id="gradeInputsContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+              <!-- Dynamic grade, level, and credit inputs will be added here -->
+          </div>
+          
+          <div class="btn-group">
+              <button id="calculateGpaBtn">
+                  <i class="fas fa-calculator"></i> Calculate GPA
+              </button>
+              <button class="btn-clear" id="clearGpaFieldsBtn">
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
+              </button>
+          </div>
+          
+          <div class="result-section">
+              <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
+              <h3>Your Weighted GPA (4.67 scale): <span id="weightedGpa4_67Result"></span></h3>
+              <h3>Your Weighted GPA (5.0 scale): <span id="weightedGpa5_0Result"></span></h3>
+          </div>
+      </div>
+  </div>
+  <footer class="footer">
+      <div class="container">
+          <p>Created by Advaith S, 2025</p>
+      </div>
+  </footer>
 </body>
 </html>
