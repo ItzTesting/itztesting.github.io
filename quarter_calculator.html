@@ -4,11 +4,11 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
 
-  gtag('config', 'G-LNMT1VXJW1');
+gtag('config', 'G-LNMT1VXJW1');
 </script>
 
 <meta charset="UTF-8">
@@ -16,1197 +16,1197 @@
 <title>Quarter Grade Calculator</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  :root {
-      --primary-bg: #1a1a1a;
-      --secondary-bg: #2E2E2E;
-      --input-bg: #3B3B3B;
-      --text-color: #F1F1F1;
-      --text-secondary: #D1D1D1;
-      --accent-color: #4CAF50;
-      --accent-hover: #45a049;
-      --link-color: #64B5F6;
-      --border-color: #555;
-      --card-bg: #333333;
-      --nav-bg: #222222;
-      --highlight-bg: rgba(76, 175, 80, 0.15);
-  }
+:root {
+    --primary-bg: #1a1a1a;
+    --secondary-bg: #2E2E2E;
+    --input-bg: #3B3B3B;
+    --text-color: #F1F1F1;
+    --text-secondary: #D1D1D1;
+    --accent-color: #4CAF50;
+    --accent-hover: #45a049;
+    --link-color: #64B5F6;
+    --border-color: #555;
+    --card-bg: #333333;
+    --nav-bg: #222222;
+    --highlight-bg: rgba(76, 175, 80, 0.15);
+}
 
-  * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-  }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-  body {
-      background-color: var(--primary-bg);
-      color: var(--text-color);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      padding-bottom: 2rem;
-  }
+body {
+    background-color: var(--primary-bg);
+    color: var(--text-color);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    padding-bottom: 2rem;
+}
 
-  .navbar {
-      background-color: var(--nav-bg);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-  }
+.navbar {
+    background-color: var(--nav-bg);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
 
-  .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-  }
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
 
-  .nav-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-  }
+.nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+}
 
-  .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--text-color);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-  }
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
 
-  .logo i {
-      margin-right: 0.5rem;
-      color: var(--accent-color);
-  }
+.logo i {
+    margin-right: 0.5rem;
+    color: var(--accent-color);
+}
 
-  .nav-links {
-      display: flex;
-      list-style: none;
-  }
+.nav-links {
+    display: flex;
+    list-style: none;
+}
 
-  .nav-links li {
-      margin-left: 1.5rem;
-  }
+.nav-links li {
+    margin-left: 1.5rem;
+}
 
-  .nav-links a {
-      color: var(--text-color);
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-      display: flex;
-      align-items: center;
-  }
+.nav-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+}
 
-  .nav-links a:hover {
-      color: var(--accent-color);
-  }
+.nav-links a:hover {
+    color: var(--accent-color);
+}
 
-  .nav-links a.active {
-      color: var(--accent-color);
-      font-weight: 600;
-  }
+.nav-links a.active {
+    color: var(--accent-color);
+    font-weight: 600;
+}
 
-  .nav-links a i {
-      margin-right: 0.5rem;
-  }
+.nav-links a i {
+    margin-right: 0.5rem;
+}
 
-  .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text-color);
-      font-size: 1.5rem;
-      cursor: pointer;
-  }
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
 
-  .card {
-      background-color: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 2rem;
-      margin: 2rem 0;
-  }
+.card {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    margin: 2rem 0;
+}
 
-  h2 {
-      color: var(--text-color);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      text-align: center;
-      font-size: 1.8rem;
-  }
+h2 {
+    color: var(--text-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    font-size: 1.8rem;
+}
 
-  h3 {
-      color: var(--text-color);
-      margin: 1rem 0;
-      font-weight: 500;
-  }
+h3 {
+    color: var(--text-color);
+    margin: 1rem 0;
+    font-weight: 500;
+}
 
-  .form-group {
-      margin-bottom: 1rem;
-  }
+.form-group {
+    margin-bottom: 1rem;
+}
 
-  label {
-      display: block;
-      color: var(--text-secondary);
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-  }
+label {
+    display: block;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
 
-  input, select {
-      background-color: var(--input-bg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      padding: 0.75rem;
-      width: 100%;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-  }
+input, select {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 0.75rem;
+    width: 100%;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
 
-  input:focus, select:focus {
-      outline: none;
-      border-color: var(--accent-color);
-  }
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
 
-  .input-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1rem;
-  }
+.input-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
 
-  .input-group {
-      flex: 1;
-      min-width: 200px;
-  }
+.input-group {
+    flex: 1;
+    min-width: 200px;
+}
 
-  .btn-group {
-      display: flex;
-      gap: 1rem;
-      margin: 1.5rem 0;
-      flex-wrap: wrap;
-  }
+.btn-group {
+    display: flex;
+    gap: 1rem;
+    margin: 1.5rem 0;
+    flex-wrap: wrap;
+}
 
-  button {
-      cursor: pointer;
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: background-color 0.3s;
-      flex: 1;
-      min-width: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-  }
+button {
+    cursor: pointer;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s;
+    flex: 1;
+    min-width: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-  button:hover {
-      background-color: var(--accent-hover);
-  }
+button:hover {
+    background-color: var(--accent-hover);
+}
 
-  button i {
-      margin-right: 0.5rem;
-  }
+button i {
+    margin-right: 0.5rem;
+}
 
-  .btn-clear {
-      background-color: #f44336;
-  }
+.btn-clear {
+    background-color: #f44336;
+}
 
-  .btn-clear:hover {
-      background-color: #d32f2f;
-  }
+.btn-clear:hover {
+    background-color: #d32f2f;
+}
 
-  .result-section {
-      background-color: var(--secondary-bg);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 1.5rem;
-  }
+.result-section {
+    background-color: var(--secondary-bg);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
 
-  .result-section h3 {
-      margin-top: 0;
-      color: var(--accent-color);
-  }
+.result-section h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+}
 
-  .footer {
-      text-align: center;
-      padding: 1rem 0;
-      margin-top: 2rem;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-  }
+.footer {
+    text-align: center;
+    padding: 1rem 0;
+    margin-top: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
 
-  /* Specific styles for Quarter Calculator */
-  .category-section {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1.5rem;
-      background-color: var(--secondary-bg);
-      margin-bottom: 1.5rem;
-  }
+/* Specific styles for Quarter Calculator */
+.category-section {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    background-color: var(--secondary-bg);
+    margin-bottom: 1.5rem;
+}
 
-  .category-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
-  }
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
 
-  .category-header h3 {
-      margin: 0;
-      color: var(--accent-color);
-  }
+.category-header h3 {
+    margin: 0;
+    color: var(--accent-color);
+}
 
-  .category-header .input-group {
-      flex: none;
-      width: 120px; /* Fixed width for weight input */
-      margin-left: 1rem;
-  }
+.category-header .input-group {
+    flex: none;
+    width: 120px; /* Fixed width for weight input */
+    margin-left: 1rem;
+}
 
-  .assignment-inputs {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-  }
+.assignment-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
 
-  /* Styles for assignment inputs (matching GPA calculator's class inputs) */
-  .class-input-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1rem;
-      align-items: flex-end; /* Align items at the bottom */
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1rem;
-      background-color: var(--secondary-bg);
-  }
+/* Styles for assignment inputs (matching GPA calculator's class inputs) */
+.class-input-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-end; /* Align items at the bottom */
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: var(--secondary-bg);
+}
 
-  .class-input-group {
-      flex: 1;
-      min-width: 150px; /* Adjust as needed */
-  }
+.class-input-group {
+    flex: 1;
+    min-width: 150px; /* Adjust as needed */
+}
 
-  .class-input-group label {
-      white-space: nowrap; /* Prevent label from wrapping */
-  }
+.class-input-group label {
+    white-space: nowrap; /* Prevent label from wrapping */
+}
 
-  .remove-class-btn {
-      background-color: #f44336;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      flex-shrink: 0;
-      min-width: auto;
-  }
+.remove-class-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    flex-shrink: 0;
+    min-width: auto;
+}
 
-  /* Styles for the checkbox option container (mimicking ap-final-option) */
-  .checkbox-option-container {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1rem;
-      background-color: var(--secondary-bg);
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem; /* Space between checkbox and label */
-  }
+/* Styles for the checkbox option container (mimicking ap-final-option) */
+.checkbox-option-container {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: var(--secondary-bg);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Space between checkbox and label */
+}
 
-  .checkbox-option-container input[type="checkbox"] {
-      width: auto; /* Override full width */
-      margin-bottom: 0; /* Remove default margin */
-      margin-right: 0.5rem; /* Space after checkbox */
-  }
+.checkbox-option-container input[type="checkbox"] {
+    width: auto; /* Override full width */
+    margin-bottom: 0; /* Remove default margin */
+    margin-right: 0.5rem; /* Space after checkbox */
+}
 
-  .checkbox-option-container label {
-      margin-bottom: 0; /* Remove default margin */
-      cursor: pointer;
-      display: inline; /* Ensure label is inline with checkbox */
-  }
+.checkbox-option-container label {
+    margin-bottom: 0; /* Remove default margin */
+    cursor: pointer;
+    display: inline; /* Ensure label is inline with checkbox */
+}
 
-  /* Style for hidden assignment name input group (matching GPA calculator's class name input group) */
-  .class-name-input-group {
-      display: none; /* Hidden by default */
-  }
+/* Style for hidden assignment name input group (matching GPA calculator's class name input group) */
+.class-name-input-group {
+    display: none; /* Hidden by default */
+}
 
-  /* New styles for overall weight inputs */
-  .overall-weights-section {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 1rem;
-      background-color: var(--secondary-bg);
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      justify-content: space-between;
-  }
-  .overall-weights-section .input-group {
-      flex: 1;
-      min-width: 180px;
-  }
-  .overall-weights-section label {
-      margin-bottom: 0.25rem;
-  }
+/* New styles for overall weight inputs */
+.overall-weights-section {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    background-color: var(--secondary-bg);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: space-between;
+}
+.overall-weights-section .input-group {
+    flex: 1;
+    min-width: 180px;
+}
+.overall-weights-section label {
+    margin-bottom: 0.25rem;
+}
 
-  /* Styles for needed grades section */
-  #neededGradesSection .input-group {
-      min-width: 150px; /* Adjust as needed for this section */
-  }
-  #neededGradesSection .input-row {
-      align-items: flex-end; /* Align inputs and labels nicely */
-  }
+/* Styles for needed grades section */
+#neededGradesSection .input-group {
+    min-width: 150px; /* Adjust as needed for this section */
+}
+#neededGradesSection .input-row {
+    align-items: flex-end; /* Align inputs and labels nicely */
+}
 
 /* Modal Styles */
 .modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal-backdrop.show {
-    opacity: 1;
-    visibility: visible;
+  opacity: 1;
+  visibility: visible;
 }
 
 .modal-container {
-    background-color: var(--card-bg);
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-    max-width: 500px;
-    width: 90%;
-    position: relative;
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-    display: flex; /* Use flexbox for content alignment */
-    flex-direction: column; /* Stack content vertically */
-    gap: 1.5rem; /* Space between elements */
+  background-color: var(--card-bg);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+  transform: translateY(-20px);
+  transition: transform 0.3s ease;
+  display: flex; /* Use flexbox for content alignment */
+  flex-direction: column; /* Stack content vertically */
+  gap: 1.5rem; /* Space between elements */
 }
 
 .modal-backdrop.show .modal-container {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 /* Removed .modal-close styles as it's no longer an 'X' button */
 
 .modal-header {
-    margin-bottom: 0; /* Adjusted margin as gap handles spacing */
-    text-align: center;
+  margin-bottom: 0; /* Adjusted margin as gap handles spacing */
+  text-align: center;
 }
 
 .modal-header h3 {
-    color: var(--accent-color);
-    font-size: 1.8rem;
-    margin-bottom: 0.5rem;
+  color: var(--accent-color);
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
 }
 
 .modal-body {
-    color: var(--text-color);
-    text-align: center;
-    font-size: 1.1rem;
+  color: var(--text-color);
+  text-align: center;
+  font-size: 1.1rem;
 }
 
 .modal-footer {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem; /* Add some space above the button */
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem; /* Add some space above the button */
 }
 
 .modal-footer button {
-    min-width: 120px; /* Ensure button has a decent size */
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    border-radius: 5px;
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  min-width: 120px; /* Ensure button has a decent size */
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 5px;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .modal-footer button:hover {
-    background-color: var(--accent-hover);
+  background-color: var(--accent-hover);
 }
 </style>
 <script>
-  let categoryCounters = {
-      'learnerTasks': 0,
-      'assessments': 0,
-      'custom': 0,
-      'assignments': 0 // New counter for single assignments view
-  };
+let categoryCounters = {
+    'learnerTasks': 0,
+    'assessments': 0,
+    'custom': 0,
+    'assignments': 0 // New counter for single assignments view
+};
 
-  // Global variable to track the current view state
-  let currentViewIsGrouped = false; 
+// Global variable to track the current view state
+let currentViewIsGrouped = false; 
 
-  document.addEventListener('DOMContentLoaded', function() {
-      // Add event listeners for Quarter Calculator
-      document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
-      document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for Quarter Calculator
+    document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
+    document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
 
-      // Add event listeners for "Add Assignment" buttons
-      document.getElementById('addLearnerTasksBtn').addEventListener('click', () => addAssignmentInput('learnerTasks'));
-      document.getElementById('addAssessmentsBtn').addEventListener('click', () => addAssignmentInput('assessments'));
-      document.getElementById('addCustomBtn').addEventListener('click', () => addAssignmentInput('custom'));
-      document.getElementById('addAssignmentBtn').addEventListener('click', () => addAssignmentInput('assignments')); // New button for single view
+    // Add event listeners for "Add Assignment" buttons
+    document.getElementById('addLearnerTasksBtn').addEventListener('click', () => addAssignmentInput('learnerTasks'));
+    document.getElementById('addAssessmentsBtn').addEventListener('click', () => addAssignmentInput('assessments'));
+    document.getElementById('addCustomBtn').addEventListener('click', () => addAssignmentInput('custom'));
+    document.getElementById('addAssignmentBtn').addEventListener('click', () => addAssignmentInput('assignments')); // New button for single view
 
-      // Add event listener for the "Show Assignment Names" checkbox
-      document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
-      // Add event listener for the "Group View" checkbox
-      document.getElementById('groupViewCheckbox').addEventListener('change', (event) => toggleGroupView(event.target.checked));
-      
-      // Add event listeners for Needed Grades section
-      document.getElementById('numFutureAssignments').addEventListener('change', toggleFutureAssignmentInputs);
-      document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFutureGrades);
+    // Add event listener for the "Show Assignment Names" checkbox
+    document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
+    // Add event listener for the "Group View" checkbox
+    document.getElementById('groupViewCheckbox').addEventListener('change', (event) => toggleGroupView(event.target.checked));
+    
+    // Add event listeners for Needed Grades section
+    document.getElementById('numFutureAssignments').addEventListener('change', toggleFutureAssignmentInputs);
+    document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFutureGrades);
 
-      // Initial visibility check for assignment names and group view
-      document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
-      document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
-      toggleGroupView(false); // Explicitly set group view OFF on page load
-      toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
-      toggleFutureAssignmentInputs(); // Initial state for needed grades section
-  });
+    // Initial visibility check for assignment names and group view
+    document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
+    document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
+    toggleGroupView(false); // Explicitly set group view OFF on page load
+    toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
+    toggleFutureAssignmentInputs(); // Initial state for needed grades section
+});
 
-  function toggleMenu() {
-      const navLinks = document.querySelector('.nav-links');
-      navLinks.classList.toggle('active');
-  }
+function toggleMenu() {
+    const navLinks = document.querySelector('.nav-links');
+    navLinks.classList.toggle('active');
+}
 
-  // Modified toggleGroupView to accept a boolean for explicit control
-  function toggleGroupView(shouldBeGroupView) {
-      currentViewIsGrouped = shouldBeGroupView; // Update the global state
-      document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
-      document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
-      document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
+// Modified toggleGroupView to accept a boolean for explicit control
+function toggleGroupView(shouldBeGroupView) {
+    currentViewIsGrouped = shouldBeGroupView; // Update the global state
+    document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
+    document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
+    document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
 
-      calculateQuarterGrade(); // Recalculate based on new view
-  }
+    calculateQuarterGrade(); // Recalculate based on new view
+}
 
-  function addAssignmentInput(category) {
-      categoryCounters[category]++;
-      const container = document.getElementById(`${category}Assignments`);
-      const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
+function addAssignmentInput(category) {
+    categoryCounters[category]++;
+    const container = document.getElementById(`${category}Assignments`);
+    const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
 
-      const assignmentRow = document.createElement('div');
-      assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
-      assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
-      assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
+    const assignmentRow = document.createElement('div');
+    assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
+    assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
+    assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
 
-      // Assignment Name input
-      const nameInputGroup = document.createElement('div');
-      nameInputGroup.classList.add('class-input-group', 'class-name-input-group');
-      if (showAssignmentNames) {
-          nameInputGroup.style.display = 'block';
-      }
-      const nameLabel = document.createElement('label');
-      nameLabel.setAttribute('for', `${category}Name${categoryCounters[category]}`);
-      nameLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Name`;
-      const nameInput = document.createElement('input');
-      nameInput.setAttribute('type', 'text');
-      nameInput.setAttribute('id', `${category}Name${categoryCounters[category]}`);
-      nameInput.setAttribute('placeholder', `e.g., Chapter 1 Quiz`);
-      nameInput.classList.add('assignment-name-input');
-      nameInputGroup.appendChild(nameLabel);
-      nameInputGroup.appendChild(nameInput);
-      assignmentRow.appendChild(nameInputGroup);
+    // Assignment Name input
+    const nameInputGroup = document.createElement('div');
+    nameInputGroup.classList.add('class-input-group', 'class-name-input-group');
+    if (showAssignmentNames) {
+        nameInputGroup.style.display = 'block';
+    }
+    const nameLabel = document.createElement('label');
+    nameLabel.setAttribute('for', `${category}Name${categoryCounters[category]}`);
+    nameLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Name`;
+    const nameInput = document.createElement('input');
+    nameInput.setAttribute('type', 'text');
+    nameInput.setAttribute('id', `${category}Name${categoryCounters[category]}`);
+    nameInput.setAttribute('placeholder', `e.g., Chapter 1 Quiz`);
+    nameInput.classList.add('assignment-name-input');
+    nameInputGroup.appendChild(nameLabel);
+    nameInputGroup.appendChild(nameInput);
+    assignmentRow.appendChild(nameInputGroup);
 
-      // Assignment Grade (%) input
-      const gradeInputGroup = document.createElement('div');
-      gradeInputGroup.classList.add('class-input-group');
-      const gradeLabel = document.createElement('label');
-      gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
-      gradeLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Grade (%)`;
-      const gradeInput = document.createElement('input');
-      gradeInput.setAttribute('type', 'number');
-      gradeInput.setAttribute('id', `${category}Grade${categoryCounters[category]}`);
-      gradeInput.setAttribute('min', '0');
-      gradeInput.setAttribute('max', '100');
-      gradeInput.setAttribute('placeholder', 'Enter grade');
-      gradeInput.classList.add('assignment-grade-input');
-      gradeInputGroup.appendChild(gradeLabel);
-      gradeInputGroup.appendChild(gradeInput);
-      assignmentRow.appendChild(gradeInputGroup);
+    // Assignment Grade (%) input
+    const gradeInputGroup = document.createElement('div');
+    gradeInputGroup.classList.add('class-input-group');
+    const gradeLabel = document.createElement('label');
+    gradeLabel.setAttribute('for', `${category}Grade${categoryCounters[category]}`);
+    gradeLabel.innerText = `${formatCategoryName(category)} ${categoryCounters[category]} Grade (%)`;
+    const gradeInput = document.createElement('input');
+    gradeInput.setAttribute('type', 'number');
+    gradeInput.setAttribute('id', `${category}Grade${categoryCounters[category]}`);
+    gradeInput.setAttribute('min', '0');
+    gradeInput.setAttribute('max', '100');
+    gradeInput.setAttribute('placeholder', 'Enter grade');
+    gradeInput.classList.add('assignment-grade-input');
+    gradeInputGroup.appendChild(gradeLabel);
+    gradeInputGroup.appendChild(gradeInput);
+    assignmentRow.appendChild(gradeInputGroup);
 
-      // Assignment Type/Weight input (dynamic for 'assignments' category)
-      if (category === 'assignments') {
-          const typeInputGroup = document.createElement('div');
-          typeInputGroup.classList.add('class-input-group');
-          const typeLabel = document.createElement('label');
-          typeLabel.setAttribute('for', `${category}Type${categoryCounters[category]}`);
-          typeLabel.innerText = `Assignment Type`;
-          const typeSelect = document.createElement('select');
-          typeSelect.setAttribute('id', `${category}Type${categoryCounters[category]}`);
-          typeSelect.classList.add('assignment-type-select');
-          const types = ["Learner Tasks", "Assessments", "Custom"];
-          types.forEach(type => {
-              const option = document.createElement('option');
-              option.value = type;
-              option.innerText = type;
-              typeSelect.appendChild(option);
-          });
-          typeSelect.value = "Learner Tasks"; // Default type
-          typeSelect.onchange = function() {
-              toggleCustomWeightInput(assignmentRow, typeSelect.value);
-              calculateQuarterGrade(); // Recalculate when type changes
-          };
-          typeInputGroup.appendChild(typeLabel);
-          typeInputGroup.appendChild(typeSelect);
-          assignmentRow.appendChild(typeInputGroup);
+    // Assignment Type/Weight input (dynamic for 'assignments' category)
+    if (category === 'assignments') {
+        const typeInputGroup = document.createElement('div');
+        typeInputGroup.classList.add('class-input-group');
+        const typeLabel = document.createElement('label');
+        typeLabel.setAttribute('for', `${category}Type${categoryCounters[category]}`);
+        typeLabel.innerText = `Assignment Type`;
+        const typeSelect = document.createElement('select');
+        typeSelect.setAttribute('id', `${category}Type${categoryCounters[category]}`);
+        typeSelect.classList.add('assignment-type-select');
+        const types = ["Learner Tasks", "Assessments", "Custom"];
+        types.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type;
+            option.innerText = type;
+            typeSelect.appendChild(option);
+        });
+        typeSelect.value = "Learner Tasks"; // Default type
+        typeSelect.onchange = function() {
+            toggleCustomWeightInput(assignmentRow, typeSelect.value);
+            calculateQuarterGrade(); // Recalculate when type changes
+        };
+        typeInputGroup.appendChild(typeLabel);
+        typeInputGroup.appendChild(typeSelect);
+        assignmentRow.appendChild(typeInputGroup);
 
-          // Custom Weight input (initially hidden)
-          const customWeightInputGroup = document.createElement('div');
-          customWeightInputGroup.classList.add('class-input-group', 'custom-weight-input-group');
-          customWeightInputGroup.style.display = 'none'; // Hidden by default
-          const customWeightLabel = document.createElement('label');
-          customWeightLabel.setAttribute('for', `${category}CustomWeight${categoryCounters[category]}`);
-          customWeightLabel.innerText = `Custom Weight (%)`;
-          const customWeightInput = document.createElement('input');
-          customWeightInput.setAttribute('type', 'number');
-          customWeightInput.setAttribute('id', `${category}CustomWeight${categoryCounters[category]}`);
-          customWeightInput.setAttribute('min', '0');
-          customWeightInput.setAttribute('max', '100');
-          customWeightInput.setAttribute('value', '100'); // Default custom weight
-          customWeightInput.setAttribute('placeholder', 'e.g., 100');
-          customWeightInput.classList.add('assignment-custom-weight-input');
-          customWeightInputGroup.appendChild(customWeightLabel);
-          customWeightInputGroup.appendChild(customWeightInput);
-          assignmentRow.appendChild(customWeightInputGroup);
+        // Custom Weight input (initially hidden)
+        const customWeightInputGroup = document.createElement('div');
+        customWeightInputGroup.classList.add('class-input-group', 'custom-weight-input-group');
+        customWeightInputGroup.style.display = 'none'; // Hidden by default
+        const customWeightLabel = document.createElement('label');
+        customWeightLabel.setAttribute('for', `${category}CustomWeight${categoryCounters[category]}`);
+        customWeightLabel.innerText = `Custom Weight (%)`;
+        const customWeightInput = document.createElement('input');
+        customWeightInput.setAttribute('type', 'number');
+        customWeightInput.setAttribute('id', `${category}CustomWeight${categoryCounters[category]}`);
+        customWeightInput.setAttribute('min', '0');
+        customWeightInput.setAttribute('max', '100');
+        customWeightInput.setAttribute('value', '100'); // Default custom weight
+        customWeightInput.setAttribute('placeholder', 'e.g., 100');
+        customWeightInput.classList.add('assignment-custom-weight-input');
+        customWeightInputGroup.appendChild(customWeightLabel);
+        customWeightInputGroup.appendChild(customWeightInput);
+        assignmentRow.appendChild(customWeightInputGroup);
 
-      } else if (category === 'custom') { // Only for 'custom' category in group view
-          const weightInputGroup = document.createElement('div');
-          weightInputGroup.classList.add('class-input-group');
-          const weightLabel = document.createElement('label');
-          weightLabel.setAttribute('for', `${category}Weight${categoryCounters[category]}`);
-          weightLabel.innerText = `Weight (%)`;
-          const weightInput = document.createElement('input');
-          weightInput.setAttribute('type', 'number');
-          weightInput.setAttribute('id', `${category}Weight${categoryCounters[category]}`);
-          weightInput.setAttribute('min', '0');
-          weightInput.setAttribute('max', '100');
-          weightInput.setAttribute('value', '100'); // Default weight for individual assignments
-          weightInput.setAttribute('placeholder', 'e.g., 100');
-          weightInput.classList.add('assignment-weight-input');
-          weightInputGroup.appendChild(weightLabel);
-          weightInputGroup.appendChild(weightInput);
-          assignmentRow.appendChild(weightInputGroup);
-      }
-
-      // Remove Assignment button
-      const removeButton = document.createElement('button');
-      removeButton.classList.add('remove-class-btn');
-      removeButton.innerText = 'Remove';
-      removeButton.onclick = function() {
-          assignmentRow.remove();
-          updateAssignmentNumbers(category);
-          calculateQuarterGrade();
-      };
-      assignmentRow.appendChild(removeButton);
-
-      container.appendChild(assignmentRow);
-      updateAssignmentNumbers(category);
-  }
-
-  function toggleCustomWeightInput(assignmentRow, selectedType) {
-      const customWeightGroup = assignmentRow.querySelector('.custom-weight-input-group');
-      if (customWeightGroup) {
-          customWeightGroup.style.display = selectedType === 'Custom' ? 'block' : 'none';
-      }
-  }
-
-  function updateAssignmentNumbers(category) {
-      const assignmentRows = document.querySelectorAll(`#${category}Assignments .class-input-row`);
-      const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
-
-      assignmentRows.forEach((row, index) => {
-          const assignmentNum = index + 1;
-          const categoryName = row.getAttribute('data-category');
-
-          // Update labels and IDs for name input
-          const nameInputGroup = row.querySelector('.class-name-input-group');
-          if (nameInputGroup) {
-              nameInputGroup.style.display = showAssignmentNames ? 'block' : 'none';
-          }
-          const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
-          const nameInput = row.querySelector(`input[id^="${categoryName}Name"]`);
-          if (nameLabel && nameInput) {
-              nameLabel.setAttribute('for', `${categoryName}Name${assignmentNum}`);
-              nameInput.setAttribute('id', `${categoryName}Name${assignmentNum}`);
-              nameLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Name`;
-          }
-
-          // Update labels and IDs for grade input
-          const gradeLabel = row.querySelector(`label[for^="${categoryName}Grade"]`);
-          const gradeInput = row.querySelector(`input[id^="${categoryName}Grade"]`);
-          if (gradeLabel && gradeInput) {
-              gradeLabel.setAttribute('for', `${categoryName}Grade${assignmentNum}`);
-              gradeInput.setAttribute('id', `${categoryName}Grade${assignmentNum}`);
-              if (!showAssignmentNames) {
-                  gradeLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Grade (%)`;
-              } else {
-                  gradeLabel.innerText = `Grade (%)`;
-              }
-          }
-
-          // Update labels and IDs for weight/type input
-          if (categoryName === 'assignments') {
-              const typeLabel = row.querySelector(`label[for^="${categoryName}Type"]`);
-              const typeSelect = row.querySelector(`select[id^="${categoryName}Type"]`);
-              if (typeLabel && typeSelect) {
-                  typeLabel.setAttribute('for', `${categoryName}Type${assignmentNum}`);
-                  typeSelect.setAttribute('id', `${categoryName}Type${assignmentNum}`);
-              }
-              const customWeightLabel = row.querySelector(`label[for^="${categoryName}CustomWeight"]`);
-              const customWeightInput = row.querySelector(`input[id^="${categoryName}CustomWeight"]`);
-              if (customWeightLabel && customWeightInput) {
-                  customWeightLabel.setAttribute('for', `${categoryName}CustomWeight${assignmentNum}`);
-                  customWeightInput.setAttribute('id', `${categoryName}CustomWeight${assignmentNum}`);
-              }
-              // Ensure custom weight input visibility is correct on re-numbering
-              const selectedType = typeSelect ? typeSelect.value : '';
-              toggleCustomWeightInput(row, selectedType);
-
-          } else if (categoryName === 'custom') {
-              const weightLabel = row.querySelector(`label[for^="${categoryName}Weight"]`);
-              const weightInput = row.querySelector(`input[id^="${categoryName}Weight"]`);
-              if (weightLabel && weightInput) {
-                  weightLabel.setAttribute('for', `${categoryName}Weight${assignmentNum}`);
-                  weightInput.setAttribute('id', `${categoryName}Weight${assignmentNum}`);
-              }
-          }
-      });
-  }
-
-  function toggleAssignmentNamesVisibility() {
-      const showNames = document.getElementById('showAssignmentNamesCheckbox').checked;
-      const nameInputGroups = document.querySelectorAll('.class-name-input-group');
-      nameInputGroups.forEach(group => {
-          group.style.display = showNames ? 'block' : 'none';
-      });
-
-      const allCategories = ['learnerTasks', 'assessments', 'custom', 'assignments'];
-      allCategories.forEach(category => {
-          updateAssignmentNumbers(category);
-      });
-  }
-
-  function formatCategoryName(category) {
-      if (category === 'assignments') {
-          return 'Assignment';
-      }
-      return category.replace(/([A-Z])/g, ' $1')
-                     .replace(/^./, function(str){ return str.toUpperCase(); });
-  }
-
-  /**
-   * Calculates the current weighted sum and total weight of all entered assignments.
-   * @returns {{currentWeightedSum: number, currentTotalWeight: number}}
-   */
-  function getCurrentQuarterStats() {
-      const isGroupView = currentViewIsGrouped;
-      let currentWeightedSum = 0;
-      let currentTotalWeight = 0;
-
-      if (isGroupView) {
-          const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
-          const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
-
-          const categories = ['learnerTasks', 'assessments'];
-          categories.forEach(category => {
-              const categoryWeight = parseFloat(document.getElementById(`${category}Weight`).value) || 0;
-              
-              const assignmentInputs = document.querySelectorAll(`#${category}Assignments input.assignment-grade-input`);
-              let currentCategoryGrades = [];
-              assignmentInputs.forEach(input => {
-                  const grade = parseFloat(input.value);
-                  if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                      currentCategoryGrades.push(grade);
-                  }
-              });
-
-              if (currentCategoryGrades.length > 0) {
-                  const categoryAverage = currentCategoryGrades.reduce((sum, grade) => sum + grade, 0) / currentCategoryGrades.length;
-                  currentWeightedSum += categoryAverage * categoryWeight;
-                  currentTotalWeight += categoryWeight;
-              }
-          });
-
-          const customAssignmentRows = document.querySelectorAll(`#customAssignments .class-input-row`);
-          customAssignmentRows.forEach(row => {
-              const gradeInput = row.querySelector('.assignment-grade-input');
-              const weightInput = row.querySelector('.assignment-weight-input');
-
-              const grade = parseFloat(gradeInput.value);
-              const weight = parseFloat(weightInput.value);
-
-              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
-                  currentWeightedSum += grade * weight;
-                  currentTotalWeight += weight;
-              }
-          });
-
-      } else { // Single Assignment Category View
-          const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
-          const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
-
-          let learnerTaskGrades = [];
-          let assessmentGrades = [];
-          let customWeightedSumSingle = 0;
-          let customTotalWeightSingle = 0;
-
-          const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
-          assignmentRows.forEach(row => {
-              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
-              const type = row.querySelector('.assignment-type-select').value;
-              const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
-
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                  if (type === 'Learner Tasks') {
-                      learnerTaskGrades.push(grade);
-                  } else if (type === 'Assessments') {
-                      assessmentGrades.push(grade);
-                  } else if (type === 'Custom') {
-                      if (!isNaN(customWeight) && customWeight >= 0) {
-                          customWeightedSumSingle += grade * customWeight;
-                          customTotalWeightSingle += customWeight;
-                      }
-                  }
-              }
-          });
-
-          const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
-          const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
-          const avgCustom = customTotalWeightSingle > 0 ? customWeightedSumSingle / customTotalWeightSingle : 0;
-
-          currentWeightedSum = (avgLearnerTasks * learnerTaskOverallWeight) + (avgAssessments * assessmentOverallWeight) + customWeightedSumSingle;
-          currentTotalWeight = learnerTaskOverallWeight + assessmentOverallWeight + customTotalWeightSingle;
-      }
-      return { currentWeightedSum, currentTotalWeight };
-  }
-
-  function calculateQuarterGrade() {
-      const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
-      let resultHtml = "";
-
-      if (currentTotalWeight > 0) {
-          const quarterGrade = currentWeightedSum / currentTotalWeight;
-          resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">${quarterGrade.toFixed(3)}%</span></h3>`;
-      } else {
-          resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>`;
-      }
-
-      // Display individual category averages if in group view or if single assignments were entered
-      const isGroupView = currentViewIsGrouped;
-      if (isGroupView) {
-          const learnerTaskGrades = [];
-          document.querySelectorAll('#learnerTasksAssignments input.assignment-grade-input').forEach(input => {
-              const grade = parseFloat(input.value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) learnerTaskGrades.push(grade);
-          });
-          const assessmentGrades = [];
-          document.querySelectorAll('#assessmentsAssignments input.assignment-grade-input').forEach(input => {
-              const grade = parseFloat(input.value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) assessmentGrades.push(grade);
-          });
-          const customGrades = [];
-          const customWeights = [];
-          document.querySelectorAll('#customAssignments .class-input-row').forEach(row => {
-              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
-              const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
-                  customGrades.push(grade);
-                  customWeights.push(weight);
-              }
-          });
-
-          const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
-          const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
-          const avgCustom = customWeights.reduce((sum, w) => sum + w, 0) > 0 ? customGrades.reduce((sum, g, i) => sum + (g * customWeights[i]), 0) / customWeights.reduce((sum, w) => sum + w, 0) : 0;
-
-          if (learnerTaskGrades.length > 0) {
-              resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
-          }
-          if (assessmentGrades.length > 0) {
-              resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
-          }
-          if (customGrades.length > 0) {
-              resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
-          }
-
-          // NEW LOGIC FOR DRAG DOWN COMPARISON (only if both categories have grades)
-          if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
-              const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
-              const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
-
-              const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
-              const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
-
-              let dragDownMessage = "";
-              if (learnerTaskDragDown > assessmentDragDown) {
-                  dragDownMessage = `Learner Tasks are dragging your grade down more.`;
-              } else if (assessmentDragDown > learnerTaskDragDown) {
-                  dragDownMessage = `Assessments are dragging your grade down more.`;
-              } else {
-                  dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
-              }
-              resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
-          }
-      } else { // Single Assignment View
-          const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
-          const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
-
-          let learnerTaskGrades = [];
-          let assessmentGrades = [];
-          let customWeightedSumSingle = 0;
-          let customTotalWeightSingle = 0;
-
-          document.querySelectorAll(`#assignmentsAssignments .class-input-row`).forEach(row => {
-              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
-              const type = row.querySelector('.assignment-type-select').value;
-              const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
-
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                  if (type === 'Learner Tasks') {
-                      learnerTaskGrades.push(grade);
-                  } else if (type === 'Assessments') {
-                      assessmentGrades.push(grade);
-                  } else if (type === 'Custom') {
-                      if (!isNaN(customWeight) && customWeight >= 0) {
-                          customWeightedSumSingle += grade * customWeight;
-                          customTotalWeightSingle += customWeight;
-                      }
-                  }
-              }
-          });
-
-          const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
-          const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
-          const avgCustom = customTotalWeightSingle > 0 ? customWeightedSumSingle / customTotalWeightSingle : 0;
-
-          if (learnerTaskGrades.length > 0) {
-              resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
-          }
-          if (assessmentGrades.length > 0) {
-              resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
-          }
-          if (customTotalWeightSingle > 0) {
-              resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
-          }
-
-          // NEW LOGIC FOR DRAG DOWN COMPARISON (only if both categories have grades)
-          if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
-              const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
-              const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
-
-              let dragDownMessage = "";
-              if (learnerTaskDragDown > assessmentDragDown) {
-                  dragDownMessage = `Learner Tasks are dragging your grade down more.`;
-              } else if (assessmentDragDown > learnerTaskDragDown) {
-                  dragDownMessage = `Assessments are dragging your grade down more.`;
-              } else {
-                  dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
-              }
-              resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
-          }
-      }
-
-      document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
-  }
-
-  /**
-   * @param {Array<{score: number, weight: number}>} done
-   * @param {number} nextWeight - weight of future assignment (decimal)
-   * @param {number} desiredGrade - desired final quarter grade (percentage, e.g., 90 for 90%)
-   * @return {number} - minimum score needed on the assignment
-   */
-  function neededForOneMore(done, nextWeight, desiredGrade) {
-    let currentTotal = 0;
-    let currentWeight = 0;
-
-    for (let { score, weight } of done) {
-      currentTotal += score * weight;
-      currentWeight += weight;
+    } else if (category === 'custom') { // Only for 'custom' category in group view
+        const weightInputGroup = document.createElement('div');
+        weightInputGroup.classList.add('class-input-group');
+        const weightLabel = document.createElement('label');
+        weightLabel.setAttribute('for', `${category}Weight${categoryCounters[category]}`);
+        weightLabel.innerText = `Weight (%)`;
+        const weightInput = document.createElement('input');
+        weightInput.setAttribute('type', 'number');
+        weightInput.setAttribute('id', `${category}Weight${categoryCounters[category]}`);
+        weightInput.setAttribute('min', '0');
+        weightInput.setAttribute('max', '100');
+        weightInput.setAttribute('value', '100'); // Default weight for individual assignments
+        weightInput.setAttribute('placeholder', 'e.g., 100');
+        weightInput.classList.add('assignment-weight-input');
+        weightInputGroup.appendChild(weightLabel);
+        weightInputGroup.appendChild(weightInput);
+        assignmentRow.appendChild(weightInputGroup);
     }
 
-    // desiredGrade is already a percentage (e.g., 90).
-    // targetPoints should be the total weighted sum needed for the desired average.
-    const targetPoints = desiredGrade * (currentWeight + nextWeight);
-    return (targetPoints - currentTotal) / nextWeight;
-  }
-
-  /**
-   * @param {Array<{score: number, weight: number}>} done
-   * @param {number} wA - weight of assignment A (decimal)
-   * @param {number} wB - weight of assignment B (decimal)
-   * @param {number} desiredGrade - desired final quarter grade (percentage, e.g., 90 for 90%)
-   * @return {Object} - scores needed for different scenarios
-   */
-  function neededForTwoMore(done, wA, wB, desiredGrade) {
-    let currentTotal = 0;
-    let currentWeight = 0;
-
-    for (let { score, weight } of done) {
-      currentTotal += score * weight;
-      currentWeight += weight;
-    }
-
-    const fullWeight = currentWeight + wA + wB;
-    // desiredGrade is already a percentage (e.g., 90).
-    const targetPoints = desiredGrade * fullWeight;
-
-    const sameOnBoth = (targetPoints - currentTotal) / (wA + wB);
-    const ifA100ThenB = (targetPoints - currentTotal - (100 * wA)) / wB; // Use 100 for 100%
-    const ifB100ThenA = (targetPoints - currentTotal - (100 * wB)) / wA; // Use 100 for 100%
-
-    return {
-      sameOnBoth,
-      ifA100ThenB,
-      ifB100ThenA
+    // Remove Assignment button
+    const removeButton = document.createElement('button');
+    removeButton.classList.add('remove-class-btn');
+    removeButton.innerText = 'Remove';
+    removeButton.onclick = function() {
+        assignmentRow.remove();
+        updateAssignmentNumbers(category);
+        calculateQuarterGrade();
     };
+    assignmentRow.appendChild(removeButton);
+
+    container.appendChild(assignmentRow);
+    updateAssignmentNumbers(category);
+}
+
+function toggleCustomWeightInput(assignmentRow, selectedType) {
+    const customWeightGroup = assignmentRow.querySelector('.custom-weight-input-group');
+    if (customWeightGroup) {
+        customWeightGroup.style.display = selectedType === 'Custom' ? 'block' : 'none';
+    }
+}
+
+function updateAssignmentNumbers(category) {
+    const assignmentRows = document.querySelectorAll(`#${category}Assignments .class-input-row`);
+    const showAssignmentNames = document.getElementById('showAssignmentNamesCheckbox').checked;
+
+    assignmentRows.forEach((row, index) => {
+        const assignmentNum = index + 1;
+        const categoryName = row.getAttribute('data-category');
+
+        // Update labels and IDs for name input
+        const nameInputGroup = row.querySelector('.class-name-input-group');
+        if (nameInputGroup) {
+            nameInputGroup.style.display = showAssignmentNames ? 'block' : 'none';
+        }
+        const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
+        const nameInput = row.querySelector(`input[id^="${categoryName}Name"]`);
+        if (nameLabel && nameInput) {
+            nameLabel.setAttribute('for', `${categoryName}Name${assignmentNum}`);
+            nameInput.setAttribute('id', `${categoryName}Name${assignmentNum}`);
+            nameLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Name`;
+        }
+
+        // Update labels and IDs for grade input
+        const gradeLabel = row.querySelector(`label[for^="${categoryName}Grade"]`);
+        const gradeInput = row.querySelector(`input[id^="${categoryName}Grade"]`);
+        if (gradeLabel && gradeInput) {
+            gradeLabel.setAttribute('for', `${categoryName}Grade${assignmentNum}`);
+            gradeInput.setAttribute('id', `${categoryName}Grade${assignmentNum}`);
+            if (!showAssignmentNames) {
+                gradeLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Grade (%)`;
+            } else {
+                gradeLabel.innerText = `Grade (%)`;
+            }
+        }
+
+        // Update labels and IDs for weight/type input
+        if (categoryName === 'assignments') {
+            const typeLabel = row.querySelector(`label[for^="${categoryName}Type"]`);
+            const typeSelect = row.querySelector(`select[id^="${categoryName}Type"]`);
+            if (typeLabel && typeSelect) {
+                typeLabel.setAttribute('for', `${categoryName}Type${assignmentNum}`);
+                typeSelect.setAttribute('id', `${categoryName}Type${assignmentNum}`);
+            }
+            const customWeightLabel = row.querySelector(`label[for^="${categoryName}CustomWeight"]`);
+            const customWeightInput = row.querySelector(`input[id^="${categoryName}CustomWeight"]`);
+            if (customWeightLabel && customWeightInput) {
+                customWeightLabel.setAttribute('for', `${categoryName}CustomWeight${assignmentNum}`);
+                customWeightInput.setAttribute('id', `${categoryName}CustomWeight${assignmentNum}`);
+            }
+            // Ensure custom weight input visibility is correct on re-numbering
+            const selectedType = typeSelect ? typeSelect.value : '';
+            toggleCustomWeightInput(row, selectedType);
+
+        } else if (categoryName === 'custom') {
+            const weightLabel = row.querySelector(`label[for^="${categoryName}Weight"]`);
+            const weightInput = row.querySelector(`input[id^="${categoryName}Weight"]`);
+            if (weightLabel && weightInput) {
+                weightLabel.setAttribute('for', `${categoryName}Weight${assignmentNum}`);
+                weightInput.setAttribute('id', `${categoryName}Weight${assignmentNum}`);
+            }
+        }
+    });
+}
+
+function toggleAssignmentNamesVisibility() {
+    const showNames = document.getElementById('showAssignmentNamesCheckbox').checked;
+    const nameInputGroups = document.querySelectorAll('.class-name-input-group');
+    nameInputGroups.forEach(group => {
+        group.style.display = showNames ? 'block' : 'none';
+    });
+
+    const allCategories = ['learnerTasks', 'assessments', 'custom', 'assignments'];
+    allCategories.forEach(category => {
+        updateAssignmentNumbers(category);
+    });
+}
+
+function formatCategoryName(category) {
+    if (category === 'assignments') {
+        return 'Assignment';
+    }
+    return category.replace(/([A-Z])/g, ' $1')
+                   .replace(/^./, function(str){ return str.toUpperCase(); });
+}
+
+/**
+ * Calculates the current weighted sum and total weight of all entered assignments.
+ * @returns {{currentWeightedSum: number, currentTotalWeight: number}}
+ */
+function getCurrentQuarterStats() {
+    const isGroupView = currentViewIsGrouped;
+    let currentWeightedSum = 0;
+    let currentTotalWeight = 0;
+
+    if (isGroupView) {
+        const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
+        const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
+
+        const categories = ['learnerTasks', 'assessments'];
+        categories.forEach(category => {
+            const categoryWeight = parseFloat(document.getElementById(`${category}Weight`).value) || 0;
+            
+            const assignmentInputs = document.querySelectorAll(`#${category}Assignments input.assignment-grade-input`);
+            let currentCategoryGrades = [];
+            assignmentInputs.forEach(input => {
+                const grade = parseFloat(input.value);
+                if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                    currentCategoryGrades.push(grade);
+                }
+            });
+
+            if (currentCategoryGrades.length > 0) {
+                const categoryAverage = currentCategoryGrades.reduce((sum, grade) => sum + grade, 0) / currentCategoryGrades.length;
+                currentWeightedSum += categoryAverage * categoryWeight;
+                currentTotalWeight += categoryWeight;
+            }
+        });
+
+        const customAssignmentRows = document.querySelectorAll(`#customAssignments .class-input-row`);
+        customAssignmentRows.forEach(row => {
+            const gradeInput = row.querySelector('.assignment-grade-input');
+            const weightInput = row.querySelector('.assignment-weight-input');
+
+            const grade = parseFloat(gradeInput.value);
+            const weight = parseFloat(weightInput.value);
+
+            if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                currentWeightedSum += grade * weight;
+                currentTotalWeight += weight;
+            }
+        });
+
+    } else { // Single Assignment Category View
+        const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+        const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+        let learnerTaskGrades = [];
+        let assessmentGrades = [];
+        let customWeightedSumSingle = 0;
+        let customTotalWeightSingle = 0;
+
+        const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
+        assignmentRows.forEach(row => {
+            const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+            const type = row.querySelector('.assignment-type-select').value;
+            const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
+
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                if (type === 'Learner Tasks') {
+                    learnerTaskGrades.push(grade);
+                } else if (type === 'Assessments') {
+                    assessmentGrades.push(grade);
+                } else if (type === 'Custom') {
+                    if (!isNaN(customWeight) && customWeight >= 0) {
+                        customWeightedSumSingle += grade * customWeight;
+                        customTotalWeightSingle += customWeight;
+                    }
+                }
+            }
+        });
+
+        const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+        const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+        const avgCustom = customTotalWeightSingle > 0 ? customWeightedSumSingle / customTotalWeightSingle : 0;
+
+        currentWeightedSum = (avgLearnerTasks * learnerTaskOverallWeight) + (avgAssessments * assessmentOverallWeight) + customWeightedSumSingle;
+        currentTotalWeight = learnerTaskOverallWeight + assessmentOverallWeight + customTotalWeightSingle;
+    }
+    return { currentWeightedSum, currentTotalWeight };
+}
+
+function calculateQuarterGrade() {
+    const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
+    let resultHtml = "";
+
+    if (currentTotalWeight > 0) {
+        const quarterGrade = currentWeightedSum / currentTotalWeight;
+        resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">${quarterGrade.toFixed(3)}%</span></h3>`;
+    } else {
+        resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>`;
+    }
+
+    // Display individual category averages if in group view or if single assignments were entered
+    const isGroupView = currentViewIsGrouped;
+    if (isGroupView) {
+        const learnerTaskGrades = [];
+        document.querySelectorAll('#learnerTasksAssignments input.assignment-grade-input').forEach(input => {
+            const grade = parseFloat(input.value);
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) learnerTaskGrades.push(grade);
+        });
+        const assessmentGrades = [];
+        document.querySelectorAll('#assessmentsAssignments input.assignment-grade-input').forEach(input => {
+            const grade = parseFloat(input.value);
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) assessmentGrades.push(grade);
+        });
+        const customGrades = [];
+        const customWeights = [];
+        document.querySelectorAll('#customAssignments .class-input-row').forEach(row => {
+            const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+            const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
+            if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                customGrades.push(grade);
+                customWeights.push(weight);
+            }
+        });
+
+        const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+        const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+        const avgCustom = customWeights.reduce((sum, w) => sum + w, 0) > 0 ? customGrades.reduce((sum, g, i) => sum + (g * customWeights[i]), 0) / customWeights.reduce((sum, w) => sum + w, 0) : 0;
+
+        if (learnerTaskGrades.length > 0) {
+            resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
+        }
+        if (assessmentGrades.length > 0) {
+            resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
+        }
+        if (customGrades.length > 0) {
+            resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
+        }
+
+        // NEW LOGIC FOR DRAG DOWN COMPARISON (only if both categories have grades)
+        if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
+            const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
+            const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
+
+            const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
+            const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
+
+            let dragDownMessage = "";
+            if (learnerTaskDragDown > assessmentDragDown) {
+                dragDownMessage = `Learner Tasks are dragging your grade down more.`;
+            } else if (assessmentDragDown > learnerTaskDragDown) {
+                dragDownMessage = `Assessments are dragging your grade down more.`;
+            } else {
+                dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
+            }
+            resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
+        }
+    } else { // Single Assignment View
+        const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+        const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+        let learnerTaskGrades = [];
+        let assessmentGrades = [];
+        let customWeightedSumSingle = 0;
+        let customTotalWeightSingle = 0;
+
+        document.querySelectorAll(`#assignmentsAssignments .class-input-row`).forEach(row => {
+            const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+            const type = row.querySelector('.assignment-type-select').value;
+            const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
+
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                if (type === 'Learner Tasks') {
+                    learnerTaskGrades.push(grade);
+                } else if (type === 'Assessments') {
+                    assessmentGrades.push(grade);
+                } else if (type === 'Custom') {
+                    if (!isNaN(customWeight) && customWeight >= 0) {
+                        customWeightedSumSingle += grade * customWeight;
+                        customTotalWeightSingle += customWeight;
+                    }
+                }
+            }
+        });
+
+        const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+        const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+        const avgCustom = customTotalWeightSingle > 0 ? customWeightedSumSingle / customTotalWeightSingle : 0;
+
+        if (learnerTaskGrades.length > 0) {
+            resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
+        }
+        if (assessmentGrades.length > 0) {
+            resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
+        }
+        if (customTotalWeightSingle > 0) {
+            resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
+        }
+
+        // NEW LOGIC FOR DRAG DOWN COMPARISON (only if both categories have grades)
+        if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
+            const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
+            const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
+
+            let dragDownMessage = "";
+            if (learnerTaskDragDown > assessmentDragDown) {
+                dragDownMessage = `Learner Tasks are dragging your grade down more.`;
+            } else if (assessmentDragDown > learnerTaskDragDown) {
+                dragDownMessage = `Assessments are dragging your grade down more.`;
+            } else {
+                dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
+            }
+            resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
+        }
+    }
+
+    document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
+}
+
+/**
+ * @param {Array<{score: number, weight: number}>} done
+ * @param {number} nextWeight - weight of future assignment (decimal)
+ * @param {number} desiredGrade - desired final quarter grade (percentage, e.g., 90 for 90%)
+ * @return {number} - minimum score needed on the assignment
+ */
+function neededForOneMore(done, nextWeight, desiredGrade) {
+  let currentTotal = 0;
+  let currentWeight = 0;
+
+  for (let { score, weight } of done) {
+    currentTotal += score * weight;
+    currentWeight += weight;
   }
 
-  function calculateNeededFutureGrades() {
-      const desiredGrade = parseFloat(document.getElementById('desiredQuarterGradeNeeded').value);
-      const numFutureAssignments = parseInt(document.getElementById('numFutureAssignments').value);
-      const neededResultsContainer = document.getElementById('neededGradesResults');
-      neededResultsContainer.innerHTML = ''; // Clear previous results
+  // desiredGrade is already a percentage (e.g., 90).
+  // targetPoints should be the total weighted sum needed for the desired average.
+  const targetPoints = desiredGrade * (currentWeight + nextWeight);
+  return (targetPoints - currentTotal) / nextWeight;
+}
 
-      if (isNaN(desiredGrade) || desiredGrade < 0 || desiredGrade > 100) {
-          neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid desired quarter grade (0-100%).</p>';
-          return;
-      }
+/**
+ * @param {Array<{score: number, weight: number}>} done
+ * @param {number} wA - weight of assignment A (decimal)
+ * @param {number} wB - weight of assignment B (decimal)
+ * @param {number} desiredGrade - desired final quarter grade (percentage, e.g., 90 for 90%)
+ * @return {Object} - scores needed for different scenarios
+ */
+function neededForTwoMore(done, wA, wB, desiredGrade) {
+  let currentTotal = 0;
+  let currentWeight = 0;
 
-      const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
-
-      let doneAssignments = [];
-      const isGroupView = currentViewIsGrouped;
-
-      if (isGroupView) {
-          const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
-          const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
-
-          // Learner Tasks
-          const learnerTaskGrades = [];
-          document.querySelectorAll('#learnerTasksAssignments input.assignment-grade-input').forEach(input => {
-              const grade = parseFloat(input.value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) learnerTaskGrades.push(grade);
-          });
-          if (learnerTaskGrades.length > 0) {
-              const avg = learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length;
-              doneAssignments.push({ score: avg, weight: learnerTaskOverallWeight / 100 }); // Convert weight to decimal
-          }
-
-          // Assessments
-          const assessmentGrades = [];
-          document.querySelectorAll('#assessmentsAssignments input.assignment-grade-input').forEach(input => {
-              const grade = parseFloat(input.value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) assessmentGrades.push(grade);
-          });
-          if (assessmentGrades.length > 0) {
-              const avg = assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length;
-              doneAssignments.push({ score: avg, weight: assessmentOverallWeight / 100 }); // Convert weight to decimal
-          }
-
-          // Custom assignments (individual weights)
-          document.querySelectorAll('#customAssignments .class-input-row').forEach(row => {
-              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
-              const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
-              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
-                  doneAssignments.push({ score: grade, weight: weight / 100 }); // Convert weight to decimal
-              }
-          });
-
-      } else { // Single Assignment Category View
-          const overallLearnerTaskWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
-          const overallAssessmentWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
-
-          let learnerTaskGrades = [];
-          let assessmentGrades = [];
-          let customAssignmentsSingle = []; // Store custom assignments for single view
-
-          document.querySelectorAll(`#assignmentsAssignments .class-input-row`).forEach(row => {
-              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
-              const type = row.querySelector('.assignment-type-select').value;
-              const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
-
-              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                  if (type === 'Learner Tasks') {
-                      learnerTaskGrades.push(grade);
-                  } else if (type === 'Assessments') {
-                      assessmentGrades.push(grade);
-                  } else if (type === 'Custom') {
-                      if (!isNaN(customWeight) && customWeight >= 0) {
-                          customAssignmentsSingle.push({ score: grade, weight: customWeight });
-                      }
-                  }
-              }
-          });
-
-          if (learnerTaskGrades.length > 0) {
-              const avg = learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length;
-              doneAssignments.push({ score: avg, weight: overallLearnerTaskWeight / 100 });
-          }
-          if (assessmentGrades.length > 0) {
-              const avg = assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length;
-              doneAssignments.push({ score: avg, weight: overallAssessmentWeight / 100 });
-          }
-          customAssignmentsSingle.forEach(item => {
-              doneAssignments.push({ score: item.score, weight: item.weight / 100 });
-          });
-      }
-
-
-      if (numFutureAssignments === 1) {
-          const weightA = parseFloat(document.getElementById('futureAssignment1Weight').value);
-          if (isNaN(weightA) || weightA <= 0 || weightA > 100) {
-              neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid weight for the future assignment (1-100%).</p>';
-              return;
-          }
-          const needed = neededForOneMore(doneAssignments, weightA / 100, desiredGrade); // Convert weight to decimal
-          displayNeededResult(neededResultsContainer, needed, 1);
-
-      } else if (numFutureAssignments === 2) {
-          const weightA = parseFloat(document.getElementById('futureAssignmentAWeight').value);
-          const weightB = parseFloat(document.getElementById('futureAssignmentBWeight').value);
-
-          if (isNaN(weightA) || weightA <= 0 || weightA > 100 || isNaN(weightB) || weightB <= 0 || weightB > 100) {
-              neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter valid weights for both future assignments (1-100%).</p>';
-              return;
-          }
-          const needed = neededForTwoMore(doneAssignments, weightA / 100, weightB / 100, desiredGrade); // Convert weights to decimal
-          displayNeededResult(neededResultsContainer, needed, 2);
-      } else {
-          neededResultsContainer.innerHTML = '<p style="color: var(--text-secondary);">Select the number of future assignments to calculate.</p>';
-      }
+  for (let { score, weight } of done) {
+    currentTotal += score * weight;
+    currentWeight += weight;
   }
 
-  function displayNeededResult(container, result, numAssignments) {
-      let html = '';
-      if (numAssignments === 1) {
-          const needed = result;
-          if (needed > 100) {
-              html = `<h3>Needed Grade: <span style="color: #f44336;">Not Possible</span></h3>
-                      <p style="color: var(--text-secondary);">You need a ${needed.toFixed(3)}% on your next assignment, which is likely not achievable.</p>`;
-          } else if (needed < 0) {
-              html = `<h3>Needed Grade: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-                      <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
-          } else {
-              html = `<h3>Needed Grade: <span style="color: var(--accent-color);">${needed.toFixed(3)}%</span></h3>
-                      <p style="color: var(--text-secondary);">You need to score this on your next assignment to achieve your desired quarter grade.</p>`;
-          }
-      } else if (numAssignments === 2) {
-          const { sameOnBoth, ifA100ThenB, ifB100ThenA } = result;
+  const fullWeight = currentWeight + wA + wB;
+  // desiredGrade is already a percentage (e.g., 90).
+  const targetPoints = desiredGrade * fullWeight;
 
-          html += `<h3>Needed Grades Scenarios:</h3>`;
+  const sameOnBoth = (targetPoints - currentTotal) / (wA + wB);
+  const ifA100ThenB = (targetPoints - currentTotal - (100 * wA)) / wB; // Use 100 for 100%
+  const ifB100ThenA = (targetPoints - currentTotal - (100 * wB)) / wA; // Use 100 for 100%
 
-          // Scenario 1: Same grade on both
-          if (sameOnBoth > 100) {
-              html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: #f44336;">Not Possible</span> (needs ${sameOnBoth.toFixed(3)}%)</p>`;
-          } else if (sameOnBoth < 0) {
-              html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: var(--accent-color);">Already Achieved!</span></p>`;
-          } else {
-              html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: var(--accent-color);">${sameOnBoth.toFixed(3)}%</span> on each.</p>`;
-          }
+  return {
+    sameOnBoth,
+    ifA100ThenB,
+    ifB100ThenA
+  };
+}
 
-          // Scenario 2: Assignment A gets 100%
-          if (ifA100ThenB > 100) {
-              html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: #f44336;">Not Possible</span> (needs ${ifA100ThenB.toFixed(3)}%)</p>`;
-          } else if (ifA100ThenB < 0) {
-              html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: var(--accent-color);">0% or less</span> (already good).</p>`;
-          } else {
-              html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: var(--accent-color);">${ifA100ThenB.toFixed(3)}%</span>.</p>`;
-          }
+function calculateNeededFutureGrades() {
+    const desiredGrade = parseFloat(document.getElementById('desiredQuarterGradeNeeded').value);
+    const numFutureAssignments = parseInt(document.getElementById('numFutureAssignments').value);
+    const neededResultsContainer = document.getElementById('neededGradesResults');
+    neededResultsContainer.innerHTML = ''; // Clear previous results
 
-          // Scenario 3: Assignment B gets 100%
-          if (ifB100ThenA > 100) {
-              html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: #f44336;">Not Possible</span> (needs ${ifB100ThenA.toFixed(3)}%)</p>`;
-          } else if (ifB100ThenA < 0) {
-              html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: var(--accent-color);">0% or less</span> (already good).</p>`;
-          } else {
-              html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: var(--accent-color);">${ifB100ThenA.toFixed(3)}%</span>.</p>`;
-          }
-      }
-      container.innerHTML = html;
-  }
+    if (isNaN(desiredGrade) || desiredGrade < 0 || desiredGrade > 100) {
+        neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid desired quarter grade (0-100%).</p>';
+        return;
+    }
+
+    const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
+
+    let doneAssignments = [];
+    const isGroupView = currentViewIsGrouped;
+
+    if (isGroupView) {
+        const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
+        const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
+
+        // Learner Tasks
+        const learnerTaskGrades = [];
+        document.querySelectorAll('#learnerTasksAssignments input.assignment-grade-input').forEach(input => {
+            const grade = parseFloat(input.value);
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) learnerTaskGrades.push(grade);
+        });
+        if (learnerTaskGrades.length > 0) {
+            const avg = learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length;
+            doneAssignments.push({ score: avg, weight: learnerTaskOverallWeight / 100 }); // Convert weight to decimal
+        }
+
+        // Assessments
+        const assessmentGrades = [];
+        document.querySelectorAll('#assessmentsAssignments input.assignment-grade-input').forEach(input => {
+            const grade = parseFloat(input.value);
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) assessmentGrades.push(grade);
+        });
+        if (assessmentGrades.length > 0) {
+            const avg = assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length;
+            doneAssignments.push({ score: avg, weight: assessmentOverallWeight / 100 }); // Convert weight to decimal
+        }
+
+        // Custom assignments (individual weights)
+        document.querySelectorAll('#customAssignments .class-input-row').forEach(row => {
+            const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+            const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
+            if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                doneAssignments.push({ score: grade, weight: weight / 100 }); // Convert weight to decimal
+            }
+        });
+
+    } else { // Single Assignment Category View
+        const overallLearnerTaskWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+        const overallAssessmentWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+        let learnerTaskGrades = [];
+        let assessmentGrades = [];
+        let customAssignmentsSingle = []; // Store custom assignments for single view
+
+        document.querySelectorAll(`#assignmentsAssignments .class-input-row`).forEach(row => {
+            const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+            const type = row.querySelector('.assignment-type-select').value;
+            const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
+
+            if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                if (type === 'Learner Tasks') {
+                    learnerTaskGrades.push(grade);
+                } else if (type === 'Assessments') {
+                    assessmentGrades.push(grade);
+                } else if (type === 'Custom') {
+                    if (!isNaN(customWeight) && customWeight >= 0) {
+                        customAssignmentsSingle.push({ score: grade, weight: customWeight });
+                    }
+                }
+            }
+        });
+
+        if (learnerTaskGrades.length > 0) {
+            const avg = learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length;
+            doneAssignments.push({ score: avg, weight: overallLearnerTaskWeight / 100 });
+        }
+        if (assessmentGrades.length > 0) {
+            const avg = assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length;
+            doneAssignments.push({ score: avg, weight: overallAssessmentWeight / 100 });
+        }
+        customAssignmentsSingle.forEach(item => {
+            doneAssignments.push({ score: item.score, weight: item.weight / 100 });
+        });
+    }
 
 
-  function toggleFutureAssignmentInputs() {
-      const numAssignments = document.getElementById('numFutureAssignments').value;
-      document.getElementById('oneFutureAssignmentInputs').style.display = 'none';
-      document.getElementById('twoFutureAssignmentsInputs').style.display = 'none';
-      document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
+    if (numFutureAssignments === 1) {
+        const weightA = parseFloat(document.getElementById('futureAssignment1Weight').value);
+        if (isNaN(weightA) || weightA <= 0 || weightA > 100) {
+            neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid weight for the future assignment (1-100%).</p>';
+            return;
+        }
+        const needed = neededForOneMore(doneAssignments, weightA / 100, desiredGrade); // Convert weight to decimal
+        displayNeededResult(neededResultsContainer, needed, 1);
 
-      if (numAssignments === '1') {
-          document.getElementById('oneFutureAssignmentInputs').style.display = 'flex';
-      } else if (numAssignments === '2') {
-          document.getElementById('twoFutureAssignmentsInputs').style.display = 'flex';
-      }
-  }
+    } else if (numFutureAssignments === 2) {
+        const weightA = parseFloat(document.getElementById('futureAssignmentAWeight').value);
+        const weightB = parseFloat(document.getElementById('futureAssignmentBWeight').value);
 
-  function clearQuarterFields() {
-      document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
-      document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = '');
-      
-      document.querySelectorAll('.assignment-inputs').forEach(container => {
-          container.innerHTML = '';
-      });
+        if (isNaN(weightA) || weightA <= 0 || weightA > 100 || isNaN(weightB) || weightB <= 0 || weightB > 100) {
+            neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter valid weights for both future assignments (1-100%).</p>';
+            return;
+        }
+        const needed = neededForTwoMore(doneAssignments, weightA / 100, weightB / 100, desiredGrade); // Convert weights to decimal
+        displayNeededResult(neededResultsContainer, needed, 2);
+    } else {
+        neededResultsContainer.innerHTML = '<p style="color: var(--text-secondary);">Select the number of future assignments to calculate.</p>';
+    }
+}
 
-      // Clear overall weight inputs
-      document.getElementById('overallLearnerTaskWeight').value = '';
-      document.getElementById('overallAssessmentWeight').value = '';
+function displayNeededResult(container, result, numAssignments) {
+    let html = '';
+    if (numAssignments === 1) {
+        const needed = result;
+        if (needed > 100) {
+            html = `<h3>Needed Grade: <span style="color: #f44336;">Not Possible</span></h3>
+                    <p style="color: var(--text-secondary);">You need a ${needed.toFixed(3)}% on your next assignment, which is likely not achievable.</p>`;
+        } else if (needed < 0) {
+            html = `<h3>Needed Grade: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+                    <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
+        } else {
+            html = `<h3>Needed Grade: <span style="color: var(--accent-color);">${needed.toFixed(3)}%</span></h3>
+                    <p style="color: var(--text-secondary);">You need to score this on your next assignment to achieve your desired quarter grade.</p>`;
+        }
+    } else if (numAssignments === 2) {
+        const { sameOnBoth, ifA100ThenB, ifB100ThenA } = result;
 
-      // Clear needed grades section inputs and results
-      document.getElementById('desiredQuarterGradeNeeded').value = '';
-      document.getElementById('numFutureAssignments').value = '';
-      document.getElementById('futureAssignment1Weight').value = '';
-      document.getElementById('futureAssignmentAWeight').value = '';
-      document.getElementById('futureAssignmentBWeight').value = '';
-      document.getElementById('neededGradesResults').innerHTML = '';
-      toggleFutureAssignmentInputs(); // Reset visibility
+        html += `<h3>Needed Grades Scenarios:</h3>`;
 
-      // Clear results container
-      document.getElementById('quarterResultsContainer').innerHTML = '';
+        // Scenario 1: Same grade on both
+        if (sameOnBoth > 100) {
+            html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: #f44336;">Not Possible</span> (needs ${sameOnBoth.toFixed(3)}%)</p>`;
+        } else if (sameOnBoth < 0) {
+            html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: var(--accent-color);">Already Achieved!</span></p>`;
+        } else {
+            html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: var(--accent-color);">${sameOnBoth.toFixed(3)}%</span> on each.</p>`;
+        }
 
-      categoryCounters = {
-          'learnerTasks': 0,
-          'assessments': 0,
-          'custom': 0,
-          'assignments': 0
-      };
-      
-      // Set the Show Assignment Names checkbox state and trigger its toggle function
-      document.getElementById('showAssignmentNamesCheckbox').checked = true; 
-      toggleAssignmentNamesVisibility(); 
-      
-      // Explicitly set group view OFF after clearing
-      document.getElementById('groupViewCheckbox').checked = false;
-      toggleGroupView(false); 
-      
-      calculateQuarterGrade(); // Recalculate after clearing and setting initial view
-  }
+        // Scenario 2: Assignment A gets 100%
+        if (ifA100ThenB > 100) {
+            html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: #f44336;">Not Possible</span> (needs ${ifA100ThenB.toFixed(3)}%)</p>`;
+        } else if (ifA100ThenB < 0) {
+            html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: var(--accent-color);">0% or less</span> (already good).</p>`;
+        } else {
+            html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: var(--accent-color);">${ifA100ThenB.toFixed(3)}%</span>.</p>`;
+        }
+
+        // Scenario 3: Assignment B gets 100%
+        if (ifB100ThenA > 100) {
+            html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: #f44336;">Not Possible</span> (needs ${ifB100ThenA.toFixed(3)}%)</p>`;
+        } else if (ifB100ThenA < 0) {
+            html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: var(--accent-color);">0% or less</span> (already good).</p>`;
+        } else {
+            html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: var(--accent-color);">${ifB100ThenA.toFixed(3)}%</span>.</p>`;
+        }
+    }
+    container.innerHTML = html;
+}
+
+
+function toggleFutureAssignmentInputs() {
+    const numAssignments = document.getElementById('numFutureAssignments').value;
+    document.getElementById('oneFutureAssignmentInputs').style.display = 'none';
+    document.getElementById('twoFutureAssignmentsInputs').style.display = 'none';
+    document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
+
+    if (numAssignments === '1') {
+        document.getElementById('oneFutureAssignmentInputs').style.display = 'flex';
+    } else if (numAssignments === '2') {
+        document.getElementById('twoFutureAssignmentsInputs').style.display = 'flex';
+    }
+}
+
+function clearQuarterFields() {
+    document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
+    document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = '');
+    
+    document.querySelectorAll('.assignment-inputs').forEach(container => {
+        container.innerHTML = '';
+    });
+
+    // Clear overall weight inputs
+    document.getElementById('overallLearnerTaskWeight').value = '';
+    document.getElementById('overallAssessmentWeight').value = '';
+
+    // Clear needed grades section inputs and results
+    document.getElementById('desiredQuarterGradeNeeded').value = '';
+    document.getElementById('numFutureAssignments').value = '';
+    document.getElementById('futureAssignment1Weight').value = '';
+    document.getElementById('futureAssignmentAWeight').value = '';
+    document.getElementById('futureAssignmentBWeight').value = '';
+    document.getElementById('neededGradesResults').innerHTML = '';
+    toggleFutureAssignmentInputs(); // Reset visibility
+
+    // Clear results container
+    document.getElementById('quarterResultsContainer').innerHTML = '';
+
+    categoryCounters = {
+        'learnerTasks': 0,
+        'assessments': 0,
+        'custom': 0,
+        'assignments': 0
+    };
+    
+    // Set the Show Assignment Names checkbox state and trigger its toggle function
+    document.getElementById('showAssignmentNamesCheckbox').checked = true; 
+    toggleAssignmentNamesVisibility(); 
+    
+    // Explicitly set group view OFF after clearing
+    document.getElementById('groupViewCheckbox').checked = false;
+    toggleGroupView(false); 
+    
+    calculateQuarterGrade(); // Recalculate after clearing and setting initial view
+}
 </script>
 </head>
 <body>
@@ -1416,6 +1416,6 @@
     </div>
 </div>
 
-<script src="/public/js/global-popup.js"></script>
+<script src="/js/global-popup.js"></script>
 </body>
 </html>
