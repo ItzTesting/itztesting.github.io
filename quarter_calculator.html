@@ -360,6 +360,14 @@
   .overall-weights-section label {
       margin-bottom: 0.25rem;
   }
+
+  /* Styles for needed grades section */
+  #neededGradesSection .input-group {
+      min-width: 150px; /* Adjust as needed for this section */
+  }
+  #neededGradesSection .input-row {
+      align-items: flex-end; /* Align inputs and labels nicely */
+  }
 </style>
 <script>
   let categoryCounters = {
@@ -388,11 +396,16 @@
       // Add event listener for the "Group View" checkbox
       document.getElementById('groupViewCheckbox').addEventListener('change', (event) => toggleGroupView(event.target.checked));
       
+      // Add event listeners for Needed Grades section
+      document.getElementById('numFutureAssignments').addEventListener('change', toggleFutureAssignmentInputs);
+      document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFutureGrades);
+
       // Initial visibility check for assignment names and group view
       document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
       document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
       toggleGroupView(false); // Explicitly set group view OFF on page load
       toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
+      toggleFutureAssignmentInputs(); // Initial state for needed grades section
   });
 
   function toggleMenu() {
@@ -625,23 +638,18 @@
                      .replace(/^./, function(str){ return str.toUpperCase(); });
   }
 
-  function calculateQuarterGrade() {
-      const isGroupView = currentViewIsGrouped; // Use the global state
-      let totalWeightedSum = 0;
-      let totalWeight = 0;
-      let resultHtml = "";
-
-      let learnerTaskGrades = [];
-      let assessmentGrades = [];
-      let customWeightedSum = 0;
-      let customTotalWeight = 0;
-
-      let learnerTaskOverallWeight = 0;
-      let assessmentOverallWeight = 0;
+  /**
+   * Calculates the current weighted sum and total weight of all entered assignments.
+   * @returns {{currentWeightedSum: number, currentTotalWeight: number}}
+   */
+  function getCurrentQuarterStats() {
+      const isGroupView = currentViewIsGrouped;
+      let currentWeightedSum = 0;
+      let currentTotalWeight = 0;
 
       if (isGroupView) {
-          learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
-          assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
+          const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
+          const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
 
           const categories = ['learnerTasks', 'assessments'];
           categories.forEach(category => {
@@ -658,10 +666,8 @@
 
               if (currentCategoryGrades.length > 0) {
                   const categoryAverage = currentCategoryGrades.reduce((sum, grade) => sum + grade, 0) / currentCategoryGrades.length;
-                  if (category === 'learnerTasks') learnerTaskGrades = currentCategoryGrades;
-                  if (category === 'assessments') assessmentGrades = currentCategoryGrades;
-                  totalWeightedSum += categoryAverage * categoryWeight;
-                  totalWeight += categoryWeight;
+                  currentWeightedSum += categoryAverage * categoryWeight;
+                  currentTotalWeight += categoryWeight;
               }
           });
 
@@ -674,16 +680,19 @@
               const weight = parseFloat(weightInput.value);
 
               if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
-                  customWeightedSum += grade * weight;
-                  customTotalWeight += weight;
+                  currentWeightedSum += grade * weight;
+                  currentTotalWeight += weight;
               }
           });
-          totalWeightedSum += customWeightedSum;
-          totalWeight += customTotalWeight;
 
       } else { // Single Assignment Category View
-          learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
-          assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+          const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+          const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+          let learnerTaskGrades = [];
+          let assessmentGrades = [];
+          let customWeightedSumSingle = 0;
+          let customTotalWeightSingle = 0;
 
           const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
           assignmentRows.forEach(row => {
@@ -702,58 +711,390 @@
                   } else if (assignmentType === 'Custom') {
                       const customWeight = parseFloat(customWeightInput.value);
                       if (!isNaN(customWeight) && customWeight >= 0) {
-                          customWeightedSum += grade * customWeight;
-                          customTotalWeight += customWeight;
+                          customWeightedSumSingle += grade * customWeight;
+                          customTotalWeightSingle += customWeight;
                       }
                   }
               }
           });
+
+          const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+          const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+          const avgCustom = customTotalWeightSingle > 0 ? customWeightedSumSingle / customTotalWeightSingle : 0;
+
+          currentWeightedSum = (avgLearnerTasks * learnerTaskOverallWeight) + (avgAssessments * assessmentOverallWeight) + customWeightedSumSingle;
+          currentTotalWeight = learnerTaskOverallWeight + assessmentOverallWeight + customTotalWeightSingle;
       }
+      return { currentWeightedSum, currentTotalWeight };
+  }
 
-      let avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
-      let avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
-      let avgCustom = customTotalWeight > 0 ? customWeightedSum / customTotalWeight : 0;
+  function calculateQuarterGrade() {
+      const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
+      let resultHtml = "";
 
-      // Recalculate totalWeightedSum and totalWeight for single view after averages are known
-      if (!isGroupView) { 
-          totalWeightedSum = (avgLearnerTasks * learnerTaskOverallWeight) + (avgAssessments * assessmentOverallWeight) + customWeightedSum;
-          totalWeight = learnerTaskOverallWeight + assessmentOverallWeight + customTotalWeight;
-      }
-
-      if (totalWeight > 0) {
-          const quarterGrade = totalWeightedSum / totalWeight;
+      if (currentTotalWeight > 0) {
+          const quarterGrade = currentWeightedSum / currentTotalWeight;
           resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">${quarterGrade.toFixed(3)}%</span></h3>`;
       } else {
           resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>`;
       }
 
-      if (learnerTaskGrades.length > 0) {
-          resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
-      }
-      if (assessmentGrades.length > 0) {
-          resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
-      }
-      if (customTotalWeight > 0) {
-          resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
-      }
+      // Display individual category averages if in group view or if single assignments were entered
+      const isGroupView = currentViewIsGrouped;
+      if (isGroupView) {
+          const learnerTaskGrades = [];
+          document.querySelectorAll('#learnerTasksAssignments input.assignment-grade-input').forEach(input => {
+              const grade = parseFloat(input.value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) learnerTaskGrades.push(grade);
+          });
+          const assessmentGrades = [];
+          document.querySelectorAll('#assessmentsAssignments input.assignment-grade-input').forEach(input => {
+              const grade = parseFloat(input.value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) assessmentGrades.push(grade);
+          });
+          const customGrades = [];
+          const customWeights = [];
+          document.querySelectorAll('#customAssignments .class-input-row').forEach(row => {
+              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+              const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                  customGrades.push(grade);
+                  customWeights.push(weight);
+              }
+          });
 
-      // NEW LOGIC FOR DRAG DOWN COMPARISON
-      if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
-          const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
-          const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
+          const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+          const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+          const avgCustom = customWeights.reduce((sum, w) => sum + w, 0) > 0 ? customGrades.reduce((sum, g, i) => sum + (g * customWeights[i]), 0) / customWeights.reduce((sum, w) => sum + w, 0) : 0;
 
-          let dragDownMessage = "";
-          if (learnerTaskDragDown > assessmentDragDown) {
-              dragDownMessage = `Learner Tasks are dragging your grade down more.`;
-          } else if (assessmentDragDown > learnerTaskDragDown) {
-              dragDownMessage = `Assessments are dragging your grade down more.`;
-          } else {
-              dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
+          if (learnerTaskGrades.length > 0) {
+              resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
           }
-          resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
+          if (assessmentGrades.length > 0) {
+              resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
+          }
+          if (customGrades.length > 0) {
+              resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
+          }
+
+          // NEW LOGIC FOR DRAG DOWN COMPARISON (only if both categories have grades)
+          if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
+              const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
+              const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
+
+              const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
+              const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
+
+              let dragDownMessage = "";
+              if (learnerTaskDragDown > assessmentDragDown) {
+                  dragDownMessage = `Learner Tasks are dragging your grade down more.`;
+              } else if (assessmentDragDown > learnerTaskDragDown) {
+                  dragDownMessage = `Assessments are dragging your grade down more.`;
+              } else {
+                  dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
+              }
+              resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
+          }
+      } else { // Single Assignment View
+          const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+          const assessmentOverallWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+          let learnerTaskGrades = [];
+          let assessmentGrades = [];
+          let customWeightedSumSingle = 0;
+          let customTotalWeightSingle = 0;
+
+          document.querySelectorAll(`#assignmentsAssignments .class-input-row`).forEach(row => {
+              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+              const type = row.querySelector('.assignment-type-select').value;
+              const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
+
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                  if (type === 'Learner Tasks') {
+                      learnerTaskGrades.push(grade);
+                  } else if (type === 'Assessments') {
+                      assessmentGrades.push(grade);
+                  } else if (type === 'Custom') {
+                      if (!isNaN(customWeight) && customWeight >= 0) {
+                          customWeightedSumSingle += grade * customWeight;
+                          customTotalWeightSingle += customWeight;
+                      }
+                  }
+              }
+          });
+
+          const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
+          const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
+          const avgCustom = customTotalWeightSingle > 0 ? customWeightedSumSingle / customTotalWeightSingle : 0;
+
+          if (learnerTaskGrades.length > 0) {
+              resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
+          }
+          if (assessmentGrades.length > 0) {
+              resultHtml += `<h3>Assessments Average: <span id="assessmentsAvg">${avgAssessments.toFixed(3)}%</span></h3>`;
+          }
+          if (customTotalWeightSingle > 0) {
+              resultHtml += `<h3>Custom Average: <span id="customAvg">${avgCustom.toFixed(3)}%</span></h3>`;
+          }
+
+          // NEW LOGIC FOR DRAG DOWN COMPARISON (only if both categories have grades)
+          if (learnerTaskGrades.length > 0 && assessmentGrades.length > 0) {
+              const learnerTaskDragDown = (100 - avgLearnerTasks) * learnerTaskOverallWeight;
+              const assessmentDragDown = (100 - avgAssessments) * assessmentOverallWeight;
+
+              let dragDownMessage = "";
+              if (learnerTaskDragDown > assessmentDragDown) {
+                  dragDownMessage = `Learner Tasks are dragging your grade down more.`;
+              } else if (assessmentDragDown > learnerTaskDragDown) {
+                  dragDownMessage = `Assessments are dragging your grade down more.`;
+              } else {
+                  dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
+              }
+              resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
+          }
       }
 
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
+  }
+
+  /**
+   * @param {Array<{score: number, weight: number}>} done
+   * @param {number} nextWeight - weight of future assignment (decimal)
+   * @param {number} desiredGrade - desired final quarter grade (decimal)
+   * @return {number} - minimum score needed on the assignment
+   */
+  function neededForOneMore(done, nextWeight, desiredGrade) {
+    let currentTotal = 0;
+    let currentWeight = 0;
+
+    for (let { score, weight } of done) {
+      currentTotal += score * weight;
+      currentWeight += weight;
+    }
+
+    // Convert desiredGrade to a decimal (e.g., 90% -> 0.90)
+    const desiredGradeDecimal = desiredGrade / 100;
+
+    const targetPoints = desiredGradeDecimal * (currentWeight + nextWeight);
+    return (targetPoints - currentTotal) / nextWeight;
+  }
+
+  /**
+   * @param {Array<{score: number, weight: number}>} done
+   * @param {number} wA - weight of assignment A (decimal)
+   * @param {number} wB - weight of assignment B (decimal)
+   * @param {number} desiredGrade - desired final quarter grade (decimal)
+   * @return {Object} - scores needed for different scenarios
+   */
+  function neededForTwoMore(done, wA, wB, desiredGrade) {
+    let currentTotal = 0;
+    let currentWeight = 0;
+
+    for (let { score, weight } of done) {
+      currentTotal += score * weight;
+      currentWeight += weight;
+    }
+
+    // Convert desiredGrade to a decimal (e.g., 90% -> 0.90)
+    const desiredGradeDecimal = desiredGrade / 100;
+
+    const fullWeight = currentWeight + wA + wB;
+    const targetPoints = desiredGradeDecimal * fullWeight;
+
+    const sameOnBoth = (targetPoints - currentTotal) / (wA + wB);
+    const ifA100ThenB = (targetPoints - currentTotal - (100 * wA)) / wB; // Use 100 for 100%
+    const ifB100ThenA = (targetPoints - currentTotal - (100 * wB)) / wA; // Use 100 for 100%
+
+    return {
+      sameOnBoth,
+      ifA100ThenB,
+      ifB100ThenA
+    };
+  }
+
+  function calculateNeededFutureGrades() {
+      const desiredGrade = parseFloat(document.getElementById('desiredQuarterGradeNeeded').value);
+      const numFutureAssignments = parseInt(document.getElementById('numFutureAssignments').value);
+      const neededResultsContainer = document.getElementById('neededGradesResults');
+      neededResultsContainer.innerHTML = ''; // Clear previous results
+
+      if (isNaN(desiredGrade) || desiredGrade < 0 || desiredGrade > 100) {
+          neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid desired quarter grade (0-100%).</p>';
+          return;
+      }
+
+      const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
+
+      // Prepare 'done' array for the helper functions
+      // The helper functions expect weights as decimals (e.g., 0.2 for 20%).
+      // Our current system uses percentages (e.g., 20 for 20%).
+      // We need to convert the weights from the current system to decimals for the helper functions.
+      // However, the provided functions also seem to expect scores as raw percentages (e.g., 85 for 85%).
+      // Let's adjust the `done` array to pass scores as percentages and weights as decimals.
+
+      let doneAssignments = [];
+      const isGroupView = currentViewIsGrouped;
+
+      if (isGroupView) {
+          const learnerTaskOverallWeight = parseFloat(document.getElementById('learnerTasksWeight').value) || 0;
+          const assessmentOverallWeight = parseFloat(document.getElementById('assessmentsWeight').value) || 0;
+
+          // Learner Tasks
+          const learnerTaskGrades = [];
+          document.querySelectorAll('#learnerTasksAssignments input.assignment-grade-input').forEach(input => {
+              const grade = parseFloat(input.value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) learnerTaskGrades.push(grade);
+          });
+          if (learnerTaskGrades.length > 0) {
+              const avg = learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length;
+              doneAssignments.push({ score: avg, weight: learnerTaskOverallWeight / 100 }); // Convert weight to decimal
+          }
+
+          // Assessments
+          const assessmentGrades = [];
+          document.querySelectorAll('#assessmentsAssignments input.assignment-grade-input').forEach(input => {
+              const grade = parseFloat(input.value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) assessmentGrades.push(grade);
+          });
+          if (assessmentGrades.length > 0) {
+              const avg = assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length;
+              doneAssignments.push({ score: avg, weight: assessmentOverallWeight / 100 }); // Convert weight to decimal
+          }
+
+          // Custom assignments (individual weights)
+          document.querySelectorAll('#customAssignments .class-input-row').forEach(row => {
+              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+              const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
+              if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
+                  doneAssignments.push({ score: grade, weight: weight / 100 }); // Convert weight to decimal
+              }
+          });
+
+      } else { // Single Assignment Category View
+          const overallLearnerTaskWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
+          const overallAssessmentWeight = parseFloat(document.getElementById('overallAssessmentWeight').value) || 0;
+
+          let learnerTaskGrades = [];
+          let assessmentGrades = [];
+          let customAssignmentsSingle = []; // Store custom assignments for single view
+
+          document.querySelectorAll(`#assignmentsAssignments .class-input-row`).forEach(row => {
+              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+              const type = row.querySelector('.assignment-type-select').value;
+              const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
+
+              if (!isNaN(grade) && grade >= 0 && grade <= 100) {
+                  if (type === 'Learner Tasks') {
+                      learnerTaskGrades.push(grade);
+                  } else if (type === 'Assessments') {
+                      assessmentGrades.push(grade);
+                  } else if (type === 'Custom') {
+                      if (!isNaN(customWeight) && customWeight >= 0) {
+                          customAssignmentsSingle.push({ score: grade, weight: customWeight });
+                      }
+                  }
+              }
+          });
+
+          if (learnerTaskGrades.length > 0) {
+              const avg = learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length;
+              doneAssignments.push({ score: avg, weight: overallLearnerTaskWeight / 100 });
+          }
+          if (assessmentGrades.length > 0) {
+              const avg = assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length;
+              doneAssignments.push({ score: avg, weight: overallAssessmentWeight / 100 });
+          }
+          customAssignmentsSingle.forEach(item => {
+              doneAssignments.push({ score: item.score, weight: item.weight / 100 });
+          });
+      }
+
+
+      if (numFutureAssignments === 1) {
+          const weightA = parseFloat(document.getElementById('futureAssignment1Weight').value);
+          if (isNaN(weightA) || weightA <= 0 || weightA > 100) {
+              neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid weight for the future assignment (1-100%).</p>';
+              return;
+          }
+          const needed = neededForOneMore(doneAssignments, weightA / 100, desiredGrade); // Convert weight to decimal
+          displayNeededResult(neededResultsContainer, needed, 1);
+
+      } else if (numFutureAssignments === 2) {
+          const weightA = parseFloat(document.getElementById('futureAssignmentAWeight').value);
+          const weightB = parseFloat(document.getElementById('futureAssignmentBWeight').value);
+
+          if (isNaN(weightA) || weightA <= 0 || weightA > 100 || isNaN(weightB) || weightB <= 0 || weightB > 100) {
+              neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter valid weights for both future assignments (1-100%).</p>';
+              return;
+          }
+          const needed = neededForTwoMore(doneAssignments, weightA / 100, weightB / 100, desiredGrade); // Convert weights to decimal
+          displayNeededResult(neededResultsContainer, needed, 2);
+      } else {
+          neededResultsContainer.innerHTML = '<p style="color: var(--text-secondary);">Select the number of future assignments to calculate.</p>';
+      }
+  }
+
+  function displayNeededResult(container, result, numAssignments) {
+      let html = '';
+      if (numAssignments === 1) {
+          const needed = result;
+          if (needed > 100) {
+              html = `<h3>Needed Grade: <span style="color: #f44336;">Not Possible</span></h3>
+                      <p style="color: var(--text-secondary);">You need a ${needed.toFixed(3)}% on your next assignment, which is likely not achievable.</p>`;
+          } else if (needed < 0) {
+              html = `<h3>Needed Grade: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+                      <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
+          } else {
+              html = `<h3>Needed Grade: <span style="color: var(--accent-color);">${needed.toFixed(3)}%</span></h3>
+                      <p style="color: var(--text-secondary);">You need to score this on your next assignment to achieve your desired quarter grade.</p>`;
+          }
+      } else if (numAssignments === 2) {
+          const { sameOnBoth, ifA100ThenB, ifB100ThenA } = result;
+
+          html += `<h3>Needed Grades Scenarios:</h3>`;
+
+          // Scenario 1: Same grade on both
+          if (sameOnBoth > 100) {
+              html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: #f44336;">Not Possible</span> (needs ${sameOnBoth.toFixed(3)}%)</p>`;
+          } else if (sameOnBoth < 0) {
+              html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: var(--accent-color);">Already Achieved!</span></p>`;
+          } else {
+              html += `<p><strong>If both assignments get the same grade:</strong> <span style="color: var(--accent-color);">${sameOnBoth.toFixed(3)}%</span> on each.</p>`;
+          }
+
+          // Scenario 2: Assignment A gets 100%
+          if (ifA100ThenB > 100) {
+              html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: #f44336;">Not Possible</span> (needs ${ifA100ThenB.toFixed(3)}%)</p>`;
+          } else if (ifA100ThenB < 0) {
+              html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: var(--accent-color);">0% or less</span> (already good).</p>`;
+          } else {
+              html += `<p><strong>If Assignment A gets 100%:</strong> Assignment B needs <span style="color: var(--accent-color);">${ifA100ThenB.toFixed(3)}%</span>.</p>`;
+          }
+
+          // Scenario 3: Assignment B gets 100%
+          if (ifB100ThenA > 100) {
+              html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: #f44336;">Not Possible</span> (needs ${ifB100ThenA.toFixed(3)}%)</p>`;
+          } else if (ifB100ThenA < 0) {
+              html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: var(--accent-color);">0% or less</span> (already good).</p>`;
+          } else {
+              html += `<p><strong>If Assignment B gets 100%:</strong> Assignment A needs <span style="color: var(--accent-color);">${ifB100ThenA.toFixed(3)}%</span>.</p>`;
+          }
+      }
+      container.innerHTML = html;
+  }
+
+
+  function toggleFutureAssignmentInputs() {
+      const numAssignments = document.getElementById('numFutureAssignments').value;
+      document.getElementById('oneFutureAssignmentInputs').style.display = 'none';
+      document.getElementById('twoFutureAssignmentsInputs').style.display = 'none';
+      document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
+
+      if (numAssignments === '1') {
+          document.getElementById('oneFutureAssignmentInputs').style.display = 'flex';
+      } else if (numAssignments === '2') {
+          document.getElementById('twoFutureAssignmentsInputs').style.display = 'flex';
+      }
   }
 
   function clearQuarterFields() {
@@ -767,6 +1108,15 @@
       // Clear overall weight inputs
       document.getElementById('overallLearnerTaskWeight').value = '';
       document.getElementById('overallAssessmentWeight').value = '';
+
+      // Clear needed grades section inputs and results
+      document.getElementById('desiredQuarterGradeNeeded').value = '';
+      document.getElementById('numFutureAssignments').value = '';
+      document.getElementById('futureAssignment1Weight').value = '';
+      document.getElementById('futureAssignmentAWeight').value = '';
+      document.getElementById('futureAssignmentBWeight').value = '';
+      document.getElementById('neededGradesResults').innerHTML = '';
+      toggleFutureAssignmentInputs(); // Reset visibility
 
       // Clear results container
       document.getElementById('quarterResultsContainer').innerHTML = '';
@@ -919,6 +1269,58 @@
       <div class="result-section">
           <div id="quarterResultsContainer">
               <!-- Results will be displayed here -->
+          </div>
+      </div>
+  </div>
+
+  <!-- New Card for Needed Grades -->
+  <div class="card" id="neededGradesSection">
+      <h2>Calculate Needed Grades</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+          Determine the scores you need on your remaining assignments to achieve your desired quarter grade.
+      </p>
+
+      <div class="form-group">
+          <label for="desiredQuarterGradeNeeded">Desired Quarter Grade (%)</label>
+          <input type="number" id="desiredQuarterGradeNeeded" min="0" max="100" placeholder="e.g., 90">
+      </div>
+
+      <div class="form-group">
+          <label for="numFutureAssignments">Number of Future Assignments</label>
+          <select id="numFutureAssignments">
+              <option value="">Select...</option>
+              <option value="1">1 Assignment</option>
+              <option value="2">2 Assignments</option>
+          </select>
+      </div>
+
+      <div id="oneFutureAssignmentInputs" class="input-row" style="display: none;">
+          <div class="input-group">
+              <label for="futureAssignment1Weight">Assignment Weight (%)</label>
+              <input type="number" id="futureAssignment1Weight" min="1" max="100" placeholder="e.g., 20">
+          </div>
+      </div>
+
+      <div id="twoFutureAssignmentsInputs" class="input-row" style="display: none;">
+          <div class="input-group">
+              <label for="futureAssignmentAWeight">Assignment A Weight (%)</label>
+              <input type="number" id="futureAssignmentAWeight" min="1" max="100" placeholder="e.g., 10">
+          </div>
+          <div class="input-group">
+              <label for="futureAssignmentBWeight">Assignment B Weight (%)</label>
+              <input type="number" id="futureAssignmentBWeight" min="1" max="100" placeholder="e.g., 15">
+          </div>
+      </div>
+
+      <div class="btn-group">
+          <button id="calculateNeededGradesBtn">
+              <i class="fas fa-calculator"></i> Calculate Needed Grades
+          </button>
+      </div>
+
+      <div class="result-section">
+          <div id="neededGradesResults">
+              <!-- Needed grades results will be displayed here -->
           </div>
       </div>
   </div>
