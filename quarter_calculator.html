@@ -386,8 +386,10 @@
       document.getElementById('groupViewCheckbox').addEventListener('change', toggleGroupView);
 
       // Initial visibility check for assignment names and group view
-      toggleAssignmentNamesVisibility();
-      toggleGroupView(); // Call this first to set initial state
+      // Ensure initial state is correct on page load
+      document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
+      document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
+      toggleGroupView(); // Call this first to set initial state for group view
       toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
   });
 
@@ -402,7 +404,7 @@
       document.getElementById('singleAssignmentCategory').style.display = isGroupView ? 'none' : 'block';
       document.getElementById('overallWeightsSection').style.display = isGroupView ? 'none' : 'flex'; // Show/hide overall weights
 
-      clearQuarterFields(false); // Pass false to prevent re-toggling group view
+      // Do NOT call clearQuarterFields here. This function only toggles the view.
       calculateQuarterGrade(); // Recalculate based on new view
   }
 
@@ -752,7 +754,7 @@
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
   }
 
-  function clearQuarterFields(shouldToggleGroupView = true) {
+  function clearQuarterFields() {
       document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
       document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = '');
       
@@ -774,13 +776,14 @@
           'assignments': 0
       };
       
-      document.getElementById('groupViewCheckbox').checked = false; // Default to group view OFF
-      document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to assignment names ON
+      // Explicitly set the checkbox states and then trigger their respective toggle functions
+      document.getElementById('groupViewCheckbox').checked = false; 
+      document.getElementById('showAssignmentNamesCheckbox').checked = true; 
       
-      toggleAssignmentNamesVisibility();
-      if (shouldToggleGroupView) {
-          toggleGroupView();
-      }
+      toggleGroupView(); // This will now correctly set display based on checked=false
+      toggleAssignmentNamesVisibility(); // This will correctly set display based on checked=true
+      
+      calculateQuarterGrade(); // Recalculate after clearing and setting initial view
   }
 </script>
 </head>
