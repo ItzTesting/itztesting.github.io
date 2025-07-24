@@ -696,20 +696,16 @@
 
           const assignmentRows = document.querySelectorAll(`#assignmentsAssignments .class-input-row`);
           assignmentRows.forEach(row => {
-              const gradeInput = row.querySelector('.assignment-grade-input');
-              const typeSelect = row.querySelector('.assignment-type-select');
-              const customWeightInput = row.querySelector('.assignment-custom-weight-input');
-
-              const grade = parseFloat(gradeInput.value);
-              const assignmentType = typeSelect ? typeSelect.value : '';
+              const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
+              const type = row.querySelector('.assignment-type-select').value;
+              const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
 
               if (!isNaN(grade) && grade >= 0 && grade <= 100) {
-                  if (assignmentType === 'Learner Tasks') {
+                  if (type === 'Learner Tasks') {
                       learnerTaskGrades.push(grade);
-                  } else if (assignmentType === 'Assessments') {
+                  } else if (type === 'Assessments') {
                       assessmentGrades.push(grade);
-                  } else if (assignmentType === 'Custom') {
-                      const customWeight = parseFloat(customWeightInput.value);
+                  } else if (type === 'Custom') {
                       if (!isNaN(customWeight) && customWeight >= 0) {
                           customWeightedSumSingle += grade * customWeight;
                           customTotalWeightSingle += customWeight;
@@ -860,7 +856,7 @@
   /**
    * @param {Array<{score: number, weight: number}>} done
    * @param {number} nextWeight - weight of future assignment (decimal)
-   * @param {number} desiredGrade - desired final quarter grade (decimal)
+   * @param {number} desiredGrade - desired final quarter grade (percentage, e.g., 90 for 90%)
    * @return {number} - minimum score needed on the assignment
    */
   function neededForOneMore(done, nextWeight, desiredGrade) {
@@ -872,10 +868,9 @@
       currentWeight += weight;
     }
 
-    // Convert desiredGrade to a decimal (e.g., 90% -> 0.90)
-    const desiredGradeDecimal = desiredGrade / 100;
-
-    const targetPoints = desiredGradeDecimal * (currentWeight + nextWeight);
+    // desiredGrade is already a percentage (e.g., 90).
+    // targetPoints should be the total weighted sum needed for the desired average.
+    const targetPoints = desiredGrade * (currentWeight + nextWeight);
     return (targetPoints - currentTotal) / nextWeight;
   }
 
@@ -883,7 +878,7 @@
    * @param {Array<{score: number, weight: number}>} done
    * @param {number} wA - weight of assignment A (decimal)
    * @param {number} wB - weight of assignment B (decimal)
-   * @param {number} desiredGrade - desired final quarter grade (decimal)
+   * @param {number} desiredGrade - desired final quarter grade (percentage, e.g., 90 for 90%)
    * @return {Object} - scores needed for different scenarios
    */
   function neededForTwoMore(done, wA, wB, desiredGrade) {
@@ -895,11 +890,9 @@
       currentWeight += weight;
     }
 
-    // Convert desiredGrade to a decimal (e.g., 90% -> 0.90)
-    const desiredGradeDecimal = desiredGrade / 100;
-
     const fullWeight = currentWeight + wA + wB;
-    const targetPoints = desiredGradeDecimal * fullWeight;
+    // desiredGrade is already a percentage (e.g., 90).
+    const targetPoints = desiredGrade * fullWeight;
 
     const sameOnBoth = (targetPoints - currentTotal) / (wA + wB);
     const ifA100ThenB = (targetPoints - currentTotal - (100 * wA)) / wB; // Use 100 for 100%
@@ -924,13 +917,6 @@
       }
 
       const { currentWeightedSum, currentTotalWeight } = getCurrentQuarterStats();
-
-      // Prepare 'done' array for the helper functions
-      // The helper functions expect weights as decimals (e.g., 0.2 for 20%).
-      // Our current system uses percentages (e.g., 20 for 20%).
-      // We need to convert the weights from the current system to decimals for the helper functions.
-      // However, the provided functions also seem to expect scores as raw percentages (e.g., 85 for 85%).
-      // Let's adjust the `done` array to pass scores as percentages and weights as decimals.
 
       let doneAssignments = [];
       const isGroupView = currentViewIsGrouped;
