@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -16,706 +16,605 @@ gtag('config', 'G-LNMT1VXJW1');
 <title>Half-Year Grade Calculator</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  :root {
-      --primary-bg: #1a1a1a;
-      --secondary-bg: #2E2E2E;
-      --input-bg: #3B3B3B;
-      --text-color: #F1F1F1;
-      --text-secondary: #D1D1D1;
-      --accent-color: #4CAF50;
-      --accent-hover: #45a049;
-      --link-color: #64B5F6;
-      --border-color: #555;
-      --card-bg: #333333;
-      --nav-bg: #222222;
-      --highlight-bg: rgba(76, 175, 80, 0.15);
-  }
+    :root {
+        --primary-bg: #1a1a1a;
+        --secondary-bg: #2E2E2E;
+        --input-bg: #3B3B3B;
+        --text-color: #F1F1F1;
+        --text-secondary: #D1D1D1;
+        --accent-color: #4CAF50;
+        --accent-hover: #45a049;
+        --link-color: #64B5F6;
+        --border-color: #555;
+        --card-bg: #333333;
+        --nav-bg: #222222;
+        --highlight-bg: rgba(76, 175, 80, 0.15);
+    }
 
-  * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-  }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-  body {
-      background-color: var(--primary-bg);
-      color: var(--text-color);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      padding-bottom: 2rem;
-  }
+    body {
+        background-color: var(--primary-bg);
+        color: var(--text-color);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        padding-bottom: 2rem;
+    }
 
-  .navbar {
-      background-color: var(--nav-bg);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-  }
+    .navbar {
+        background-color: var(--nav-bg);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
 
-  .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 1rem;
-  }
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
 
-  .nav-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem;
-  }
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+    }
 
-  .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--text-color);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-  }
+    .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--text-color);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+    }
 
-  .logo i {
-      margin-right: 0.5rem;
-      color: var(--accent-color);
-  }
+    .logo i {
+        margin-right: 0.5rem;
+        color: var(--accent-color);
+    }
 
-  .nav-links {
-      display: flex;
-      list-style: none;
-  }
+    .nav-links {
+        display: flex;
+        list-style: none;
+    }
 
-  .nav-links li {
-      margin-left: 1.5rem;
-  }
+    .nav-links li {
+        margin-left: 1.5rem;
+    }
 
-  .nav-links a {
-      color: var(--text-color);
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s;
-      display: flex;
-      align-items: center;
-  }
+    .nav-links a {
+        color: var(--text-color);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+        display: flex;
+        align-items: center;
+    }
 
-  .nav-links a:hover {
-      color: var(--accent-color);
-  }
+    .nav-links a:hover {
+        color: var(--accent-color);
+    }
 
-  .nav-links a.active {
-      color: var(--accent-color);
-      font-weight: 600;
-  }
+    .nav-links a.active {
+        color: var(--accent-color);
+        font-weight: 600;
+    }
 
-  .nav-links a i {
-      margin-right: 0.5rem;
-  }
+    .nav-links a i {
+        margin-right: 0.5rem;
+    }
 
-  .mobile-menu-btn {
-      display: none;
-      background: none;
-      border: none;
-      color: var(--text-color);
-      font-size: 1.5rem;
-      cursor: pointer;
-  }
+    .mobile-menu-btn {
+        display: none;
+        background: none;
+        border: none;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
 
-  .card {
-      background-color: var(--card-bg);
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      padding: 2rem;
-      margin: 2rem 0;
-  }
+    .card {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        padding: 2rem;
+        margin: 2rem 0;
+    }
 
-  h2 {
-      color: var(--text-color);
-      margin-bottom: 1.5rem;
-      font-weight: 600;
-      text-align: center;
-      font-size: 1.8rem;
-  }
+    h2 {
+        color: var(--text-color);
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        font-size: 1.8rem;
+    }
 
-  h3 {
-      color: var(--text-color);
-      margin: 1rem 0;
-      font-weight: 500;
-  }
+    h3 {
+        color: var(--text-color);
+        margin: 1rem 0;
+        font-weight: 500;
+    }
 
-  .form-group {
-      margin-bottom: 1rem;
-  }
+    .form-group {
+        margin-bottom: 1rem;
+    }
 
-  label {
-      display: block;
-      color: var(--text-secondary);
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-  }
+    label {
+        display: block;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
 
-  input {
-      background-color: var(--input-bg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      border-radius: 5px;
-      padding: 0.75rem;
-      width: 100%;
-      font-size: 1rem;
-      transition: border-color 0.3s;
-  }
+    input {
+        background-color: var(--input-bg);
+        color: var(--text-color);
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        padding: 0.75rem;
+        width: 100%;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
 
-  input:focus {
-      outline: none;
-      border-color: var(--accent-color);
-  }
+    input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+    }
 
-  .input-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1rem;
-  }
+    .input-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
 
-  .input-group {
-      flex: 1;
-      min-width: 200px;
-  }
+    .input-group {
+        flex: 1;
+        min-width: 200px;
+    }
 
-  .btn-group {
-      display: flex;
-      gap: 1rem;
-      margin: 1.5rem 0;
-      flex-wrap: wrap;
-  }
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin: 1.5rem 0;
+        flex-wrap: wrap;
+    }
 
-  button {
-      cursor: pointer;
-      background-color: var(--accent-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: background-color 0.3s;
-      flex: 1;
-      min-width: 150px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-  }
+    button {
+        cursor: pointer;
+        background-color: var(--accent-color);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 0.75rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        transition: background-color 0.3s;
+        flex: 1;
+        min-width: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-  button:hover {
-      background-color: var(--accent-hover);
-  }
+    button:hover {
+        background-color: var(--accent-hover);
+    }
 
-  button i {
-      margin-right: 0.5rem;
-  }
+    button i {
+        margin-right: 0.5rem;
+    }
 
-  .btn-clear {
-      background-color: #f44336;
-  }
+    .btn-clear {
+        background-color: #f44336;
+    }
 
-  .btn-clear:hover {
-      background-color: #d32f2f;
-  }
+    .btn-clear:hover {
+        background-color: #d32f2f;
+    }
 
-  .result-section {
-      background-color: var(--secondary-bg);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 1.5rem;
-  }
+    .result-section {
+        background-color: var(--secondary-bg);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
 
-  .result-section h3 {
-      margin-top: 0;
-      color: var(--accent-color);
-  }
+    .result-section h3 {
+        margin-top: 0;
+        color: var(--accent-color);
+    }
 
-  .footer {
-      text-align: center;
-      padding: 1rem 0;
-      margin-top: 2rem;
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-  }
+    .footer {
+        text-align: center;
+        padding: 1rem 0;
+        margin-top: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
 
-  .grade-pairs-section {
-      display: none;
-      background-color: var(--secondary-bg);
-      border-radius: 8px;
-      padding: 1.5rem;
-      margin-top: 1.5rem;
-  }
+    .grade-pairs-section {
+        display: none;
+        background-color: var(--secondary-bg);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
+    }
 
-  .grade-pairs-section h3 {
-      color: var(--accent-color);
-      margin-bottom: 1rem;
-  }
+    .grade-pairs-section h3 {
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+    }
 
-  .optimal-combos {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1.5rem;
-      margin: 1.5rem 0;
-      justify-content: center; /* Center the combo cards */
-  }
+    .optimal-combos {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+        justify-content: center; /* Center the combo cards */
+    }
 
-  .optimal-combo {
-      background-color: var(--highlight-bg);
-      padding: 1.25rem;
-      border-radius: 5px;
-      border-left: 4px solid var(--accent-color);
-      flex: 1;
-      min-width: 280px;
-      max-width: 45%; /* Limit width for larger screens to prevent stretching */
-      box-sizing: border-box; /* Include padding and border in the element's total width and height */
-  }
+    .optimal-combo {
+        background-color: var(--highlight-bg);
+        padding: 1.25rem;
+        border-radius: 5px;
+        border-left: 4px solid var(--accent-color);
+        flex: 1;
+        min-width: 280px;
+        max-width: 45%; /* Limit width for larger screens to prevent stretching */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
 
-  @media (max-width: 900px) {
-      .optimal-combo {
-          max-width: 100%; /* Full width on smaller screens */
-      }
-  }
+    @media (max-width: 900px) {
+        .optimal-combo {
+            max-width: 100%; /* Full width on smaller screens */
+        }
+    }
 
-  .optimal-combo h4 {
-      color: var(--accent-color);
-      margin-bottom: 0.75rem;
-      font-weight: 600;
-      text-align: center; /* Center strategy titles */
-  }
+    .optimal-combo h4 {
+        color: var(--accent-color);
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        text-align: center; /* Center strategy titles */
+    }
 
-  .optimal-grades {
-      display: flex;
-      justify-content: space-around;
-      margin: 1rem 0;
-      flex-wrap: wrap;
-      gap: 1rem;
-  }
+    .optimal-grades {
+        display: flex;
+        justify-content: space-around;
+        margin: 1rem 0;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-  .optimal-grade-item {
-      text-align: center;
-      flex: 1;
-      min-width: 120px;
-      padding: 0.5rem; /* Add some padding */
-  }
+    .optimal-grade-item {
+        text-align: center;
+        flex: 1;
+        min-width: 120px;
+        padding: 0.5rem; /* Add some padding */
+    }
 
-  .optimal-grade-value {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-  }
+    .optimal-grade-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
 
-  .optimal-grade-label {
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-  }
+    .optimal-grade-label {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+    }
 
-  .strategy-description {
-      margin-top: 0.75rem;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      text-align: center; /* Center description */
-  }
+    .strategy-description {
+        margin-top: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        text-align: center; /* Center description */
+    }
 
-  @media (max-width: 768px) {
-      .nav-links {
-          display: none;
-          position: absolute;
-          top: 60px;
-          left: 0;
-          right: 0;
-          background-color: var(--nav-bg);
-          flex-direction: column;
-          padding: 1rem;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
+    @media (max-width: 768px) {
+        .nav-links {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background-color: var(--nav-bg);
+            flex-direction: column;
+            padding: 1rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
 
-      .nav-links.active {
-          display: flex;
-      }
+        .nav-links.active {
+            display: flex;
+        }
 
-      .nav-links li {
-          margin: 0.5rem 0;
-      }
+        .nav-links li {
+            margin: 0.5rem 0;
+        }
 
-      .mobile-menu-btn {
-          display: block;
-      }
+        .mobile-menu-btn {
+            display: block;
+        }
 
-      .card {
-          padding: 1.5rem;
-          margin: 1rem 0;
-      }
+        .card {
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
 
-      .input-group {
-          min-width: 100%;
-      }
-  }
-
-/* Modal Styles */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.modal-backdrop.show {
-  opacity: 1;
-  visibility: visible;
-}
-
-.modal-container {
-  background-color: var(--card-bg);
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  transform: translateY(-20px);
-  transition: transform 0.3s ease;
-  display: flex; /* Use flexbox for content alignment */
-  flex-direction: column; /* Stack content vertically */
-  gap: 1.5rem; /* Space between elements */
-}
-
-.modal-backdrop.show .modal-container {
-  transform: translateY(0);
-}
-
-/* Removed .modal-close styles as it's no longer an 'X' button */
-
-.modal-header {
-  margin-bottom: 0; /* Adjusted margin as gap handles spacing */
-  text-align: center;
-}
-
-.modal-header h3 {
-  color: var(--accent-color);
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-}
-
-.modal-body {
-  color: var(--text-color);
-  text-align: center;
-  font-size: 1.1rem;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem; /* Add some space above the button */
-}
-
-.modal-footer button {
-  min-width: 120px; /* Ensure button has a decent size */
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
-  font-weight: 500;
-  border-radius: 5px;
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.modal-footer button:hover {
-  background-color: var(--accent-hover);
-}
+        .input-group {
+            min-width: 100%;
+        }
+    }
 </style>
 <script>
-  function toggleMenu() {
-      const navLinks = document.querySelector('.nav-links');
-      navLinks.classList.toggle('active');
-  }
+    function toggleMenu() {
+        const navLinks = document.querySelector('.nav-links');
+        navLinks.classList.toggle('active');
+    }
 
-  function calculateFinalGrade() {
-      let quarter1 = parseFloat(document.getElementById("q1").value) || 0;
-      let quarter2 = parseFloat(document.getElementById("q2").value) || 0;
-      let finalExam = parseFloat(document.getElementById("finalExam").value) || 0;
-      let desiredGrade = parseFloat(document.getElementById("desiredGrade").value);
-      
-      // Calculate current grade based on provided values
-      let hasQ1 = !isNaN(quarter1) && document.getElementById("q1").value !== "";
-      let hasQ2 = !isNaN(quarter2) && document.getElementById("q2").value !== "";
-      let hasFinalExam = !isNaN(finalExam) && document.getElementById("finalExam").value !== "";
-      
-      let resultText = "";
-      
-      // If we have at least one quarter, calculate current grade
-      if (hasQ1 || hasQ2 || hasFinalExam) {
-          let totalWeight = 0;
-          let weightedSum = 0;
-          
-          if (hasQ1) {
-              weightedSum += quarter1 * 0.4;
-              totalWeight += 0.4;
-          }
-          
-          if (hasQ2) {
-              weightedSum += quarter2 * 0.4;
-              totalWeight += 0.4;
-          }
-          
-          if (hasFinalExam) {
-              weightedSum += finalExam * 0.2;
-              totalWeight += 0.2;
-          }
-          
-          // Calculate current grade based on provided components
-          let currentGrade = totalWeight > 0 ? weightedSum / totalWeight : 0;
-          resultText = "Current Grade: " + currentGrade.toFixed(3) + "%";
-          
-          // If desired grade is provided, calculate needed final exam grade
-          if (!isNaN(desiredGrade) && desiredGrade > 0) {
-              // If both quarters are provided but final exam is not
-              if (hasQ1 && hasQ2 && !hasFinalExam) {
-                  let currentWeighted = (quarter1 * 0.4) + (quarter2 * 0.4);
-                  let neededFinalExam = ((desiredGrade - currentWeighted) / 0.2);
-                  
-                  if (neededFinalExam >= 999.99) {
-                      resultText += "<br>Unfortunately, it's not possible to achieve your desired grade.";
-                  } else if (neededFinalExam < 0) {
-                      resultText += "<br>You have already achieved your desired grade!";
-                  } else {
-                      resultText += "<br>You need a " + neededFinalExam.toFixed(3) + "% on the Final Exam.";
-                  }
-              }
-              // If we're missing some quarters, calculate the average needed
-              else if (!hasQ1 || !hasQ2 || !hasFinalExam) {
-                  let remainingWeight = 1 - totalWeight;
-                  let neededAvg = remainingWeight > 0 ? ((desiredGrade - weightedSum) / remainingWeight) : 0;
-                  
-                  if (neededAvg >= 999.99) {
-                      resultText += "<br>Unfortunately, it's not possible to achieve your desired grade.";
-                  } else if (neededAvg < 0) {
-                      resultText += "<br>You have already achieved your desired grade!";
-                  } else {
-                      resultText += "<br>You need an average of " + neededAvg.toFixed(3) + "% on the remaining components.";
-                  }
-              }
-          }
-      } else if (!isNaN(desiredGrade) && desiredGrade > 0) {
-          // If only desired grade is provided
-          resultText = "Please enter at least one quarter grade to calculate.";
-      } else {
-          resultText = "Please enter at least one grade to calculate.";
-      }
-      
-      // Check if we should show the grade pairs section for half-year calculator
-      const gradePairsSection = document.getElementById('gradePairsSection');
-      
-      // If only Q1 is provided and desired grade is entered
-      if (hasQ1 && !hasQ2 && !hasFinalExam && !isNaN(desiredGrade) && desiredGrade > 0) {
-          // Calculate optimal strategies
-          calculateOptimalHalfYearStrategies(quarter1, desiredGrade);
-          
-          // Show the grade pairs section
-          gradePairsSection.style.display = 'block';
-      } else {
-          // Hide the grade pairs section
-          gradePairsSection.style.display = 'none';
-      }
-      
-      document.getElementById("result").innerHTML = resultText;
-  }
+    function calculateFinalGrade() {
+        let quarter1 = parseFloat(document.getElementById("q1").value) || 0;
+        let quarter2 = parseFloat(document.getElementById("q2").value) || 0;
+        let finalExam = parseFloat(document.getElementById("finalExam").value) || 0;
+        let desiredGrade = parseFloat(document.getElementById("desiredGrade").value);
+        
+        // Calculate current grade based on provided values
+        let hasQ1 = !isNaN(quarter1) && document.getElementById("q1").value !== "";
+        let hasQ2 = !isNaN(quarter2) && document.getElementById("q2").value !== "";
+        let hasFinalExam = !isNaN(finalExam) && document.getElementById("finalExam").value !== "";
+        
+        let resultText = "";
+        
+        // If we have at least one quarter, calculate current grade
+        if (hasQ1 || hasQ2 || hasFinalExam) {
+            let totalWeight = 0;
+            let weightedSum = 0;
+            
+            if (hasQ1) {
+                weightedSum += quarter1 * 0.4;
+                totalWeight += 0.4;
+            }
+            
+            if (hasQ2) {
+                weightedSum += quarter2 * 0.4;
+                totalWeight += 0.4;
+            }
+            
+            if (hasFinalExam) {
+                weightedSum += finalExam * 0.2;
+                totalWeight += 0.2;
+            }
+            
+            // Calculate current grade based on provided components
+            let currentGrade = totalWeight > 0 ? weightedSum / totalWeight : 0;
+            resultText = "Current Grade: " + currentGrade.toFixed(3) + "%";
+            
+            // If desired grade is provided, calculate needed final exam grade
+            if (!isNaN(desiredGrade) && desiredGrade > 0) {
+                // If both quarters are provided but final exam is not
+                if (hasQ1 && hasQ2 && !hasFinalExam) {
+                    let currentWeighted = (quarter1 * 0.4) + (quarter2 * 0.4);
+                    let neededFinalExam = ((desiredGrade - currentWeighted) / 0.2);
+                    
+                    if (neededFinalExam >= 999.99) {
+                        resultText += "<br>Unfortunately, it's not possible to achieve your desired grade.";
+                    } else if (neededFinalExam < 0) {
+                        resultText += "<br>You have already achieved your desired grade!";
+                    } else {
+                        resultText += "<br>You need a " + neededFinalExam.toFixed(3) + "% on the Final Exam.";
+                    }
+                }
+                // If we're missing some quarters, calculate the average needed
+                else if (!hasQ1 || !hasQ2 || !hasFinalExam) {
+                    let remainingWeight = 1 - totalWeight;
+                    let neededAvg = remainingWeight > 0 ? ((desiredGrade - weightedSum) / remainingWeight) : 0;
+                    
+                    if (neededAvg >= 999.99) {
+                        resultText += "<br>Unfortunately, it's not possible to achieve your desired grade.";
+                    } else if (neededAvg < 0) {
+                        resultText += "<br>You have already achieved your desired grade!";
+                    } else {
+                        resultText += "<br>You need an average of " + neededAvg.toFixed(3) + "% on the remaining components.";
+                    }
+                }
+            }
+        } else if (!isNaN(desiredGrade) && desiredGrade > 0) {
+            // If only desired grade is provided
+            resultText = "Please enter at least one quarter grade to calculate.";
+        } else {
+            resultText = "Please enter at least one grade to calculate.";
+        }
+        
+        // Check if we should show the grade pairs section for half-year calculator
+        const gradePairsSection = document.getElementById('gradePairsSection');
+        
+        // If only Q1 is provided and desired grade is entered
+        if (hasQ1 && !hasQ2 && !hasFinalExam && !isNaN(desiredGrade) && desiredGrade > 0) {
+            // Calculate optimal strategies
+            calculateOptimalHalfYearStrategies(quarter1, desiredGrade);
+            
+            // Show the grade pairs section
+            gradePairsSection.style.display = 'block';
+        } else {
+            // Hide the grade pairs section
+            gradePairsSection.style.display = 'none';
+        }
+        
+        document.getElementById("result").innerHTML = resultText;
+    }
 
-  function calculateOptimalHalfYearStrategies(q1Grade, desiredGrade) {
-      // Calculate the target sum needed
-      const targetSum = desiredGrade * 100;
-      const q1Contribution = q1Grade * 40; // Q1 is 40%
-      const remainingNeeded = targetSum - q1Contribution;
-      
-      // Strategy 1: Focus on Q2 (100% on Q2, minimum on Final)
-      const q2Max = 100;
-      const q2MaxContribution = q2Max * 40; // Q2 is 40%
-      const minFinalNeeded = (remainingNeeded - q2MaxContribution) / 20; // Final is 20%
-      
-      // Strategy 2: Focus on Final Exam (100% on Final, minimum on Q2)
-      const finalMax = 100;
-      const finalMaxContribution = finalMax * 20; // Final is 20%
-      const minQ2Needed = (remainingNeeded - finalMaxContribution) / 40; // Q2 is 40%
-      
-      // Check if these are valid combinations
-      let strategy1Valid = minFinalNeeded < 999.99;
-      let strategy2Valid = minQ2Needed < 999.99;
-      
-      // Update the display for Strategy 1
-      if (strategy1Valid) {
-          const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 1000) / 1000);
-          document.getElementById('maxQ2').innerText = q2Max + '%';
-          document.getElementById('minFinal').innerText = roundedFinal.toFixed(3) + '%';
-          document.getElementById('strategy1').style.display = 'block';
-      } else {
-          document.getElementById('strategy1').style.display = 'none';
-      }
-      
-      // Update the display for Strategy 2
-      if (strategy2Valid) {
-          const roundedQ2 = Math.max(0, Math.ceil(minQ2Needed * 1000) / 1000);
-          document.getElementById('maxFinal').innerText = finalMax + '%';
-          document.getElementById('minQ2').innerText = roundedQ2.toFixed(3) + '%';
-          document.getElementById('strategy2').style.display = 'block';
-      } else {
-          document.getElementById('strategy2').style.display = 'none';
-      }
-      
-      // Show/hide the optimal combinations section
-      document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
-  }
+    function calculateOptimalHalfYearStrategies(q1Grade, desiredGrade) {
+        // Calculate the target sum needed
+        const targetSum = desiredGrade * 100;
+        const q1Contribution = q1Grade * 40; // Q1 is 40%
+        const remainingNeeded = targetSum - q1Contribution;
+        
+        // Strategy 1: Focus on Q2 (100% on Q2, minimum on Final)
+        const q2Max = 100;
+        const q2MaxContribution = q2Max * 40; // Q2 is 40%
+        const minFinalNeeded = (remainingNeeded - q2MaxContribution) / 20; // Final is 20%
+        
+        // Strategy 2: Focus on Final Exam (100% on Final, minimum on Q2)
+        const finalMax = 100;
+        const finalMaxContribution = finalMax * 20; // Final is 20%
+        const minQ2Needed = (remainingNeeded - finalMaxContribution) / 40; // Q2 is 40%
+        
+        // Check if these are valid combinations
+        let strategy1Valid = minFinalNeeded < 999.99;
+        let strategy2Valid = minQ2Needed < 999.99;
+        
+        // Update the display for Strategy 1
+        if (strategy1Valid) {
+            const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 1000) / 1000);
+            document.getElementById('maxQ2').innerText = q2Max + '%';
+            document.getElementById('minFinal').innerText = roundedFinal.toFixed(3) + '%';
+            document.getElementById('strategy1').style.display = 'block';
+        } else {
+            document.getElementById('strategy1').style.display = 'none';
+        }
+        
+        // Update the display for Strategy 2
+        if (strategy2Valid) {
+            const roundedQ2 = Math.max(0, Math.ceil(minQ2Needed * 1000) / 1000);
+            document.getElementById('maxFinal').innerText = finalMax + '%';
+            document.getElementById('minQ2').innerText = roundedQ2.toFixed(3) + '%';
+            document.getElementById('strategy2').style.display = 'block';
+        } else {
+            document.getElementById('strategy2').style.display = 'none';
+        }
+        
+        // Show/hide the optimal combinations section
+        document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
+    }
 
-  function clearFields() {
-      document.getElementById("q1").value = "";
-      document.getElementById("q2").value = "";
-      document.getElementById("finalExam").value = "";
-      document.getElementById("desiredGrade").value = "";
-      document.getElementById("result").innerHTML = "";
-      // Hide the grade pairs section
-      document.getElementById('gradePairsSection').style.display = 'none';
-  }
+    function clearFields() {
+        document.getElementById("q1").value = "";
+        document.getElementById("q2").value = "";
+        document.getElementById("finalExam").value = "";
+        document.getElementById("desiredGrade").value = "";
+        document.getElementById("result").innerHTML = "";
+        // Hide the grade pairs section
+        document.getElementById('gradePairsSection').style.display = 'none';
+    }
 </script>
 </head>
 <body>
 <nav class="navbar">
-  <div class="nav-container">
-      <a href="index.html" class="logo">
-          <i class="fas fa-calculator"></i>
-          Grade Calculator
-      </a>
-      <button class="mobile-menu-btn" onclick="toggleMenu()">
-          <i class="fas fa-bars"></i>
-      </button>
-      <ul class="nav-links">
-          <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
-          <li><a href="half_semester_calculator.html" class="active"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-          <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
-          <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
-      </ul>
-  </div>
+    <div class="nav-container">
+        <a href="index.html" class="logo">
+            <i class="fas fa-calculator"></i>
+            Grade Calculator
+        </a>
+        <button class="mobile-menu-btn" onclick="toggleMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
+            <li><a href="half_semester_calculator.html" class="active"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
+            <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
+            <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
+        </ul>
+    </div>
 </nav>
 
 <div class="container">
-  <div class="card">
-      <h2>Half-Year Grade Calculator</h2>
-      
-      <div class="input-row">
-          <div class="input-group">
-              <label for="q1">Quarter 1 Grade (%)</label>
-              <input type="number" id="q1" min="0" max="100" placeholder="Enter grade">
-          </div>
-          <div class="input-group">
-              <label for="q2">Quarter 2 Grade (%)</label>
-              <input type="number" id="q2" min="0" max="100" placeholder="Enter grade">
-          </div>
-      </div>
-      
-      <div class="input-row">
-          <div class="input-group">
-              <label for="finalExam">Final Exam Grade (%)</label>
-              <input type="number" id="finalExam" min="0" max="100" placeholder="Enter grade">
-          </div>
-      </div>
-      
-      <div class="form-group">
-          <label for="desiredGrade">Desired Final Grade (%) (Optional)</label>
-          <input type="number" id="desiredGrade" min="0" max="100" placeholder="Enter your target grade">
-      </div>
-      
-      <div class="btn-group">
-          <button onclick="calculateFinalGrade()">
-              <i class="fas fa-calculator"></i> Calculate Grade
-          </button>
-          <button class="btn-clear" onclick="clearFields()">
-              <i class="fas fa-trash-alt"></i> Clear All Fields
-          </button>
-      </div>
-      
-      <div class="result-section">
-          <h3>Result: <span id="result"></span></h3>
-      </div>
+    <div class="card">
+        <h2>Half-Year Grade Calculator</h2>
+        
+        <div class="input-row">
+            <div class="input-group">
+                <label for="q1">Quarter 1 Grade (%)</label>
+                <input type="number" id="q1" min="0" max="100" placeholder="Enter grade">
+            </div>
+            <div class="input-group">
+                <label for="q2">Quarter 2 Grade (%)</label>
+                <input type="number" id="q2" min="0" max="100" placeholder="Enter grade">
+            </div>
+        </div>
+        
+        <div class="input-row">
+            <div class="input-group">
+                <label for="finalExam">Final Exam Grade (%)</label>
+                <input type="number" id="finalExam" min="0" max="100" placeholder="Enter grade">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="desiredGrade">Desired Final Grade (%) (Optional)</label>
+            <input type="number" id="desiredGrade" min="0" max="100" placeholder="Enter your target grade">
+        </div>
+        
+        <div class="btn-group">
+            <button onclick="calculateFinalGrade()">
+                <i class="fas fa-calculator"></i> Calculate Grade
+            </button>
+            <button class="btn-clear" onclick="clearFields()">
+                <i class="fas fa-trash-alt"></i> Clear All Fields
+            </button>
+        </div>
+        
+        <div class="result-section">
+            <h3>Result: <span id="result"></span></h3>
+        </div>
 
-      <!-- Grade Pairs Section -->
-      <div id="gradePairsSection" class="grade-pairs-section">
-          <h3>Optimal Grade Strategies</h3>
-          
-          <!-- Optimal Combinations Section -->
-          <div id="optimalCombos" class="optimal-combos">
-              <!-- Strategy 1: Max Q2, Min Final -->
-              <div id="strategy1" class="optimal-combo">
-                  <h4>Strategy 1: Focus on Quarter 2</h4>
-                  <div class="optimal-grades">
-                      <div class="optimal-grade-item">
-                          <div class="optimal-grade-value" id="maxQ2">100%</div>
-                          <div class="optimal-grade-label">Quarter 2 (Maximum)</div>
-                      </div>
-                      <div class="optimal-grade-item">
-                          <div class="optimal-grade-value" id="minFinal">0%</div>
-                          <div class="optimal-grade-label">Final Exam (Minimum)</div>
-                      </div>
-                  </div>
-                  <div class="strategy-description">
-                      This strategy maximizes your Quarter 2 grade while minimizing your Final Exam performance.
-                  </div>
-              </div>
-              
-              <!-- Strategy 2: Max Final, Min Q2 -->
-              <div id="strategy2" class="optimal-combo">
-                  <h4>Strategy 2: Focus on Final Exam</h4>
-                  <div class="optimal-grades">
-                      <div class="optimal-grade-item">
-                          <div class="optimal-grade-value" id="minQ2">0%</div>
-                          <div class="optimal-grade-label">Quarter 2 (Minimum)</div>
-                      </div>
-                      <div class="optimal-grade-item">
-                          <div class="optimal-grade-value" id="maxFinal">100%</div>
-                          <div class="optimal-grade-label">Final Exam (Maximum)</div>
-                      </div>
-                  </div>
-                  <div class="strategy-description">
-                      This strategy maximizes your Final Exam grade while minimizing your Quarter 2 performance.
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+        <!-- Grade Pairs Section -->
+        <div id="gradePairsSection" class="grade-pairs-section">
+            <h3>Optimal Grade Strategies</h3>
+            
+            <!-- Optimal Combinations Section -->
+            <div id="optimalCombos" class="optimal-combos">
+                <!-- Strategy 1: Max Q2, Min Final -->
+                <div id="strategy1" class="optimal-combo">
+                    <h4>Strategy 1: Focus on Quarter 2</h4>
+                    <div class="optimal-grades">
+                        <div class="optimal-grade-item">
+                            <div class="optimal-grade-value" id="maxQ2">100%</div>
+                            <div class="optimal-grade-label">Quarter 2 (Maximum)</div>
+                        </div>
+                        <div class="optimal-grade-item">
+                            <div class="optimal-grade-value" id="minFinal">0%</div>
+                            <div class="optimal-grade-label">Final Exam (Minimum)</div>
+                        </div>
+                    </div>
+                    <div class="strategy-description">
+                        This strategy maximizes your Quarter 2 grade while minimizing your Final Exam performance.
+                    </div>
+                </div>
+                
+                <!-- Strategy 2: Max Final, Min Q2 -->
+                <div id="strategy2" class="optimal-combo">
+                    <h4>Strategy 2: Focus on Final Exam</h4>
+                    <div class="optimal-grades">
+                        <div class="optimal-grade-item">
+                            <div class="optimal-grade-value" id="minQ2">0%</div>
+                            <div class="optimal-grade-label">Quarter 2 (Minimum)</div>
+                        </div>
+                        <div class="optimal-grade-item">
+                            <div class="optimal-grade-value" id="maxFinal">100%</div>
+                            <div class="optimal-grade-label">Final Exam (Maximum)</div>
+                        </div>
+                    </div>
+                    <div class="strategy-description">
+                        This strategy maximizes your Final Exam grade while minimizing your Quarter 2 performance.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <footer class="footer">
   <div class="container">
       <p>Created by Advaith S, 2025</p>
   </div>
 </footer>
-
-<!-- Welcome Modal Popup -->
-<div id="welcomeModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="modal-container">
-        <div class="modal-header">
-            <h3 id="modalTitle">Welcome to the Grade Calculator!</h3>
-        </div>
-        <div class="modal-body">
-            <p>This tool is made to help students calculate their grades and plan for future assignments. </p>
-            <p style="margin-top: 1rem;">If you want to get your own info on this popup, contact Advaith S!</p>
-        </div>
-        <div class="modal-footer">
-            <button id="welcomeModalOkayButton">Okay!</button>
-        </div>
-    </div>
-</div>
-
-<script src="/js/global-popup.js"></script>
 </body>
 </html>
