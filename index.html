@@ -380,6 +380,77 @@
             margin-top: 1rem; /* Add margin above to separate from class type dropdown */
             margin-bottom: 1rem; /* Add margin below if it's a distinct block */
         }
+
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-container {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.show .modal-container {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-color);
+        }
+
+        .modal-header {
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .modal-header h3 {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-body {
+            color: var(--text-color);
+            text-align: center;
+            font-size: 1.1rem;
+        }
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -389,6 +460,26 @@
         // Add event listeners to buttons
         document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
         document.getElementById('clearBtn').addEventListener('click', clearFields);
+
+        // Modal Logic
+        const modalBackdrop = document.getElementById('welcomeModalBackdrop');
+        const modalCloseButton = document.getElementById('welcomeModalClose');
+
+        if (sessionStorage.getItem('shownPopup') !== 'true') {
+            modalBackdrop.classList.add('show');
+            sessionStorage.setItem('shownPopup', 'true');
+        }
+
+        function hideModal() {
+            modalBackdrop.classList.remove('show');
+        }
+
+        modalCloseButton.addEventListener('click', hideModal);
+        modalBackdrop.addEventListener('click', function(event) {
+            if (event.target === modalBackdrop) {
+                hideModal();
+            }
+        });
     });
 
     function toggleMenu() {
@@ -1020,5 +1111,19 @@
             <p>Created by Advaith S, 2025</p>
         </div>
     </footer>
+
+    <!-- Welcome Modal Popup -->
+    <div id="welcomeModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-container">
+            <button id="welcomeModalClose" class="modal-close" aria-label="Close modal">&times;</button>
+            <div class="modal-header">
+                <h3 id="modalTitle">Welcome to the Grade Calculator!</h3>
+            </div>
+            <div class="modal-body">
+                <p>This tool helps you calculate your grades and plan for future assignments across different academic periods.</p>
+                <p style="margin-top: 1rem;">Explore the various calculators using the navigation bar above.</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
