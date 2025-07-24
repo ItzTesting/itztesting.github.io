@@ -396,7 +396,7 @@ gtag('config', 'G-LNMT1VXJW1');
             
             // Calculate current grade based on provided components
             let currentGrade = totalWeight > 0 ? weightedSum / totalWeight : 0;
-            resultText = "Current Grade: " + currentGrade.toFixed(2) + "%";
+            resultText = "Current Grade: " + currentGrade.toFixed(3) + "%";
             
             // If desired grade is provided, calculate needed final exam grade
             if (!isNaN(desiredGrade) && desiredGrade > 0) {
@@ -410,7 +410,7 @@ gtag('config', 'G-LNMT1VXJW1');
                     } else if (neededFinalExam < 0) {
                         resultText += "<br>You have already achieved your desired grade!";
                     } else {
-                        resultText += "<br>You need a " + neededFinalExam.toFixed(2) + "% on the Final Exam.";
+                        resultText += "<br>You need a " + neededFinalExam.toFixed(3) + "% on the Final Exam.";
                     }
                 }
                 // If we're missing some quarters, calculate the average needed
@@ -423,7 +423,7 @@ gtag('config', 'G-LNMT1VXJW1');
                     } else if (neededAvg < 0) {
                         resultText += "<br>You have already achieved your desired grade!";
                     } else {
-                        resultText += "<br>You need an average of " + neededAvg.toFixed(2) + "% on the remaining components.";
+                        resultText += "<br>You need an average of " + neededAvg.toFixed(3) + "% on the remaining components.";
                     }
                 }
             }
@@ -474,9 +474,9 @@ gtag('config', 'G-LNMT1VXJW1');
         
         // Update the display for Strategy 1
         if (strategy1Valid) {
-            const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 100) / 100);
+            const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 1000) / 1000);
             document.getElementById('maxQ2').innerText = q2Max + '%';
-            document.getElementById('minFinal').innerText = roundedFinal.toFixed(2) + '%';
+            document.getElementById('minFinal').innerText = roundedFinal.toFixed(3) + '%';
             document.getElementById('strategy1').style.display = 'block';
         } else {
             document.getElementById('strategy1').style.display = 'none';
@@ -484,9 +484,9 @@ gtag('config', 'G-LNMT1VXJW1');
         
         // Update the display for Strategy 2
         if (strategy2Valid) {
-            const roundedQ2 = Math.max(0, Math.ceil(minQ2Needed * 100) / 100);
+            const roundedQ2 = Math.max(0, Math.ceil(minQ2Needed * 1000) / 1000);
             document.getElementById('maxFinal').innerText = finalMax + '%';
-            document.getElementById('minQ2').innerText = roundedQ2.toFixed(2) + '%';
+            document.getElementById('minQ2').innerText = roundedQ2.toFixed(3) + '%';
             document.getElementById('strategy2').style.display = 'block';
         } else {
             document.getElementById('strategy2').style.display = 'none';
