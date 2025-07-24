@@ -369,6 +369,9 @@
       'assignments': 0 // New counter for single assignments view
   };
 
+  // Global variable to track the current view state
+  let currentViewIsGrouped = false; 
+
   document.addEventListener('DOMContentLoaded', function() {
       // Add event listeners for Quarter Calculator
       document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
@@ -383,13 +386,12 @@
       // Add event listener for the "Show Assignment Names" checkbox
       document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
       // Add event listener for the "Group View" checkbox
-      document.getElementById('groupViewCheckbox').addEventListener('change', toggleGroupView);
-
+      document.getElementById('groupViewCheckbox').addEventListener('change', (event) => toggleGroupView(event.target.checked));
+      
       // Initial visibility check for assignment names and group view
-      // Ensure initial state is correct on page load
-      document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
       document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
-      toggleGroupView(); // Call this first to set initial state for group view
+      document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
+      toggleGroupView(false); // Explicitly set group view OFF on page load
       toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
   });
 
@@ -398,13 +400,13 @@
       navLinks.classList.toggle('active');
   }
 
-  function toggleGroupView() {
-      const isGroupView = document.getElementById('groupViewCheckbox').checked;
-      document.getElementById('groupedCategories').style.display = isGroupView ? 'block' : 'none';
-      document.getElementById('singleAssignmentCategory').style.display = isGroupView ? 'none' : 'block';
-      document.getElementById('overallWeightsSection').style.display = isGroupView ? 'none' : 'flex'; // Show/hide overall weights
+  // Modified toggleGroupView to accept a boolean for explicit control
+  function toggleGroupView(shouldBeGroupView) {
+      currentViewIsGrouped = shouldBeGroupView; // Update the global state
+      document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
+      document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
+      document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
 
-      // Do NOT call clearQuarterFields here. This function only toggles the view.
       calculateQuarterGrade(); // Recalculate based on new view
   }
 
@@ -624,7 +626,7 @@
   }
 
   function calculateQuarterGrade() {
-      const isGroupView = document.getElementById('groupViewCheckbox').checked;
+      const isGroupView = currentViewIsGrouped; // Use the global state
       let totalWeightedSum = 0;
       let totalWeight = 0;
       let resultHtml = "";
@@ -713,7 +715,7 @@
       let avgCustom = customTotalWeight > 0 ? customWeightedSum / customTotalWeight : 0;
 
       // Recalculate totalWeightedSum and totalWeight for single view after averages are known
-      if (!isGroupView) {
+      if (!isGroupView) { 
           totalWeightedSum = (avgLearnerTasks * learnerTaskOverallWeight) + (avgAssessments * assessmentOverallWeight) + customWeightedSum;
           totalWeight = learnerTaskOverallWeight + assessmentOverallWeight + customTotalWeight;
       }
@@ -776,12 +778,13 @@
           'assignments': 0
       };
       
-      // Explicitly set the checkbox states and then trigger their respective toggle functions
-      document.getElementById('groupViewCheckbox').checked = false; 
+      // Set the Show Assignment Names checkbox state and trigger its toggle function
       document.getElementById('showAssignmentNamesCheckbox').checked = true; 
+      toggleAssignmentNamesVisibility(); 
       
-      toggleGroupView(); // This will now correctly set display based on checked=false
-      toggleAssignmentNamesVisibility(); // This will correctly set display based on checked=true
+      // Explicitly set group view OFF after clearing
+      document.getElementById('groupViewCheckbox').checked = false;
+      toggleGroupView(false); 
       
       calculateQuarterGrade(); // Recalculate after clearing and setting initial view
   }
@@ -813,20 +816,20 @@
           Calculate your quarter grade by entering grades for different assignment categories and their weights.
       </p>
       
-      <!-- Group View Checkbox -->
-      <div class="checkbox-option-container">
-          <input type="checkbox" id="groupViewCheckbox">
-          <label for="groupViewCheckbox">Group View</label>
-      </div>
-
       <!-- Show Assignment Names Checkbox -->
       <div class="checkbox-option-container">
           <input type="checkbox" id="showAssignmentNamesCheckbox" checked>
           <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
       </div>
 
+      <!-- Group View Checkbox (New) -->
+      <div class="checkbox-option-container">
+          <input type="checkbox" id="groupViewCheckbox">
+          <label for="groupViewCheckbox">Group View</label>
+      </div>
+
       <!-- Overall Weights Section (visible when Group View is OFF) -->
-      <div id="overallWeightsSection" class="overall-weights-section" style="display: none;">
+      <div id="overallWeightsSection" class="overall-weights-section">
           <div class="input-group">
               <label for="overallLearnerTaskWeight">Learner Task Weight (%)</label>
               <input type="number" id="overallLearnerTaskWeight" min="0" max="100" placeholder="e.g., 20">
@@ -837,8 +840,8 @@
           </div>
       </div>
 
-      <!-- Grouped Categories Section (Default) -->
-      <div id="groupedCategories">
+      <!-- Grouped Categories Section (Hidden by Default) -->
+      <div id="groupedCategories" style="display: none;">
           <!-- Learner Tasks Category -->
           <div class="category-section">
               <div class="category-header">
@@ -888,8 +891,8 @@
           </div>
       </div>
 
-      <!-- Single Assignment Category Section (Hidden by Default) -->
-      <div id="singleAssignmentCategory" style="display: none;">
+      <!-- Single Assignment Category Section (Default) -->
+      <div id="singleAssignmentCategory">
           <div class="category-section">
               <div class="category-header">
                   <h3>Assignments</h3>
