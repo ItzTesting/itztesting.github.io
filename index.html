@@ -461,7 +461,7 @@
             finalGrade = 0;
         }
 
-        document.getElementById("result").innerText = finalGrade.toFixed(2) + "%";
+        document.getElementById("result").innerText = finalGrade.toFixed(3) + "%";
         
         calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, desiredGrade, midtermWeight, finalExamWeight, quarterWeights, apHasFinal);
         
@@ -613,8 +613,8 @@
             } else if (requiredGrade < 0) {
                 resultText = "You have already achieved your desired grade!";
             } else {
-                resultText = "You need a " + requiredGrade.toFixed(2) + "% in Quarter 4" + 
-                             ((classType !== "AP" || apHasFinal) ? " and " + requiredGrade.toFixed(2) + "% on the final exam" : "") + 
+                resultText = "You need a " + requiredGrade.toFixed(3) + "% in Quarter 4" + 
+                             ((classType !== "AP" || apHasFinal) ? " and " + requiredGrade.toFixed(3) + "% on the final exam" : "") + 
                              " to achieve your desired grade.";
             }
         } else if (numQuarters == 2 && !document.getElementById("midterm").value) {
@@ -626,7 +626,7 @@
             } else if (requiredGrade < 0) {
                 resultText = "You have already achieved your desired grade!";
             } else {
-                resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(2) + "% on the midterm, next two quarters" + 
+                resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(3) + "% on the midterm, next two quarters" + 
                              ((classType !== "AP" || apHasFinal) ? " and the final exam." : ".");
             }
         } else if (numQuarters == 2 && document.getElementById("midterm").value) {
@@ -638,7 +638,7 @@
             } else if (requiredGrade < 0) {
                 resultText = "You have already achieved your desired grade!";
             } else {
-                resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(2) + "% in the next two quarters" + 
+                resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(3) + "% in the next two quarters" + 
                              ((classType !== "AP" || apHasFinal) ? " and the final exam." : ".");
             }
         } else if (numQuarters == 4 && (classType !== "AP" || apHasFinal) && !document.getElementById("final").value) {
@@ -650,7 +650,7 @@
             } else if (requiredGrade < 0) {
                 resultText = "You have already achieved your desired grade!";
             } else {
-                resultText = "You need a " + requiredGrade.toFixed(2) + "% on the final exam to achieve your desired grade.";
+                resultText = "You need a " + requiredGrade.toFixed(3) + "% on the final exam to achieve your desired grade.";
             }
         }
         
@@ -678,8 +678,8 @@
         
         // Update the display for Strategy 1
         if (strategy1Valid) {
-            const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 100) / 100);
-            document.getElementById('minQ4').innerText = roundedQ4.toFixed(2) + '%';
+            const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 1000) / 1000);
+            document.getElementById('minQ4').innerText = roundedQ4.toFixed(3) + '%';
             document.getElementById('maxFinal').innerText = finalExamMax + '%';
             document.getElementById('strategy1').style.display = 'block';
         } else {
@@ -688,9 +688,9 @@
         
         // Update the display for Strategy 2
         if (strategy2Valid) {
-            const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 100) / 100);
+            const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 1000) / 1000);
             document.getElementById('maxQ4').innerText = q4Max + '%';
-            document.getElementById('minFinal').innerText = roundedFinal.toFixed(2) + '%';
+            document.getElementById('minFinal').innerText = roundedFinal.toFixed(3) + '%';
             document.getElementById('strategy2').style.display = 'block';
         } else {
             document.getElementById('strategy2').style.display = 'none';
@@ -737,8 +737,8 @@
         
         // Update the display for Strategy 1
         if (strategy1Valid) {
-            const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 100) / 100);
-            document.getElementById('minQ4').innerText = roundedQ4.toFixed(2) + '%';
+            const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 1000) / 1000);
+            document.getElementById('minQ4').innerText = roundedQ4.toFixed(3) + '%';
             document.getElementById('maxFinal').innerText = q3Max + '%';
             document.getElementById('strategy1').style.display = 'block';
         } else {
@@ -747,9 +747,9 @@
         
         // Update the display for Strategy 2
         if (strategy2Valid) {
-            const roundedQ3 = Math.max(0, Math.ceil(minQ3Needed * 100) / 100);
+            const roundedQ3 = Math.max(0, Math.ceil(minQ3Needed * 1000) / 1000);
             document.getElementById('maxQ4').innerText = q4Max + '%';
-            document.getElementById('minFinal').innerText = roundedQ3.toFixed(2) + '%';
+            document.getElementById('minFinal').innerText = roundedQ3.toFixed(3) + '%';
             document.getElementById('strategy2').style.display = 'block';
         } else {
             document.getElementById('strategy2').style.display = 'none';
@@ -797,9 +797,9 @@
         
         // Update the display for Strategy 1
         if (strategy1Valid) {
-            const roundedQuarter = Math.max(0, Math.ceil(minQuarterNeeded * 100) / 100);
+            const roundedQuarter = Math.max(0, Math.ceil(minQuarterNeeded * 1000) / 1000);
             document.getElementById('maxFinal').innerText = midtermMax + '%';
-            document.getElementById('minQ4').innerText = roundedQuarter.toFixed(2) + '%';
+            document.getElementById('minQ4').innerText = roundedQuarter.toFixed(3) + '%';
             document.getElementById('strategy1').style.display = 'block';
         } else {
             document.getElementById('strategy1').style.display = 'none';
@@ -807,8 +807,8 @@
         
         // Update the display for Strategy 2
         if (strategy2Valid) {
-            const roundedMidterm = Math.max(0, Math.ceil(minMidtermNeeded * 100) / 100);
-            document.getElementById('minFinal').innerText = roundedMidterm.toFixed(2) + '%';
+            const roundedMidterm = Math.max(0, Math.ceil(minMidtermNeeded * 1000) / 1000);
+            document.getElementById('minFinal').innerText = roundedMidterm.toFixed(3) + '%';
             document.getElementById('maxQ4').innerText = quarterMax + '%';
             document.getElementById('strategy2').style.display = 'block';
         } else {
