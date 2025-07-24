@@ -1,1146 +1,1141 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
+  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
 
-  gtag('config', 'G-LNMT1VXJW1');
+gtag('config', 'G-LNMT1VXJW1');
 </script>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade Calculator</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --primary-bg: #1a1a1a;
-            --secondary-bg: #2E2E2E;
-            --input-bg: #3B3B3B;
-            --text-color: #F1F1F1;
-            --text-secondary: #D1D1D1;
-            --accent-color: #4CAF50;
-            --accent-hover: #45a049;
-            --link-color: #64B5F6;
-            --border-color: #555;
-            --card-bg: #333333;
-            --nav-bg: #222222;
-            --highlight-bg: rgba(76, 175, 80, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background-color: var(--primary-bg);
-            color: var(--text-color);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            padding-bottom: 2rem;
-        }
-
-        .navbar {
-            background-color: var(--nav-bg);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--text-color);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo i {
-            margin-right: 0.5rem;
-            color: var(--accent-color);
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-links li {
-            margin-left: 1.5rem;
-        }
-
-        .nav-links a {
-            color: var(--text-color);
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-color);
-        }
-
-        .nav-links a.active {
-            color: var(--accent-color);
-            font-weight: 600;
-        }
-
-        .nav-links a i {
-            margin-right: 0.5rem;
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: var(--text-color);
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-
-        h2 {
-            color: var(--text-color);
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-            text-align: center;
-            font-size: 1.8rem;
-        }
-
-        h3 {
-            color: var(--text-color);
-            margin: 1rem 0;
-            font-weight: 500;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
-            display: block;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-
-        input, select {
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 5px;
-            padding: 0.75rem;
-            width: 100%;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .input-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .input-group {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;
-            flex-wrap: wrap;
-        }
-
-        button {
-            cursor: pointer;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: background-color 0.3s;
-            flex: 1;
-            min-width: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        button:hover {
-            background-color: var(--accent-hover);
-        }
-
-        button i {
-            margin-right: 0.5rem;
-        }
-
-        .btn-clear {
-            background-color: #f44336;
-        }
-
-        .btn-clear:hover {
-            background-color: #d32f2f;
-        }
-
-        .result-section {
-            background-color: var(--secondary-bg);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .result-section h3 {
-            margin-top: 0;
-            color: var(--accent-color);
-        }
-
-        a {
-            color: var(--link-color);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        a:hover {
-            color: #90CAF9;
-            text-decoration: underline;
-        }
-
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                position: absolute;
-                top: 60px;
-                left: 0;
-                right: 0;
-                background-color: var(--nav-bg);
-                flex-direction: column;
-                padding: 1rem;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            }
-
-            .nav-links.active {
-                display: flex;
-            }
-
-            .nav-links li {
-                margin: 0.5rem 0;
-            }
-
-            .mobile-menu-btn {
-                display: block;
-            }
-
-            .card {
-                padding: 1.5rem;
-                margin: 1rem 0;
-            }
-
-            .input-group {
-                min-width: 100%;
-            }
-        }
-
-        .footer {
-            text-align: center;
-            padding: 1rem 0;
-            margin-top: 2rem;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .grade-pairs-section {
-            display: none;
-            background-color: var(--secondary-bg);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-
-        .grade-pairs-section h3 {
-            color: var(--accent-color);
-            margin-bottom: 1rem;
-        }
-
-        .optimal-combos {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin: 1.5rem 0;
-        }
-
-        .optimal-combo {
-            background-color: var(--highlight-bg);
-            padding: 1.25rem;
-            border-radius: 5px;
-            border-left: 4px solid var(--accent-color);
-            flex: 1;
-            min-width: 280px;
-        }
-
-        .optimal-combo h4 {
-            color: var(--accent-color);
-            margin-bottom: 0.75rem;
-            font-weight: 600;
-        }
-
-        .optimal-grades {
-            display: flex;
-            justify-content: space-around;
-            margin: 1rem 0;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .optimal-grade-item {
-            text-align: center;
-            flex: 1;
-            min-width: 120px;
-        }
-
-        .optimal-grade-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .optimal-grade-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .strategy-description {
-            margin-top: 0.75rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            /* Removed margin-top from here as it's now on ap-final-option */
-        }
-
-        .checkbox-container input[type="checkbox"] {
-            width: auto;
-            margin-right: 0.5rem;
-        }
-
-        .checkbox-container label {
-            display: inline;
-            margin-bottom: 0;
-        }
-
-        /* Updated styles for ap-final-option to match theme */
-        .ap-final-option {
-            display: none; /* Controlled by JS */
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem; /* Increased padding for better spacing */
-            background-color: var(--secondary-bg); /* Match other sections */
-            margin-top: 1rem; /* Add margin above to separate from class type dropdown */
-            margin-bottom: 1rem; /* Add margin below if it's a distinct block */
-        }
-
-        /* Modal Styles */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-        }
-
-        .modal-backdrop.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-container {
-            background-color: var(--card-bg);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-            transform: translateY(-20px);
-            transition: transform 0.3s ease;
-            display: flex; /* Use flexbox for content alignment */
-            flex-direction: column; /* Stack content vertically */
-            gap: 1.5rem; /* Space between elements */
-        }
-
-        .modal-backdrop.show .modal-container {
-            transform: translateY(0);
-        }
-
-        /* Removed .modal-close styles as it's no longer an 'X' button */
-
-        .modal-header {
-            margin-bottom: 0; /* Adjusted margin as gap handles spacing */
-            text-align: center;
-        }
-
-        .modal-header h3 {
-            color: var(--accent-color);
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .modal-body {
-            color: var(--text-color);
-            text-align: center;
-            font-size: 1.1rem;
-        }
-
-        .modal-footer {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem; /* Add some space above the button */
-        }
-
-        .modal-footer button {
-            min-width: 120px; /* Ensure button has a decent size */
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            font-weight: 500;
-            border-radius: 5px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .modal-footer button:hover {
-            background-color: var(--accent-hover);
-        }
-    </style>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the page
-        toggleFinalField();
-        
-        // Add event listeners to buttons
-        document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
-        document.getElementById('clearBtn').addEventListener('click', clearFields);
-
-        // Modal Logic
-        // const modalBackdrop = document.getElementById('welcomeModalBackdrop');
-        // const okayButton = document.getElementById('welcomeModalOkayButton'); // Changed ID
-
-        // if (sessionStorage.getItem('shownPopup') !== 'true') {
-        //     modalBackdrop.classList.add('show');
-        //     sessionStorage.setItem('shownPopup', 'true');
-        // }
-
-        // function hideModal() {
-        //     modalBackdrop.classList.remove('show');
-        // }
-
-        // okayButton.addEventListener('click', hideModal); // Event listener for the new button
-        // modalBackdrop.addEventListener('click', function(event) {
-        //     if (event.target === modalBackdrop) {
-        //         hideModal();
-        //     }
-        // });
-    });
-
-    function toggleMenu() {
-        const navLinks = document.querySelector('.nav-links');
-        navLinks.classList.toggle('active');
-    }
-
-    function calculateFinalGrade() {
-        let numQuarters = getNumQuarters();
-        let classType = document.getElementById("classType").value;
-        let desiredGrade = parseFloat(document.getElementById("desiredGrade").value);
-        let apHasFinal = document.getElementById("apHasFinal").checked;
-        
-        // Determine weights based on class type and if AP has final
-        let quarterWeights, midtermWeight, finalExamWeight;
-        
-        if (classType === "AP") {
-            if (apHasFinal) {
-                // AP with final exam
-                quarterWeights = 20;
-                midtermWeight = 10;
-                finalExamWeight = 10;
-            } else {
-                // Standard AP
-                quarterWeights = 22;
-                midtermWeight = 12;
-                finalExamWeight = 0;
-            }
-        } else {
-            // CP/Honors
-            quarterWeights = 20;
-            midtermWeight = 10;
-            finalExamWeight = 10;
-        }
-        
-        let totalWeight = 0, weightedSum = 0;
-        
-        for (let i = 1; i <= numQuarters; i++) {
-            let quarterGrade = parseFloat(document.getElementById("q" + i).value) || 0;
-            weightedSum += quarterGrade * quarterWeights;
-            totalWeight += quarterWeights;
-        }
-        
-        let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
-        let finalExamGrade = parseFloat(document.getElementById("final").value) || 0;
-        
-        if (document.getElementById("midterm").value) {
-            weightedSum += midtermGrade * midtermWeight;
-            totalWeight += midtermWeight;
-        }
-        
-        if ((classType !== "AP" || apHasFinal) && document.getElementById("final").value) {
-            weightedSum += finalExamGrade * finalExamWeight;
-            totalWeight += finalExamWeight;
-        }
-        
-        // Calculate final grade based on the weights
-        let finalGrade;
-        if (totalWeight > 0) {
-            // If we have all quarters, midterm, and final (if applicable)
-            if (numQuarters === 4 && document.getElementById("midterm").value && 
-                ((classType !== "AP" || apHasFinal) ? document.getElementById("final").value : true)) {
-                // All components are present, use the full calculation
-                finalGrade = weightedSum / 100;
-            } else {
-                // Some components are missing, normalize by the total weight
-                finalGrade = weightedSum / totalWeight;
-            }
-        } else {
-            finalGrade = 0;
-        }
-
-        document.getElementById("result").innerText = finalGrade.toFixed(3) + "%";
-        
-        calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, desiredGrade, midtermWeight, finalExamWeight, quarterWeights, apHasFinal);
-        
-        // Check if we should show the grade pairs section
-        const gradePairsSection = document.getElementById('gradePairsSection');
-        
-        // For CP/Honors classes when desired grade is entered and Q4 and Final are blank
-        if (desiredGrade && !isNaN(desiredGrade) && 
-            classType !== "AP" && 
-            document.getElementById("q4").value === "" && 
-            document.getElementById("final").value === "") {
-    
-            // Calculate the weighted sum for the equation
-            let q1Grade = parseFloat(document.getElementById("q1").value) || 0;
-            let q2Grade = parseFloat(document.getElementById("q2").value) || 0;
-            let q3Grade = parseFloat(document.getElementById("q3").value) || 0;
-            let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
-            
-            let currentWeightedSum = (q1Grade * 20) + (q2Grade * 20) + (q3Grade * 20) + (midtermGrade * 10);
-            let remainingWeight = 20 + 10; // Q4 (20%) + Final Exam (10%)
-            
-            // Calculate the minimum average needed for the remaining components
-            let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
-            
-            // Check if it's possible to achieve the desired grade
-            if (minAvgNeeded >= 999.99) {
-                gradePairsSection.style.display = 'none';
-                return;
-            } else if (minAvgNeeded < 0) {
-                // Already achieved desired grade
-                gradePairsSection.style.display = 'none';
-                return;
-            }
-            
-            // Calculate optimal combinations
-            calculateOptimalCombinations(currentWeightedSum, desiredGrade, false);
-            
-            // Show the grade pairs section
-            gradePairsSection.style.display = 'block';
-        } 
-        // For AP classes when desired grade is entered and both Q3 and Q4 are blank
-        else if (desiredGrade && !isNaN(desiredGrade) && 
-                 classType === "AP" && 
-                 document.getElementById("q3").value === "" &&
-                 document.getElementById("q4").value === "") {
-            
-            // Calculate the weighted sum for the equation
-            let q1Grade = parseFloat(document.getElementById("q1").value) || 0;
-            let q2Grade = parseFloat(document.getElementById("q2").value) || 0;
-            let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
-            let hasMidterm = document.getElementById("midterm").value !== "";
-
-            // Use the appropriate weights based on whether AP has final
-            let currentWeightedSum = (q1Grade * quarterWeights) + (q2Grade * quarterWeights);
-            if (hasMidterm) {
-                currentWeightedSum += (midtermGrade * midtermWeight);
-            }
-
-            let remainingWeight = quarterWeights + quarterWeights; // Q3 + Q4
-            if (!hasMidterm) {
-                remainingWeight += midtermWeight; // Add midterm weight if not entered
-            }
-            
-            // Calculate the minimum average needed for the remaining components
-            let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
-            
-            // Check if it's possible to achieve the desired grade
-            if (minAvgNeeded >= 999.99) {
-                gradePairsSection.style.display = 'none';
-                return;
-            } else if (minAvgNeeded < 0) {
-                // Already achieved desired grade
-                gradePairsSection.style.display = 'none';
-                return;
-            }
-            
-            // Calculate optimal combinations for AP with both Q3 and Q4 blank
-            if (hasMidterm) {
-                // If midterm is provided, calculate Q3/Q4 strategies
-                calculateAPQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeights);
-            } else {
-                // If midterm is not provided, calculate Midterm/Q3/Q4 strategies
-                calculateAPMidtermQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeights, midtermWeight);
-            }
-            
-            // Show the grade pairs section
-            gradePairsSection.style.display = 'block';
-        }
-        // For AP classes with final when desired grade is entered and Q4 and Final are blank
-        else if (desiredGrade && !isNaN(desiredGrade) && 
-                 classType === "AP" && apHasFinal &&
-                 document.getElementById("q4").value === "" && 
-                 document.getElementById("final").value === "") {
-    
-            // Calculate the weighted sum for the equation
-            let q1Grade = parseFloat(document.getElementById("q1").value) || 0;
-            let q2Grade = parseFloat(document.getElementById("q2").value) || 0;
-            let q3Grade = parseFloat(document.getElementById("q3").value) || 0;
-            let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
-            
-            let currentWeightedSum = (q1Grade * 20) + (q2Grade * 20) + (q3Grade * 20) + (midtermGrade * 10);
-            let remainingWeight = 20 + 10; // Q4 (20%) + Final Exam (10%)
-            
-            // Calculate the minimum average needed for the remaining components
-            let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
-            
-            // Check if it's possible to achieve the desired grade
-            if (minAvgNeeded >= 999.99) {
-                gradePairsSection.style.display = 'none';
-                return;
-            } else if (minAvgNeeded < 0) {
-                // Already achieved desired grade
-                gradePairsSection.style.display = 'none';
-                return;
-            }
-            
-            // Calculate optimal combinations for AP with final (same as CP/Honors)
-            calculateOptimalCombinations(currentWeightedSum, desiredGrade, true);
-            
-            // Show the grade pairs section
-            gradePairsSection.style.display = 'block';
-        }
-        else {
-            gradePairsSection.style.display = 'none';
-        }
-    }
-    
-    function getNumQuarters() {
-        let numQuarters = 0;
-        for (let i = 1; i <= 4; i++) {
-            let quarterGrade = document.getElementById("q" + i).value;
-            if (quarterGrade !== "") {
-                numQuarters++;
-            }
-        }
-        return numQuarters;
-    }
-    
-    function calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, desiredGrade, midtermWeight, finalExamWeight, quarterWeights, apHasFinal) {
-        let remainingWeight = 0, requiredGrade = 0;
-        let resultText = "";
-        
-        if (numQuarters == 3) {
-            remainingWeight = quarterWeights + ((classType !== "AP" || apHasFinal) ? finalExamWeight : 0);
-            requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
-            
-            if (requiredGrade >= 999.99) {
-                resultText = "Unfortunately, it's not possible to achieve your desired grade.";
-            } else if (requiredGrade < 0) {
-                resultText = "You have already achieved your desired grade!";
-            } else {
-                resultText = "You need a " + requiredGrade.toFixed(3) + "% in Quarter 4" + 
-                             ((classType !== "AP" || apHasFinal) ? " and " + requiredGrade.toFixed(3) + "% on the final exam" : "") + 
-                             " to achieve your desired grade.";
-            }
-        } else if (numQuarters == 2 && !document.getElementById("midterm").value) {
-            remainingWeight = midtermWeight + (2 * quarterWeights) + ((classType !== "AP" || apHasFinal) ? finalExamWeight : 0);
-            requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
-            
-            if (requiredGrade >= 999.99) {
-                resultText = "Unfortunately, it's not possible to achieve your desired grade.";
-            } else if (requiredGrade < 0) {
-                resultText = "You have already achieved your desired grade!";
-            } else {
-                resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(3) + "% on the midterm, next two quarters" + 
-                             ((classType !== "AP" || apHasFinal) ? " and the final exam." : ".");
-            }
-        } else if (numQuarters == 2 && document.getElementById("midterm").value) {
-            remainingWeight = (2 * quarterWeights) + ((classType !== "AP" || apHasFinal) ? finalExamWeight : 0);
-            requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
-            
-            if (requiredGrade >= 999.99) {
-                resultText = "Unfortunately, it's not possible to achieve your desired grade.";
-            } else if (requiredGrade < 0) {
-                resultText = "You have already achieved your desired grade!";
-            } else {
-                resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(3) + "% in the next two quarters" + 
-                             ((classType !== "AP" || apHasFinal) ? " and the final exam." : ".");
-            }
-        } else if (numQuarters == 4 && (classType !== "AP" || apHasFinal) && !document.getElementById("final").value) {
-            remainingWeight = finalExamWeight;
-            requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
-            
-            if (requiredGrade >= 999.99) {
-                resultText = "Unfortunately, it's not possible to achieve your desired grade.";
-            } else if (requiredGrade < 0) {
-                resultText = "You have already achieved your desired grade!";
-            } else {
-                resultText = "You need a " + requiredGrade.toFixed(3) + "% on the final exam to achieve your desired grade.";
-            }
-        }
-        
-        document.getElementById("neededGrade").innerText = resultText;
-    }
-
-    function calculateOptimalCombinations(currentWeightedSum, desiredGrade, isAPWithFinal = false) {
-        // Calculate the target sum needed
-        const targetSum = (desiredGrade * 100) - currentWeightedSum;
-        
-        // For CP/Honors classes or AP with final (Q4 and Final Exam)
-        // Strategy 1: Lowest Q4, Highest Final
-        const finalExamMax = 100;
-        const finalExamMaxContribution = finalExamMax * 10;
-        const minQ4Needed = (targetSum - finalExamMaxContribution) / 20;
-        
-        // Strategy 2: Highest Q4, Lowest Final
-        const q4Max = 100;
-        const q4MaxContribution = q4Max * 20;
-        const minFinalNeeded = (targetSum - q4MaxContribution) / 10;
-        
-        // Check if these are valid combinations
-        let strategy1Valid = minQ4Needed < 999.99;
-        let strategy2Valid = minFinalNeeded < 999.99;
-        
-        // Update the display for Strategy 1
-        if (strategy1Valid) {
-            const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 1000) / 1000);
-            document.getElementById('minQ4').innerText = roundedQ4.toFixed(3) + '%';
-            document.getElementById('maxFinal').innerText = finalExamMax + '%';
-            document.getElementById('strategy1').style.display = 'block';
-        } else {
-            document.getElementById('strategy1').style.display = 'none';
-        }
-        
-        // Update the display for Strategy 2
-        if (strategy2Valid) {
-            const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 1000) / 1000);
-            document.getElementById('maxQ4').innerText = q4Max + '%';
-            document.getElementById('minFinal').innerText = roundedFinal.toFixed(3) + '%';
-            document.getElementById('strategy2').style.display = 'block';
-        } else {
-            document.getElementById('strategy2').style.display = 'none';
-        }
-        
-        // Show/hide the optimal combinations section
-        document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
-        
-        // Update section title
-        document.getElementById('gradePairsTitle').innerText = isAPWithFinal ? 'Optimal AP Grade Strategies' : 'Optimal Grade Strategies';
-        
-        // Update strategy titles
-        document.getElementById('strategy1Title').innerText = 'Strategy 1: Focus on Final Exam';
-        document.getElementById('strategy2Title').innerText = 'Strategy 2: Focus on Quarter 4';
-        
-        // Update strategy descriptions
-        document.getElementById('strategy1Desc').innerText = 'This strategy minimizes your Quarter 4 grade while maximizing your Final Exam performance.';
-        
-        document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 4 grade while minimizing your Final Exam performance.';
-        
-        // Update labels - Ensure Q4 comes before Final Exam in display
-        document.getElementById('minQ4Label').innerText = 'Quarter 4 (Minimum)';
-        document.getElementById('maxFinalLabel').innerText = 'Final Exam (Maximum)';
-        document.getElementById('maxQ4Label').innerText = 'Quarter 4 (Maximum)';
-        document.getElementById('minFinalLabel').innerText = 'Final Exam (Minimum)';
-    }
-
-    function calculateAPQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeight) {
-        // Calculate the target sum needed
-        const targetSum = (desiredGrade * 100) - currentWeightedSum;
-        
-        // Strategy 1: Maximum Q3, Minimum Q4
-        const q3Max = 100;
-        const q3MaxContribution = q3Max * quarterWeight;
-        const minQ4Needed = (targetSum - q3MaxContribution) / quarterWeight;
-        
-        // Strategy 2: Minimum Q3, Maximum Q4
-        const q4Max = 100;
-        const q4MaxContribution = q4Max * quarterWeight;
-        const minQ3Needed = (targetSum - q4MaxContribution) / quarterWeight;
-        
-        // Check if these are valid combinations
-        let strategy1Valid = minQ4Needed < 999.99;
-        let strategy2Valid = minQ3Needed < 999.99;
-        
-        // Update the display for Strategy 1
-        if (strategy1Valid) {
-            const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 1000) / 1000);
-            document.getElementById('minQ4').innerText = roundedQ4.toFixed(3) + '%';
-            document.getElementById('maxFinal').innerText = q3Max + '%';
-            document.getElementById('strategy1').style.display = 'block';
-        } else {
-            document.getElementById('strategy1').style.display = 'none';
-        }
-        
-        // Update the display for Strategy 2
-        if (strategy2Valid) {
-            const roundedQ3 = Math.max(0, Math.ceil(minQ3Needed * 1000) / 1000);
-            document.getElementById('maxQ4').innerText = q4Max + '%';
-            document.getElementById('minFinal').innerText = roundedQ3.toFixed(3) + '%';
-            document.getElementById('strategy2').style.display = 'block';
-        } else {
-            document.getElementById('strategy2').style.display = 'none';
-        }
-        
-        // Show/hide the optimal combinations section
-        document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
-        
-        // Update section title for AP
-        document.getElementById('gradePairsTitle').innerText = 'Optimal AP Grade Strategies';
-        
-        // Update strategy titles for AP
-        document.getElementById('strategy1Title').innerText = 'Strategy 1: Focus on Quarter 3';
-        document.getElementById('strategy2Title').innerText = 'Strategy 2: Focus on Quarter 4';
-        
-        // Update strategy descriptions for AP
-        document.getElementById('strategy1Desc').innerText = 'This strategy maximizes your Quarter 3 grade while minimizing your Quarter 4 performance.';
-        document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 4 grade while minimizing your Quarter 3 performance.';
-        
-        // Update labels for AP - Ensure Q3 comes before Q4 in display
-        document.getElementById('maxFinalLabel').innerText = 'Quarter 3 (Maximum)';
-        document.getElementById('minQ4Label').innerText = 'Quarter 4 (Minimum)';
-        document.getElementById('minFinalLabel').innerText = 'Quarter 3 (Minimum)';
-        document.getElementById('maxQ4Label').innerText = 'Quarter 4 (Maximum)';
-    }
-
-    function calculateAPMidtermQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeight, midtermWeight) {
-        // Calculate the target sum needed
-        const targetSum = (desiredGrade * 100) - currentWeightedSum;
-        
-        // Strategy 1: Maximum Midterm, Minimum Q3/Q4
-        const midtermMax = 100;
-        const midtermMaxContribution = midtermMax * midtermWeight;
-        // Q3 and Q4 will have the same value
-        const minQuarterNeeded = (targetSum - midtermMaxContribution) / (quarterWeight * 2); // Q3 + Q4
-        
-        // Strategy 2: Minimum Midterm, Maximum Q3/Q4
-        const quarterMax = 100;
-        const quarterMaxContribution = quarterMax * (quarterWeight * 2); // Q3 + Q4
-        const minMidtermNeeded = (targetSum - quarterMaxContribution) / midtermWeight;
-        
-        // Check if these are valid combinations
-        let strategy1Valid = minQuarterNeeded < 999.99;
-        let strategy2Valid = minMidtermNeeded < 999.99;
-        
-        // Update the display for Strategy 1
-        if (strategy1Valid) {
-            const roundedQuarter = Math.max(0, Math.ceil(minQuarterNeeded * 1000) / 1000);
-            document.getElementById('maxFinal').innerText = midtermMax + '%';
-            document.getElementById('minQ4').innerText = roundedQuarter.toFixed(3) + '%';
-            document.getElementById('strategy1').style.display = 'block';
-        } else {
-            document.getElementById('strategy1').style.display = 'none';
-        }
-        
-        // Update the display for Strategy 2
-        if (strategy2Valid) {
-            const roundedMidterm = Math.max(0, Math.ceil(minMidtermNeeded * 1000) / 1000);
-            document.getElementById('minFinal').innerText = roundedMidterm.toFixed(3) + '%';
-            document.getElementById('maxQ4').innerText = quarterMax + '%';
-            document.getElementById('strategy2').style.display = 'block';
-        } else {
-            document.getElementById('strategy2').style.display = 'none';
-        }
-        
-        // Show/hide the optimal combinations section
-        document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
-        
-        // Update section title for AP
-        document.getElementById('gradePairsTitle').innerText = 'Optimal AP Grade Strategies';
-        
-        // Update strategy titles for AP
-        document.getElementById('strategy1Title').innerText = 'Strategy 1: Focus on Midterm';
-        document.getElementById('strategy2Title').innerText = 'Strategy 2: Focus on Quarters 3 & 4';
-        
-        // Update strategy descriptions for AP
-        document.getElementById('strategy1Desc').innerText = 'This strategy maximizes your Midterm grade while minimizing your Quarter 3 and 4 performance (both quarters will have the same grade).';
-        
-        document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 3 and 4 grades while minimizing your Midterm performance (both quarters will have the same grade).';
-        
-        // Update labels for AP - Ensure Midterm comes before Q3/Q4 in display
-        document.getElementById('maxFinalLabel').innerText = 'Midterm (Maximum)';
-        document.getElementById('minQ4Label').innerText = 'Q3 & Q4 (Minimum)';
-        document.getElementById('minFinalLabel').innerText = 'Midterm (Minimum)';
-        document.getElementById('maxQ4Label').innerText = 'Q3 & Q4 (Maximum)';
-    }
-
-    function toggleFinalField() {
-        let classType = document.getElementById("classType").value;
-        let finalField = document.getElementById("finalField");
-        let apFinalOption = document.getElementById("apFinalOption");
-        
-        if (classType === "AP") {
-            finalField.style.display = "none";
-            apFinalOption.style.display = "block";
-            updateAPFinalField();
-        } else {
-            finalField.style.display = "block";
-            apFinalOption.style.display = "none";
-        }
-    }
-    
-    function updateAPFinalField() {
-        let apHasFinal = document.getElementById("apHasFinal").checked;
-        let finalField = document.getElementById("finalField");
-        
-        if (apHasFinal) {
-            finalField.style.display = "block";
-            document.querySelector('label[for="final"]').innerText = "Final Exam/Project";
-        } else {
-            finalField.style.display = "none";
-        }
-    }
-
-    function clearFields() {
-        document.querySelectorAll("input[type='number']").forEach(input => input.value = "");
-        document.getElementById("desiredGrade").value = "";
-        document.getElementById("classType").value = "CP";
-        document.getElementById("apHasFinal").checked = false;
-        toggleFinalField();
-        document.getElementById("result").innerText = "";
-        document.getElementById("neededGrade").innerText = "";
-        // Hide the grade pairs section
-        document.getElementById('gradePairsSection').style.display = 'none';
-    }
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grade Calculator</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+      :root {
+          --primary-bg: #1a1a1a;
+          --secondary-bg: #2E2E2E;
+          --input-bg: #3B3B3B;
+          --text-color: #F1F1F1;
+          --text-secondary: #D1D1D1;
+          --accent-color: #4CAF50;
+          --accent-hover: #45a049;
+          --link-color: #64B5F6;
+          --border-color: #555;
+          --card-bg: #333333;
+          --nav-bg: #222222;
+          --highlight-bg: rgba(76, 175, 80, 0.15);
+      }
+
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          background-color: var(--primary-bg);
+          color: var(--text-color);
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          line-height: 1.6;
+          padding-bottom: 2rem;
+      }
+
+      .navbar {
+          background-color: var(--nav-bg);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+          position: sticky;
+          top: 0;
+          z-index: 100;
+      }
+
+      .container {
+          width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1rem;
+      }
+
+      .nav-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 1rem;
+      }
+
+      .logo {
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: var(--text-color);
+          text-decoration: none;
+          display: flex;
+          align-items: center;
+      }
+
+      .logo i {
+          margin-right: 0.5rem;
+          color: var(--accent-color);
+      }
+
+      .nav-links {
+          display: flex;
+          list-style: none;
+      }
+
+      .nav-links li {
+          margin-left: 1.5rem;
+      }
+
+      .nav-links a {
+          color: var(--text-color);
+          text-decoration: none;
+          font-weight: 500;
+          transition: color 0.3s;
+          display: flex;
+          align-items: center;
+      }
+
+      .nav-links a:hover {
+          color: var(--accent-color);
+      }
+
+      .nav-links a.active {
+          color: var(--accent-color);
+          font-weight: 600;
+      }
+
+      .nav-links a i {
+          margin-right: 0.5rem;
+      }
+
+      .mobile-menu-btn {
+          display: none;
+          background: none;
+          border: none;
+          color: var(--text-color);
+          font-size: 1.5rem;
+          cursor: pointer;
+      }
+
+      .card {
+          background-color: var(--card-bg);
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          padding: 2rem;
+          margin: 2rem 0;
+      }
+
+      h2 {
+          color: var(--text-color);
+          margin-bottom: 1.5rem;
+          font-weight: 600;
+          text-align: center;
+          font-size: 1.8rem;
+      }
+
+      h3 {
+          color: var(--text-color);
+          margin: 1rem 0;
+          font-weight: 500;
+      }
+
+      .form-group {
+          margin-bottom: 1rem;
+      }
+
+      label {
+          display: block;
+          color: var(--text-secondary);
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+      }
+
+      input, select {
+          background-color: var(--input-bg);
+          color: var(--text-color);
+          border: 1px solid var(--border-color);
+          border-radius: 5px;
+          padding: 0.75rem;
+          width: 100%;
+          font-size: 1rem;
+          transition: border-color 0.3s;
+      }
+
+      input:focus, select:focus {
+          outline: none;
+          border-color: var(--accent-color);
+      }
+
+      .input-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1rem;
+          margin-bottom: 1rem;
+      }
+
+      .input-group {
+          flex: 1;
+          min-width: 200px;
+      }
+
+      .btn-group {
+          display: flex;
+          gap: 1rem;
+          margin: 1.5rem 0;
+          flex-wrap: wrap;
+      }
+
+      button {
+          cursor: pointer;
+          background-color: var(--accent-color);
+          color: white;
+          border: none;
+          border-radius: 5px;
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          font-weight: 500;
+          transition: background-color 0.3s;
+          flex: 1;
+          min-width: 150px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+      }
+
+      button:hover {
+          background-color: var(--accent-hover);
+      }
+
+      button i {
+          margin-right: 0.5rem;
+      }
+
+      .btn-clear {
+          background-color: #f44336;
+      }
+
+      .btn-clear:hover {
+          background-color: #d32f2f;
+      }
+
+      .result-section {
+          background-color: var(--secondary-bg);
+          border-radius: 8px;
+          padding: 1.5rem;
+          margin-top: 1.5rem;
+      }
+
+      .result-section h3 {
+          margin-top: 0;
+          color: var(--accent-color);
+      }
+
+      a {
+          color: var(--link-color);
+          text-decoration: none;
+          transition: color 0.3s;
+      }
+
+      a:hover {
+          color: #90CAF9;
+          text-decoration: underline;
+      }
+
+      @media (max-width: 768px) {
+          .nav-links {
+              display: none;
+              position: absolute;
+              top: 60px;
+              left: 0;
+              right: 0;
+              background-color: var(--nav-bg);
+              flex-direction: column;
+              padding: 1rem;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          }
+
+          .nav-links.active {
+              display: flex;
+          }
+
+          .nav-links li {
+              margin: 0.5rem 0;
+          }
+
+          .mobile-menu-btn {
+              display: block;
+          }
+
+          .card {
+              padding: 1.5rem;
+              margin: 1rem 0;
+          }
+
+          .input-group {
+              min-width: 100%;
+          }
+      }
+
+      .footer {
+          text-align: center;
+          padding: 1rem 0;
+          margin-top: 2rem;
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+      }
+
+      .grade-pairs-section {
+          display: none;
+          background-color: var(--secondary-bg);
+          border-radius: 8px;
+          padding: 1.5rem;
+          margin-top: 1.5rem;
+      }
+
+      .grade-pairs-section h3 {
+          color: var(--accent-color);
+          margin-bottom: 1rem;
+      }
+
+      .optimal-combos {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 1.5rem;
+          margin: 1.5rem 0;
+      }
+
+      .optimal-combo {
+          background-color: var(--highlight-bg);
+          padding: 1.25rem;
+          border-radius: 5px;
+          border-left: 4px solid var(--accent-color);
+          flex: 1;
+          min-width: 280px;
+      }
+
+      .optimal-combo h4 {
+          color: var(--accent-color);
+          margin-bottom: 0.75rem;
+          font-weight: 600;
+      }
+
+      .optimal-grades {
+          display: flex;
+          justify-content: space-around;
+          margin: 1rem 0;
+          flex-wrap: wrap;
+          gap: 1rem;
+      }
+
+      .optimal-grade-item {
+          text-align: center;
+          flex: 1;
+          min-width: 120px;
+      }
+
+      .optimal-grade-value {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+      }
+
+      .optimal-grade-label {
+          color: var(--text-secondary);
+          font-size: 0.9rem;
+      }
+
+      .strategy-description {
+          margin-top: 0.75rem;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+      }
+
+      .checkbox-container {
+          display: flex;
+          align-items: center;
+          /* Removed margin-top from here as it's now on ap-final-option */
+      }
+
+      .checkbox-container input[type="checkbox"] {
+          width: auto;
+          margin-right: 0.5rem;
+      }
+
+      .checkbox-container label {
+          display: inline;
+          margin-bottom: 0;
+      }
+
+      /* Updated styles for ap-final-option to match theme */
+      .ap-final-option {
+          display: none; /* Controlled by JS */
+          border: 1px solid var(--border-color);
+          border-radius: 8px;
+          padding: 1rem; /* Increased padding for better spacing */
+          background-color: var(--secondary-bg); /* Match other sections */
+          margin-top: 1rem; /* Add margin above to separate from class type dropdown */
+          margin-bottom: 1rem; /* Add margin below if it's a distinct block */
+      }
+
+      /* Modal Styles */
+      .modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.7);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          opacity: 0;
+          visibility: hidden;
+          transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .modal-backdrop.show {
+          opacity: 1;
+          visibility: visible;
+      }
+
+      .modal-container {
+          background-color: var(--card-bg);
+          padding: 2rem;
+          border-radius: 10px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+          max-width: 500px;
+          width: 90%;
+          position: relative;
+          transform: translateY(-20px);
+          transition: transform 0.3s ease;
+          display: flex; /* Use flexbox for content alignment */
+          flex-direction: column; /* Stack content vertically */
+          gap: 1.5rem; /* Space between elements */
+      }
+
+      .modal-backdrop.show .modal-container {
+          transform: translateY(0);
+      }
+
+      /* Removed .modal-close styles as it's no longer an 'X' button */
+
+      .modal-header {
+          margin-bottom: 0; /* Adjusted margin as gap handles spacing */
+          text-align: center;
+      }
+
+      .modal-header h3 {
+          color: var(--accent-color);
+          font-size: 1.8rem;
+          margin-bottom: 0.5rem;
+      }
+
+      .modal-body {
+          color: var(--text-color);
+          text-align: center;
+          font-size: 1.1rem;
+      }
+
+      .modal-footer {
+          display: flex;
+          justify-content: center;
+          margin-top: 1rem; /* Add some space above the button */
+      }
+
+      .modal-footer button {
+          min-width: 120px; /* Ensure button has a decent size */
+          padding: 0.75rem 1.5rem;
+          font-size: 1rem;
+          font-weight: 500;
+          border-radius: 5px;
+          background-color: var(--accent-color);
+          color: white;
+          border: none;
+          cursor: pointer;
+          transition: background-color 0.3s;
+      }
+
+      .modal-footer button:hover {
+          background-color: var(--accent-hover);
+      }
+  </style>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the page
+      toggleFinalField();
+      
+      // Add event listeners to buttons
+      document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
+      document.getElementById('clearBtn').addEventListener('click', clearFields);
+
+      // Modal Logic
+      // const modalBackdrop = document.getElementById('welcomeModalBackdrop');
+      // const okayButton = document.getElementById('welcomeModalOkayButton'); // Changed ID
+
+      // if (sessionStorage.getItem('shownPopup') !== 'true') {
+      //     modalBackdrop.classList.add('show');
+      //     sessionStorage.setItem('shownPopup', 'true');
+      // }
+
+      // function hideModal() {
+      //     modalBackdrop.classList.remove('show');
+      // }
+
+      // okayButton.addEventListener('click', hideModal); // Event listener for the new button
+      // modalBackdrop.addEventListener('click', function(event) {
+      //     if (event.target === modalBackdrop) {
+      //         hideModal();
+      //     }
+      // });
+  });
+
+  function toggleMenu() {
+      const navLinks = document.querySelector('.nav-links');
+      navLinks.classList.toggle('active');
+  }
+
+  function calculateFinalGrade() {
+      let numQuarters = getNumQuarters();
+      let classType = document.getElementById("classType").value;
+      let desiredGrade = parseFloat(document.getElementById("desiredGrade").value);
+      let apHasFinal = document.getElementById("apHasFinal").checked;
+      
+      // Determine weights based on class type and if AP has final
+      let quarterWeights, midtermWeight, finalExamWeight;
+      
+      if (classType === "AP") {
+          if (apHasFinal) {
+              // AP with final exam
+              quarterWeights = 20;
+              midtermWeight = 10;
+              finalExamWeight = 10;
+          } else {
+              // Standard AP
+              quarterWeights = 22;
+              midtermWeight = 12;
+              finalExamWeight = 0;
+          }
+      } else {
+          // CP/Honors
+          quarterWeights = 20;
+          midtermWeight = 10;
+          finalExamWeight = 10;
+      }
+      
+      let totalWeight = 0, weightedSum = 0;
+      
+      for (let i = 1; i <= 4; i++) { // Changed loop to always check all 4 quarters
+          let quarterGradeInput = document.getElementById("q" + i);
+          if (quarterGradeInput && quarterGradeInput.value !== "") {
+              let quarterGrade = parseFloat(quarterGradeInput.value);
+              weightedSum += quarterGrade * quarterWeights;
+              totalWeight += quarterWeights;
+          }
+      }
+      
+      let midtermGradeInput = document.getElementById("midterm");
+      if (midtermGradeInput && midtermGradeInput.value !== "") {
+          let midtermGrade = parseFloat(midtermGradeInput.value);
+          weightedSum += midtermGrade * midtermWeight;
+          totalWeight += midtermWeight;
+      }
+      
+      let finalExamGradeInput = document.getElementById("final");
+      if (finalExamGradeInput && finalExamGradeInput.value !== "" && (classType !== "AP" || apHasFinal)) {
+          let finalExamGrade = parseFloat(finalExamGradeInput.value);
+          weightedSum += finalExamGrade * finalExamWeight;
+          totalWeight += finalExamWeight;
+      }
+      
+      // Calculate final grade based on the weights
+      let finalGrade;
+      if (totalWeight > 0) {
+          finalGrade = weightedSum / totalWeight;
+      } else {
+          finalGrade = 0;
+      }
+
+      document.getElementById("result").innerText = finalGrade.toFixed(3) + "%";
+      
+      calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, desiredGrade, midtermWeight, finalExamWeight, quarterWeights, apHasFinal);
+      
+      // Check if we should show the grade pairs section
+      const gradePairsSection = document.getElementById('gradePairsSection');
+      
+      // For CP/Honors classes when desired grade is entered and Q4 and Final are blank
+      if (desiredGrade && !isNaN(desiredGrade) && 
+          classType !== "AP" && 
+          document.getElementById("q4").value === "" && 
+          document.getElementById("final").value === "") {
+  
+          // Calculate the weighted sum for the equation
+          let q1Grade = parseFloat(document.getElementById("q1").value) || 0;
+          let q2Grade = parseFloat(document.getElementById("q2").value) || 0;
+          let q3Grade = parseFloat(document.getElementById("q3").value) || 0;
+          let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
+          
+          let currentWeightedSum = (q1Grade * 20) + (q2Grade * 20) + (q3Grade * 20) + (midtermGrade * 10);
+          let remainingWeight = 20 + 10; // Q4 (20%) + Final Exam (10%)
+          
+          // Calculate the minimum average needed for the remaining components
+          let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
+          
+          // Check if it's possible to achieve the desired grade
+          if (minAvgNeeded >= 999.99) {
+              gradePairsSection.style.display = 'none';
+              return;
+          } else if (minAvgNeeded < 0) {
+              // Already achieved desired grade
+              gradePairsSection.style.display = 'none';
+              return;
+          }
+          
+          // Calculate optimal combinations
+          calculateOptimalCombinations(currentWeightedSum, desiredGrade, false);
+          
+          // Show the grade pairs section
+          gradePairsSection.style.display = 'block';
+      } 
+      // For AP classes when desired grade is entered and both Q3 and Q4 are blank
+      else if (desiredGrade && !isNaN(desiredGrade) && 
+               classType === "AP" && 
+               document.getElementById("q3").value === "" &&
+               document.getElementById("q4").value === "") {
+          
+          // Calculate the weighted sum for the equation
+          let q1Grade = parseFloat(document.getElementById("q1").value) || 0;
+          let q2Grade = parseFloat(document.getElementById("q2").value) || 0;
+          let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
+          let hasMidterm = document.getElementById("midterm").value !== "";
+
+          // Use the appropriate weights based on whether AP has final
+          let currentWeightedSum = (q1Grade * quarterWeights) + (q2Grade * quarterWeights);
+          if (hasMidterm) {
+              currentWeightedSum += (midtermGrade * midtermWeight);
+          }
+
+          let remainingWeight = quarterWeights + quarterWeights; // Q3 + Q4
+          if (!hasMidterm) {
+              remainingWeight += midtermWeight; // Add midterm weight if not entered
+          }
+          
+          // Calculate the minimum average needed for the remaining components
+          let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
+          
+          // Check if it's possible to achieve the desired grade
+          if (minAvgNeeded >= 999.99) {
+              gradePairsSection.style.display = 'none';
+              return;
+          } else if (minAvgNeeded < 0) {
+              // Already achieved desired grade
+              gradePairsSection.style.display = 'none';
+              return;
+          }
+          
+          // Calculate optimal combinations for AP with both Q3 and Q4 blank
+          if (hasMidterm) {
+              // If midterm is provided, calculate Q3/Q4 strategies
+              calculateAPQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeights);
+          } else {
+              // If midterm is not provided, calculate Midterm/Q3/Q4 strategies
+              calculateAPMidtermQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeights, midtermWeight);
+          }
+          
+          // Show the grade pairs section
+          gradePairsSection.style.display = 'block';
+      }
+      // For AP classes with final when desired grade is entered and Q4 and Final are blank
+      else if (desiredGrade && !isNaN(desiredGrade) && 
+               classType === "AP" && apHasFinal &&
+               document.getElementById("q4").value === "" && 
+               document.getElementById("final").value === "") {
+  
+          // Calculate the weighted sum for the equation
+          let q1Grade = parseFloat(document.getElementById("q1").value) || 0;
+          let q2Grade = parseFloat(document.getElementById("q2").value) || 0;
+          let q3Grade = parseFloat(document.getElementById("q3").value) || 0;
+          let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
+          
+          let currentWeightedSum = (q1Grade * 20) + (q2Grade * 20) + (q3Grade * 20) + (midtermGrade * 10);
+          let remainingWeight = 20 + 10; // Q4 (20%) + Final Exam (10%)
+          
+          // Calculate the minimum average needed for the remaining components
+          let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
+          
+          // Check if it's possible to achieve the desired grade
+          if (minAvgNeeded >= 999.99) {
+              gradePairsSection.style.display = 'none';
+              return;
+          } else if (minAvgNeeded < 0) {
+              // Already achieved desired grade
+              gradePairsSection.style.display = 'none';
+              return;
+          }
+          
+          // Calculate optimal combinations for AP with final (same as CP/Honors)
+          calculateOptimalCombinations(currentWeightedSum, desiredGrade, true);
+          
+          // Show the grade pairs section
+          gradePairsSection.style.display = 'block';
+      }
+      else {
+          gradePairsSection.style.display = 'none';
+      }
+  }
+  
+  function getNumQuarters() {
+      let numQuarters = 0;
+      for (let i = 1; i <= 4; i++) {
+          let quarterGrade = document.getElementById("q" + i).value;
+          if (quarterGrade !== "") {
+              numQuarters++;
+          }
+      }
+      return numQuarters;
+  }
+  
+  function calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, desiredGrade, midtermWeight, finalExamWeight, quarterWeights, apHasFinal) {
+      let remainingWeight = 0, requiredGrade = 0;
+      let resultText = "";
+      
+      if (numQuarters == 3) {
+          remainingWeight = quarterWeights + ((classType !== "AP" || apHasFinal) ? finalExamWeight : 0);
+          requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
+          
+          if (requiredGrade >= 999.99) {
+              resultText = "Unfortunately, it's not possible to achieve your desired grade.";
+          } else if (requiredGrade < 0) {
+              resultText = "You have already achieved your desired grade!";
+          } else {
+              resultText = "You need a " + requiredGrade.toFixed(3) + "% in Quarter 4" + 
+                           ((classType !== "AP" || apHasFinal) ? " and " + requiredGrade.toFixed(3) + "% on the final exam" : "") + 
+                           " to achieve your desired grade.";
+          }
+      } else if (numQuarters == 2 && !document.getElementById("midterm").value) {
+          remainingWeight = midtermWeight + (2 * quarterWeights) + ((classType !== "AP" || apHasFinal) ? finalExamWeight : 0);
+          requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
+          
+          if (requiredGrade >= 999.99) {
+              resultText = "Unfortunately, it's not possible to achieve your desired grade.";
+          } else if (requiredGrade < 0) {
+              resultText = "You have already achieved your desired grade!";
+          } else {
+              resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(3) + "% on the midterm, next two quarters" + 
+                           ((classType !== "AP" || apHasFinal) ? " and the final exam." : ".");
+          }
+      } else if (numQuarters == 2 && document.getElementById("midterm").value) {
+          remainingWeight = (2 * quarterWeights) + ((classType !== "AP" || apHasFinal) ? finalExamWeight : 0);
+          requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
+          
+          if (requiredGrade >= 999.99) {
+              resultText = "Unfortunately, it's not possible to achieve your desired grade.";
+          } else if (requiredGrade < 0) {
+              resultText = "You have already achieved your desired grade!";
+          } else {
+              resultText = "To achieve your desired grade, you need at least " + requiredGrade.toFixed(3) + "% in the next two quarters" + 
+                           ((classType !== "AP" || apHasFinal) ? " and the final exam." : ".");
+          }
+      } else if (numQuarters == 4 && (classType !== "AP" || apHasFinal) && !document.getElementById("final").value) {
+          remainingWeight = finalExamWeight;
+          requiredGrade = ((desiredGrade * (totalWeight + remainingWeight)) - weightedSum) / remainingWeight;
+          
+          if (requiredGrade >= 999.99) {
+              resultText = "Unfortunately, it's not possible to achieve your desired grade.";
+          } else if (requiredGrade < 0) {
+              resultText = "You have already achieved your desired grade!";
+          } else {
+              resultText = "You need a " + requiredGrade.toFixed(3) + "% on the final exam to achieve your desired grade.";
+          }
+      }
+      
+      document.getElementById("neededGrade").innerText = resultText;
+  }
+
+  function calculateOptimalCombinations(currentWeightedSum, desiredGrade, isAPWithFinal = false) {
+      // Calculate the target sum needed
+      const targetSum = (desiredGrade * 100) - currentWeightedSum;
+      
+      // For CP/Honors classes or AP with final (Q4 and Final Exam)
+      // Strategy 1: Lowest Q4, Highest Final
+      const finalExamMax = 100;
+      const finalExamMaxContribution = finalExamMax * 10;
+      const minQ4Needed = (targetSum - finalExamMaxContribution) / 20;
+      
+      // Strategy 2: Highest Q4, Lowest Final
+      const q4Max = 100;
+      const q4MaxContribution = q4Max * 20;
+      const minFinalNeeded = (targetSum - q4MaxContribution) / 10;
+      
+      // Check if these are valid combinations
+      let strategy1Valid = minQ4Needed < 999.99;
+      let strategy2Valid = minFinalNeeded < 999.99;
+      
+      // Update the display for Strategy 1
+      if (strategy1Valid) {
+          const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 1000) / 1000);
+          document.getElementById('minQ4').innerText = roundedQ4.toFixed(3) + '%';
+          document.getElementById('maxFinal').innerText = finalExamMax + '%';
+          document.getElementById('strategy1').style.display = 'block';
+      } else {
+          document.getElementById('strategy1').style.display = 'none';
+      }
+      
+      // Update the display for Strategy 2
+      if (strategy2Valid) {
+          const roundedFinal = Math.max(0, Math.ceil(minFinalNeeded * 1000) / 1000);
+          document.getElementById('maxQ4').innerText = q4Max + '%';
+          document.getElementById('minFinal').innerText = roundedFinal.toFixed(3) + '%';
+          document.getElementById('strategy2').style.display = 'block';
+      } else {
+          document.getElementById('strategy2').style.display = 'none';
+      }
+      
+      // Show/hide the optimal combinations section
+      document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
+      
+      // Update section title
+      document.getElementById('gradePairsTitle').innerText = isAPWithFinal ? 'Optimal AP Grade Strategies' : 'Optimal Grade Strategies';
+      
+      // Update strategy titles
+      document.getElementById('strategy1Title').innerText = 'Strategy 1: Focus on Final Exam';
+      document.getElementById('strategy2Title').innerText = 'Strategy 2: Focus on Quarter 4';
+      
+      // Update strategy descriptions
+      document.getElementById('strategy1Desc').innerText = 'This strategy minimizes your Quarter 4 grade while maximizing your Final Exam performance.';
+      document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 4 grade while minimizing your Final Exam performance.';
+      
+      // Update labels - Ensure Q4 comes before Final Exam in display
+      document.getElementById('minQ4Label').innerText = 'Quarter 4 (Minimum)';
+      document.getElementById('maxFinalLabel').innerText = 'Final Exam (Maximum)';
+      document.getElementById('maxQ4Label').innerText = 'Quarter 4 (Maximum)';
+      document.getElementById('minFinalLabel').innerText = 'Final Exam (Minimum)';
+  }
+
+  function calculateAPQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeight) {
+      // Calculate the target sum needed
+      const targetSum = (desiredGrade * 100) - currentWeightedSum;
+      
+      // Strategy 1: Maximum Q3, Minimum Q4
+      const q3Max = 100;
+      const q3MaxContribution = q3Max * quarterWeight;
+      const minQ4Needed = (targetSum - q3MaxContribution) / quarterWeight;
+      
+      // Strategy 2: Minimum Q3, Maximum Q4
+      const q4Max = 100;
+      const q4MaxContribution = q4Max * quarterWeight;
+      const minQ3Needed = (targetSum - q4MaxContribution) / quarterWeight;
+      
+      // Check if these are valid combinations
+      let strategy1Valid = minQ4Needed < 999.99;
+      let strategy2Valid = minQ3Needed < 999.99;
+      
+      // Update the display for Strategy 1
+      if (strategy1Valid) {
+          const roundedQ4 = Math.max(0, Math.ceil(minQ4Needed * 1000) / 1000);
+          document.getElementById('minQ4').innerText = roundedQ4.toFixed(3) + '%';
+          document.getElementById('maxFinal').innerText = q3Max + '%';
+          document.getElementById('strategy1').style.display = 'block';
+      } else {
+          document.getElementById('strategy1').style.display = 'none';
+      }
+      
+      // Update the display for Strategy 2
+      if (strategy2Valid) {
+          const roundedQ3 = Math.max(0, Math.ceil(minQ3Needed * 1000) / 1000);
+          document.getElementById('maxQ4').innerText = q4Max + '%';
+          document.getElementById('minFinal').innerText = roundedQ3.toFixed(3) + '%';
+          document.getElementById('strategy2').style.display = 'block';
+      } else {
+          document.getElementById('strategy2').style.display = 'none';
+      }
+      
+      // Show/hide the optimal combinations section
+      document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
+      
+      // Update section title for AP
+      document.getElementById('gradePairsTitle').innerText = 'Optimal AP Grade Strategies';
+      
+      // Update strategy titles for AP
+      document.getElementById('strategy1Title').innerText = 'Strategy 1: Focus on Quarter 3';
+      document.getElementById('strategy2Title').innerText = 'Strategy 2: Focus on Quarter 4';
+      
+      // Update strategy descriptions for AP
+      document.getElementById('strategy1Desc').innerText = 'This strategy maximizes your Quarter 3 grade while minimizing your Quarter 4 performance.';
+      document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 4 grade while minimizing your Quarter 3 performance.';
+      
+      // Update labels for AP - Ensure Q3 comes before Q4 in display
+      document.getElementById('maxFinalLabel').innerText = 'Quarter 3 (Maximum)';
+      document.getElementById('minQ4Label').innerText = 'Quarter 4 (Minimum)';
+      document.getElementById('minFinalLabel').innerText = 'Quarter 3 (Minimum)';
+      document.getElementById('maxQ4Label').innerText = 'Quarter 4 (Maximum)';
+  }
+
+  function calculateAPMidtermQ3Q4Strategies(currentWeightedSum, desiredGrade, quarterWeight, midtermWeight) {
+      // Calculate the target sum needed
+      const targetSum = (desiredGrade * 100) - currentWeightedSum;
+      
+      // Strategy 1: Maximum Midterm, Minimum Q3/Q4
+      const midtermMax = 100;
+      const midtermMaxContribution = midtermMax * midtermWeight;
+      // Q3 and Q4 will have the same value
+      const minQuarterNeeded = (targetSum - midtermMaxContribution) / (quarterWeight * 2); // Q3 + Q4
+      
+      // Strategy 2: Minimum Midterm, Maximum Q3/Q4
+      const quarterMax = 100;
+      const quarterMaxContribution = quarterMax * (quarterWeight * 2); // Q3 + Q4
+      const minMidtermNeeded = (targetSum - quarterMaxContribution) / midtermWeight;
+      
+      // Check if these are valid combinations
+      let strategy1Valid = minQuarterNeeded < 999.99;
+      let strategy2Valid = minMidtermNeeded < 999.99;
+      
+      // Update the display for Strategy 1
+      if (strategy1Valid) {
+          const roundedQuarter = Math.max(0, Math.ceil(minQuarterNeeded * 1000) / 1000);
+          document.getElementById('maxFinal').innerText = midtermMax + '%';
+          document.getElementById('minQ4').innerText = roundedQuarter.toFixed(3) + '%';
+          document.getElementById('strategy1').style.display = 'block';
+      } else {
+          document.getElementById('strategy1').style.display = 'none';
+      }
+      
+      // Update the display for Strategy 2
+      if (strategy2Valid) {
+          const roundedMidterm = Math.max(0, Math.ceil(minMidtermNeeded * 1000) / 1000);
+          document.getElementById('minFinal').innerText = roundedMidterm.toFixed(3) + '%';
+          document.getElementById('maxQ4').innerText = quarterMax + '%';
+          document.getElementById('strategy2').style.display = 'block';
+      } else {
+          document.getElementById('strategy2').style.display = 'none';
+      }
+      
+      // Show/hide the optimal combinations section
+      document.getElementById('optimalCombos').style.display = (strategy1Valid || strategy2Valid) ? 'flex' : 'none';
+      
+      // Update section title for AP
+      document.getElementById('gradePairsTitle').innerText = 'Optimal AP Grade Strategies';
+      
+      // Update strategy titles for AP
+      document.getElementById('strategy1Title').innerText = 'Strategy 1: Focus on Midterm';
+      document.getElementById('strategy2Title').innerText = 'Strategy 2: Focus on Quarters 3 & 4';
+      
+      // Update strategy descriptions for AP
+      document.getElementById('strategy1Desc').innerText = 'This strategy maximizes your Midterm grade while minimizing your Quarter 3 and 4 performance (both quarters will have the same grade).';
+      
+      document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 3 and 4 grades while minimizing your Midterm performance (both quarters will have the same grade).';
+      
+      // Update labels for AP - Ensure Midterm comes before Q3/Q4 in display
+      document.getElementById('maxFinalLabel').innerText = 'Midterm (Maximum)';
+      document.getElementById('minQ4Label').innerText = 'Q3 & Q4 (Minimum)';
+      document.getElementById('minFinalLabel').innerText = 'Midterm (Minimum)';
+      document.getElementById('maxQ4Label').innerText = 'Q3 & Q4 (Maximum)';
+  }
+
+  function toggleFinalField() {
+      let classType = document.getElementById("classType").value;
+      let finalField = document.getElementById("finalField");
+      let apFinalOption = document.getElementById("apFinalOption");
+      
+      if (classType === "AP") {
+          finalField.style.display = "none";
+          apFinalOption.style.display = "block";
+          updateAPFinalField();
+      } else {
+          finalField.style.display = "block";
+          apFinalOption.style.display = "none";
+      }
+  }
+  
+  function updateAPFinalField() {
+      let apHasFinal = document.getElementById("apHasFinal").checked;
+      let finalField = document.getElementById("finalField");
+      
+      if (apHasFinal) {
+          finalField.style.display = "block";
+          document.querySelector('label[for="final"]').innerText = "Final Exam/Project";
+      } else {
+          finalField.style.display = "none";
+      }
+  }
+
+  function clearFields() {
+      document.querySelectorAll("input[type='number']").forEach(input => input.value = "");
+      document.getElementById("desiredGrade").value = "";
+      document.getElementById("classType").value = "CP";
+      document.getElementById("apHasFinal").checked = false;
+      toggleFinalField();
+      document.getElementById("result").innerText = "";
+      document.getElementById("neededGrade").innerText = "";
+      // Hide the grade pairs section
+      document.getElementById('gradePairsSection').style.display = 'none';
+  }
 </script>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <i class="fas fa-calculator"></i>
-                Grade Calculator
-            </a>
-            <button class="mobile-menu-btn" onclick="toggleMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-            <ul class="nav-links">
-                <li><a href="index.html" class="active"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
-                <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-                <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
-                <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
-            </ul>
-        </div>
-    </nav>
+  <nav class="navbar">
+      <div class="nav-container">
+          <a href="index.html" class="logo">
+              <i class="fas fa-calculator"></i>
+              Grade Calculator
+          </a>
+          <button class="mobile-menu-btn" onclick="toggleMenu()">
+              <i class="fas fa-bars"></i>
+          </button>
+          <ul class="nav-links">
+              <li><a href="index.html" class="active"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
+              <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
+              <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
+              <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
+          </ul>
+      </div>
+  </nav>
 
-    <div class="container">
-        <div class="card">
-            <h2>Final Grade Calculator</h2>
-            
-            <div class="form-group">
-                <label for="desiredGrade">Desired Final Grade (%)</label>
-                <input type="number" id="desiredGrade" min="0" max="100" placeholder="Enter your target grade">
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="classType">Class Type</label>
-                    <select id="classType" onchange="toggleFinalField()">
-                        <option value="CP">CP/Honors</option>
-                        <option value="AP">AP</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div id="apFinalOption" class="ap-final-option">
-                <div class="checkbox-container">
-                    <input type="checkbox" id="apHasFinal" onchange="updateAPFinalField()">
-                    <label for="apHasFinal">This AP class has a final exam/project</label>
-                </div>
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="q1">Quarter 1</label>
-                    <input type="number" id="q1" min="0" max="100" placeholder="Enter grade">
-                </div>
-                <div class="input-group">
-                    <label for="q2">Quarter 2</label>
-                    <input type="number" id="q2" min="0" max="100" placeholder="Enter grade">
-                </div>
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="midterm">Midterm</label>
-                    <input type="number" id="midterm" min="0" max="100" placeholder="Enter grade">
-                </div>
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group">
-                    <label for="q3">Quarter 3</label>
-                    <input type="number" id="q3" min="0" max="100" placeholder="Enter grade">
-                </div>
-                <div class="input-group">
-                    <label for="q4">Quarter 4</label>
-                    <input type="number" id="q4" min="0" max="100" placeholder="Enter grade">
-                </div>
-            </div>
-            
-            <div class="input-row">
-                <div class="input-group" id="finalField">
-                    <label for="final">Final Exam (CP/Honors only)</label>
-                    <input type="number" id="final" min="0" max="100" placeholder="Enter grade">
-                </div>
-            </div>
-            
-            <div class="btn-group">
-                <button id="calculateBtn">
-                    <i class="fas fa-calculator"></i> Calculate Final Grade
-                </button>
-                <button class="btn-clear" id="clearBtn">
-                    <i class="fas fa-trash-alt"></i> Clear All Fields
-                </button>
-            </div>
-            
-            <div class="result-section">
-                <h3>Final Grade: <span id="result"></span></h3>
-                <h3 id="neededGrade"></h3>
-            </div>
-            <!-- Grade Pairs Section -->
-            <div id="gradePairsSection" class="grade-pairs-section">
-                <h3 id="gradePairsTitle">Optimal Grade Strategies</h3>
-                
-                <!-- Optimal Combinations Section -->
-                <div id="optimalCombos" class="optimal-combos">
-                    <!-- Strategy 1: Min Q4, Max Final -->
-                    <div id="strategy1" class="optimal-combo">
-                        <h4 id="strategy1Title">Strategy 1: Focus on Final Exam</h4>
-                        <div class="optimal-grades">
-                            <div class="optimal-grade-item">
-                                <div class="optimal-grade-value" id="maxFinal">100%</div>
-                                <div class="optimal-grade-label" id="maxFinalLabel">Final Exam (Maximum)</div>
-                            </div>
-                            <div class="optimal-grade-item">
-                                <div class="optimal-grade-value" id="minQ4">0%</div>
-                                <div class="optimal-grade-label" id="minQ4Label">Quarter 4 (Minimum)</div>
-                            </div>
-                        </div>
-                        <div class="strategy-description" id="strategy1Desc">
-                            This strategy minimizes your Quarter 4 grade while maximizing your Final Exam performance.
-                        </div>
-                    </div>
-                    
-                    <!-- Strategy 2: Max Q4, Min Final -->
-                    <div id="strategy2" class="optimal-combo">
-                        <h4 id="strategy2Title">Strategy 2: Focus on Quarter 4</h4>
-                        <div class="optimal-grades">
-                            <div class="optimal-grade-item">
-                                <div class="optimal-grade-value" id="minFinal">0%</div>
-                                <div class="optimal-grade-label" id="minFinalLabel">Quarter 3 (Minimum)</div>
-                            </div>
-                            <div class="optimal-grade-item">
-                                <div class="optimal-grade-value" id="maxQ4">100%</div>
-                                <div class="optimal-grade-label" id="maxQ4Label">Quarter 4 (Maximum)</div>
-                            </div>
-                        </div>
-                        <div class="strategy-description" id="strategy2Desc">
-                            This strategy maximizes your Quarter 4 grade while minimizing your Quarter 3 performance.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <footer class="footer">
-        <div class="container">
-            <p>Created by Advaith S, 2025</p>
-        </div>
-    </footer>
+  <div class="container">
+      <div class="card">
+          <h2>Final Grade Calculator</h2>
+          
+          <div class="form-group">
+              <label for="desiredGrade">Desired Final Grade (%)</label>
+              <input type="number" id="desiredGrade" min="0" max="100" placeholder="Enter your target grade">
+          </div>
+          
+          <div class="input-row">
+              <div class="input-group">
+                  <label for="classType">Class Type</label>
+                  <select id="classType" onchange="toggleFinalField()">
+                      <option value="CP">CP/Honors</option>
+                      <option value="AP">AP</option>
+                  </select>
+              </div>
+          </div>
+          
+          <div id="apFinalOption" class="ap-final-option">
+              <div class="checkbox-container">
+                  <input type="checkbox" id="apHasFinal" onchange="updateAPFinalField()">
+                  <label for="apHasFinal">This AP class has a final exam/project</label>
+              </div>
+          </div>
+          
+          <div class="input-row">
+              <div class="input-group">
+                  <label for="q1">Quarter 1</label>
+                  <input type="number" id="q1" min="0" max="100" placeholder="Enter grade">
+              </div>
+              <div class="input-group">
+                  <label for="q2">Quarter 2</label>
+                  <input type="number" id="q2" min="0" max="100" placeholder="Enter grade">
+              </div>
+          </div>
+          
+          <div class="input-row">
+              <div class="input-group">
+                  <label for="midterm">Midterm</label>
+                  <input type="number" id="midterm" min="0" max="100" placeholder="Enter grade">
+              </div>
+          </div>
+          
+          <div class="input-row">
+              <div class="input-group">
+                  <label for="q3">Quarter 3</label>
+                  <input type="number" id="q3" min="0" max="100" placeholder="Enter grade">
+              </div>
+              <div class="input-group">
+                  <label for="q4">Quarter 4</label>
+                  <input type="number" id="q4" min="0" max="100" placeholder="Enter grade">
+              </div>
+          </div>
+          
+          <div class="input-row">
+              <div class="input-group" id="finalField">
+                  <label for="final">Final Exam (CP/Honors only)</label>
+                  <input type="number" id="final" min="0" max="100" placeholder="Enter grade">
+              </div>
+          </div>
+          
+          <div class="btn-group">
+              <button id="calculateBtn">
+                  <i class="fas fa-calculator"></i> Calculate Final Grade
+              </button>
+              <button class="btn-clear" id="clearBtn">
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
+              </button>
+          </div>
+          
+          <div class="result-section">
+              <h3>Final Grade: <span id="result"></span></h3>
+              <h3 id="neededGrade"></h3>
+          </div>
+          <!-- Grade Pairs Section -->
+          <div id="gradePairsSection" class="grade-pairs-section">
+              <h3 id="gradePairsTitle">Optimal Grade Strategies</h3>
+              
+              <!-- Optimal Combinations Section -->
+              <div id="optimalCombos" class="optimal-combos">
+                  <!-- Strategy 1: Min Q4, Max Final -->
+                  <div id="strategy1" class="optimal-combo">
+                      <h4 id="strategy1Title">Strategy 1: Focus on Final Exam</h4>
+                      <div class="optimal-grades">
+                          <div class="optimal-grade-item">
+                              <div class="optimal-grade-value" id="maxFinal">100%</div>
+                              <div class="optimal-grade-label" id="maxFinalLabel">Final Exam (Maximum)</div>
+                          </div>
+                          <div class="optimal-grade-item">
+                              <div class="optimal-grade-value" id="minQ4">0%</div>
+                              <div class="optimal-grade-label" id="minQ4Label">Quarter 4 (Minimum)</div>
+                          </div>
+                      </div>
+                      <div class="strategy-description" id="strategy1Desc">
+                          This strategy minimizes your Quarter 4 grade while maximizing your Final Exam performance.
+                      </div>
+                  </div>
+                  
+                  <!-- Strategy 2: Max Q4, Min Final -->
+                  <div id="strategy2" class="optimal-combo">
+                      <h4 id="strategy2Title">Strategy 2: Focus on Quarter 4</h4>
+                      <div class="optimal-grades">
+                          <div class="optimal-grade-item">
+                              <div class="optimal-grade-value" id="minFinal">0%</div>
+                              <div class="optimal-grade-label" id="minFinalLabel">Quarter 3 (Minimum)</div>
+                          </div>
+                          <div class="optimal-grade-item">
+                              <div class="optimal-grade-value" id="maxQ4">100%</div>
+                              <div class="optimal-grade-label" id="maxQ4Label">Quarter 4 (Maximum)</div>
+                          </div>
+                      </div>
+                      <div class="strategy-description" id="strategy2Desc">
+                          This strategy maximizes your Quarter 4 grade while minimizing your Quarter 3 performance.
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  <footer class="footer">
+      <div class="container">
+          <p>Created by Advaith S, 2025</p>
+      </div>
+  </footer>
 
-    <!-- Welcome Modal Popup -->
-    <div id="welcomeModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3 id="modalTitle">Welcome to the Grade Calculator!</h3>
-            </div>
-            <div class="modal-body">
-                <p>This tool is made to help students calculate their grades and plan for future assignments. </p>
-                <p style="margin-top: 1rem;">If you want to get your own info on this popup, contact Advaith S!</p>
-            </div>
-            <div class="modal-footer">
-                <button id="welcomeModalOkayButton">Okay!</button>
-            </div>
-        </div>
-    </div>
-    <script src="/public/js/global-popup.js"></script>
+  <!-- Welcome Modal Popup -->
+  <div id="welcomeModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-container">
+          <div class="modal-header">
+              <h3 id="modalTitle">Welcome to the Grade Calculator!</h3>
+          </div>
+          <div class="modal-body">
+              <p>This tool is made to help students calculate their grades and plan for future assignments. </p>
+              <p style="margin-top: 1rem;">If you want to get your own info on this popup, contact Advaith S!</p>
+          </div>
+          <div class="modal-footer">
+              <button id="welcomeModalOkayButton">Okay!</button>
+          </div>
+      </div>
+  </div>
+  <script src="/js/global-popup.js"></script>
 </body>
 </html>
