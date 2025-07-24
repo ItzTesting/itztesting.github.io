@@ -474,24 +474,24 @@
         document.getElementById('clearBtn').addEventListener('click', clearFields);
 
         // Modal Logic
-        const modalBackdrop = document.getElementById('welcomeModalBackdrop');
-        const okayButton = document.getElementById('welcomeModalOkayButton'); // Changed ID
+        // const modalBackdrop = document.getElementById('welcomeModalBackdrop');
+        // const okayButton = document.getElementById('welcomeModalOkayButton'); // Changed ID
 
-        if (sessionStorage.getItem('shownPopup') !== 'true') {
-            modalBackdrop.classList.add('show');
-            sessionStorage.setItem('shownPopup', 'true');
-        }
+        // if (sessionStorage.getItem('shownPopup') !== 'true') {
+        //     modalBackdrop.classList.add('show');
+        //     sessionStorage.setItem('shownPopup', 'true');
+        // }
 
-        function hideModal() {
-            modalBackdrop.classList.remove('show');
-        }
+        // function hideModal() {
+        //     modalBackdrop.classList.remove('show');
+        // }
 
-        okayButton.addEventListener('click', hideModal); // Event listener for the new button
-        modalBackdrop.addEventListener('click', function(event) {
-            if (event.target === modalBackdrop) {
-                hideModal();
-            }
-        });
+        // okayButton.addEventListener('click', hideModal); // Event listener for the new button
+        // modalBackdrop.addEventListener('click', function(event) {
+        //     if (event.target === modalBackdrop) {
+        //         hideModal();
+        //     }
+        // });
     });
 
     function toggleMenu() {
@@ -1139,5 +1139,6 @@
             </div>
         </div>
     </div>
+    <script src="/public/js/global-popup.js"></script>
 </body>
 </html>
