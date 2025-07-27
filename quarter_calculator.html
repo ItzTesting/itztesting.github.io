@@ -431,7 +431,7 @@
       const assignmentRow = document.createElement('div');
       assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
       assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
-      assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
+      assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]);
 
       // Assignment Name input
       const nameInputGroup = document.createElement('div');
@@ -565,7 +565,7 @@
           // Update labels and IDs for name input
           const nameInputGroup = row.querySelector('.class-name-input-group');
           if (nameInputGroup) {
-              nameInputGroup.style.display = showNames ? 'block' : 'none';
+              nameInputGroup.style.display = showAssignmentNames ? 'block' : 'none';
           }
           const nameLabel = row.querySelector(`label[for^="${categoryName}Name"]`);
           const nameInput = row.querySelector(`input[id^="${categoryName}Name"]`);
@@ -581,7 +581,7 @@
           if (gradeLabel && gradeInput) {
               gradeLabel.setAttribute('for', `${categoryName}Grade${assignmentNum}`);
               gradeInput.setAttribute('id', `${categoryName}Grade${assignmentNum}`);
-              if (!showNames) {
+              if (!showAssignmentNames) {
                   gradeLabel.innerText = `${formatCategoryName(categoryName)} ${assignmentNum} Grade (%)`;
               } else {
                   gradeLabel.innerText = `Grade (%)`;
@@ -790,10 +790,6 @@
                   dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
               }
               resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
-              } else {
-                  dragDownMessage = `Learner Tasks and Assessments are having a similar impact on your grade.`;
-              }
-              resultHtml += `<h3>Grade Impact: <span id="dragDownImpact">${dragDownMessage}</span></h3>`;
           }
       } else { // Single Assignment View
           const learnerTaskOverallWeight = parseFloat(document.getElementById('overallLearnerTaskWeight').value) || 0;
@@ -867,8 +863,7 @@
    * @param {number} assessCount - Number of completed assessments
    * @param {number} ltWeight    - Learner task category weight (decimal)
    * @param {number} desired     - Desired overall quarter grade (decimal)
-   * @param {number|null} futureLT - Future learner task score (decimal) or null to solve for it
-   * @param {number|null} futureAssess - Future assessment score (decimal) or null to solve for it
+   * @param {string} solveForType  - 'learnerTask' or 'assessment'
    * @return {Object} - Returns the missing score needed, rounded to 2 decimals
    */
   function solveForRemainingScore(
