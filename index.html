@@ -418,6 +418,28 @@
         .modal-backdrop.show .modal-container {
             transform: translateY(0);
         }
+        .close-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.close-button:hover {
+  color: #e00;
+  transform: scale(1.2);
+}
+
+.close-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(200, 0, 0, 0.4);
+}
 
         .modal-close {
             position: absolute;
@@ -1115,7 +1137,7 @@
     <!-- Welcome Modal Popup -->
     <div id="welcomeModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
         <div class="modal-container">
-            <button id="welcomeModalClose" class="modal-close" aria-label="Close modal">&times;</button>
+            <button id="welcomeModalClose" class="close-button" aria-label="Close modal">&times;</button>
             <div class="modal-header">
                 <h3 id="modalTitle">Welcome to the Grade Calculator!</h3>
             </div>
