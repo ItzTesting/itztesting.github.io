@@ -420,16 +420,25 @@
         }
 
         .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: color 0.3s;
-        }
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+
+    padding: 0;
+    line-height: 1;
+    width: auto;
+    height: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 
         .modal-close:hover {
             color: var(--accent-color);
