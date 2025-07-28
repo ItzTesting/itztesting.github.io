@@ -854,70 +854,60 @@
   }
 
   /**
-   * Calculate the needed score on one remaining assignment to hit a desired quarter grade.
+   * Calculates the needed average score for a specific category (Learner Task or Assessment)
+   * to achieve a desired overall quarter grade, based on the provided formula.
    *
-   * @param {number} ltAvg       - Current learner task average (decimal)
-   * @param {number} ltCount     - Number of completed learner tasks
-   * @param {number} assessAvg   - Current assessment average (decimal)
-   * @param {number} assessCount - Number of completed assessments
-   * @param {number} ltWeight    - Learner task category weight (decimal)
-   * @param {number} desired     - Desired overall quarter grade (decimal)
-   * @param {string} solveFor    - 'learnerTask' or 'assessment'
-   * @return {Object} - Returns the missing score needed, rounded to 2 decimals
+   * @param {number} ltAvg - Current average of Learner Task grades (0-100).
+   * @param {number} assessAvg - Current average of Assessment grades (0-100).
+   * @param {number} ltOverallWeight - Overall category weight for Learner Tasks (0-100).
+   * @param {number} assessOverallWeight - Overall category weight for Assessments (0-100).
+   * @param {Array<Object>} customAssignments - Array of custom assignments {score: number, weight: number}.
+   * @param {number} desiredGrade - Desired overall quarter grade (0-100).
+   * @param {string} solveForType - 'learnerTask' or 'assessment'.
+   * @returns {number} The needed average score for the specified category.
+   * @throws {Error} If the target category weight is zero or if an invalid solveForType is provided.
    */
-  function solveForRemainingScore(
+  function calculateNeededCategoryAverage(
     ltAvg,
-    ltCount,
     assessAvg,
-    assessCount,
-    ltWeight,
-    desired,
-    solveFor
+    ltOverallWeight,
+    assessOverallWeight,
+    customAssignments,
+    desiredGrade,
+    solveForType
   ) {
-    const assessWeight = 1 - ltWeight;
+    let currentPoints = 0;
+    let currentWeight = 0;
+    let remainingWeight = 0; // This will be the weight of the category we are solving for
 
-    // Current total points earned
-    const ltPoints = ltAvg * ltCount;
-    const assessPoints = assessAvg * assessCount;
-
-    if (solveFor === 'learnerTask') {
-      // Solving for missing Learner Task
-      // Assume current assessAvg and assessCount are final for assessments
-      const currentAssessWeightedContribution = assessAvg * assessWeight;
-      const remainingDesiredContribution = desired - currentAssessWeightedContribution;
-
-      if (ltWeight === 0) {
-          throw new Error("Learner Task weight is 0%, cannot solve for Learner Task score.");
-      }
-
-      // Calculate the required average for Learner Tasks
-      const requiredFinalLTAvg = remainingDesiredContribution / ltWeight;
-
-      // Calculate the score needed on the *next* Learner Task
-      // (requiredFinalLTAvg * (ltCount + 1)) = ltPoints + neededScore
-      const neededScore = (requiredFinalLTAvg * (ltCount + 1)) - ltPoints;
-      return { neededLearnerTaskScore: Number(neededScore.toFixed(2)) };
-
-    } else if (solveFor === 'assessment') {
-      // Solving for missing Assessment
-      // Assume current ltAvg and ltCount are final for learner tasks
-      const currentLTWeightedContribution = ltAvg * ltWeight;
-      const remainingDesiredContribution = desired - currentLTWeightedContribution;
-
-      if (assessWeight === 0) {
-          throw new Error("Assessment weight is 0%, cannot solve for Assessment score.");
-      }
-
-      // Calculate the required average for Assessments
-      const requiredFinalAssessAvg = remainingDesiredContribution / assessWeight;
-
-      // Calculate the score needed on the *next* Assessment
-      // (requiredFinalAssessAvg * (assessCount + 1)) = assessPoints + neededScore
-      const neededScore = (requiredFinalAssessAvg * (assessCount + 1)) - assessPoints;
-      return { neededAssessmentScore: Number(neededScore.toFixed(2)) };
+    // Calculate current points and weight from categories NOT being solved for
+    if (solveForType === 'learnerTask') {
+      currentPoints += assessAvg * assessOverallWeight;
+      currentWeight += assessOverallWeight;
+      remainingWeight = ltOverallWeight;
+    } else if (solveForType === 'assessment') {
+      currentPoints += ltAvg * ltOverallWeight;
+      currentWeight += ltOverallWeight;
+      remainingWeight = assessOverallWeight;
+    } else {
+      throw new Error("Invalid solveForType provided.");
     }
 
-    throw new Error("Invalid solveFor type provided.");
+    // Add contributions from custom assignments
+    for (let { score, weight } of customAssignments) {
+      currentPoints += score * weight;
+      currentWeight += weight;
+    }
+
+    if (remainingWeight === 0) {
+        throw new Error(`The weight for ${solveForType === 'learnerTask' ? 'Learner Tasks' : 'Assessments'} is 0%, cannot solve for its score.`);
+    }
+
+    const totalWeight = currentWeight + remainingWeight;
+    const targetPoints = desiredGrade * totalWeight;
+    const rawNeeded = (targetPoints - currentPoints) / remainingWeight;
+
+    return Number(rawNeeded.toFixed(2));
   }
 
   function getQuarterGradeComponentsForNeededCalculation() {
@@ -976,12 +966,12 @@
 
       return {
           ltAvg: ltAvg,
-          ltCount: ltGrades.length,
+          ltCount: ltGrades.length, // Not directly used in new calculation, but kept for context
           assessAvg: assessAvg,
-          assessCount: assessGrades.length,
-          ltOverallWeight: ltOverallWeight, // This is the category weight, not individual assignment weight
+          assessCount: assessGrades.length, // Not directly used in new calculation, but kept for context
+          ltOverallWeight: ltOverallWeight,
           assessOverallWeight: assessOverallWeight,
-          customAssignments: customAssignments // These are individual custom assignments
+          customAssignments: customAssignments
       };
   }
 
@@ -1000,35 +990,21 @@
           return;
       }
 
-      const { ltAvg, ltCount, assessAvg, assessCount, ltOverallWeight, assessOverallWeight, customAssignments } = getQuarterGradeComponentsForNeededCalculation();
-
-      // Convert overall weights to decimal for the solveForRemainingScore function
-      const ltWeightDecimal = ltOverallWeight / 100;
-      const assessWeightDecimal = assessOverallWeight / 100;
+      const { ltAvg, assessAvg, ltOverallWeight, assessOverallWeight, customAssignments } = getQuarterGradeComponentsForNeededCalculation();
 
       let result;
 
       try {
-          if (solveForType === 'learnerTask') {
-              result = solveForRemainingScore(
-                  ltAvg / 100, ltCount,
-                  assessAvg / 100, assessCount,
-                  ltWeightDecimal,
-                  desiredGrade / 100,
-                  'learnerTask'
-              );
-              displayNeededResult(neededResultsContainer, result.neededLearnerTaskScore * 100, 'learnerTask');
-
-          } else if (solveForType === 'assessment') {
-              result = solveForRemainingScore(
-                  ltAvg / 100, ltCount,
-                  assessAvg / 100, assessCount,
-                  ltWeightDecimal,
-                  desiredGrade / 100,
-                  'assessment'
-              );
-              displayNeededResult(neededResultsContainer, result.neededAssessmentScore * 100, 'assessment');
-          }
+          result = calculateNeededCategoryAverage(
+              ltAvg,
+              assessAvg,
+              ltOverallWeight,
+              assessOverallWeight,
+              customAssignments,
+              desiredGrade,
+              solveForType
+          );
+          displayNeededResult(neededResultsContainer, result, solveForType);
       } catch (error) {
           neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
       }
@@ -1036,28 +1012,17 @@
 
   function displayNeededResult(container, resultValue, type) {
       let html = '';
-      if (type === 'learnerTask') {
-          if (resultValue > 100) {
-              html = `<h3>Needed Learner Task Score: <span style="color: #f44336;">Not Possible</span></h3>
-                      <p style="color: var(--text-secondary);">You need a ${resultValue.toFixed(2)}% on your next Learner Task, which is likely not achievable.</p>`;
-          } else if (resultValue < 0) {
-              html = `<h3>Needed Learner Task Score: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-                      <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
-          } else {
-              html = `<h3>Needed Learner Task Score: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
-                      <p style="color: var(--text-secondary);">You need to score this on your next Learner Task to achieve your desired quarter grade.</p>`;
-          }
-      } else if (type === 'assessment') {
-          if (resultValue > 100) {
-              html = `<h3>Needed Assessment Score: <span style="color: #f44336;">Not Possible</span></h3>
-                      <p style="color: var(--text-secondary);">You need a ${resultValue.toFixed(2)}% on your next Assessment, which is likely not achievable.</p>`;
-          } else if (resultValue < 0) {
-              html = `<h3>Needed Assessment Score: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-                      <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
-          } else {
-              html = `<h3>Needed Assessment Score: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
-                      <p style="color: var(--text-secondary);">You need to score this on your next Assessment to achieve your desired quarter grade.</p>`;
-          }
+      const categoryName = type === 'learnerTask' ? 'Learner Task' : 'Assessment';
+
+      if (resultValue > 100) {
+          html = `<h3>Needed ${categoryName} Average: <span style="color: #f44336;">Not Possible</span></h3>
+                  <p style="color: var(--text-secondary);">You need an average of ${resultValue.toFixed(2)}% in the ${categoryName} category, which is likely not achievable.</p>`;
+      } else if (resultValue < 0) {
+          html = `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+                  <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
+      } else {
+          html = `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
+                  <p style="color: var(--text-secondary);">You need to achieve this average in the ${categoryName} category to reach your desired quarter grade.</p>`;
       }
       container.innerHTML = html;
   }
@@ -1259,12 +1224,10 @@
           <label for="solveForType">Solve for:</label>
           <select id="solveForType">
               <option value="">Select...</option>
-              <option value="learnerTask">Needed Learner Task Score</option>
-              <option value="assessment">Needed Assessment Score</option>
+              <option value="learnerTask">Needed Learner Task Average</option>
+              <option value="assessment">Needed Assessment Average</option>
           </select>
       </div>
-
-      <!-- Removed futureScoresInputs div and its children -->
 
       <div class="btn-group">
           <button id="calculateNeededGradesBtn">
