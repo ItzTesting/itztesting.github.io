@@ -1041,21 +1041,6 @@
               );
               displayNeededResult(neededResultsContainer, result.neededAssessmentScore * 100, 'assessment');
 
-          } else if (solveForType === 'finalGrade') {
-              futureLT = parseFloat(document.getElementById('futureLTScore').value);
-              futureAssess = parseFloat(document.getElementById('futureAssessScore').value);
-              if (isNaN(futureLT) || futureLT < 0 || futureLT > 100 || isNaN(futureAssess) || futureAssess < 0 || futureAssess > 100) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter valid future Learner Task and Assessment scores (0-100%).</p>';
-                  return;
-              }
-              result = solveForRemainingScore(
-                  ltAvg / 100, ltCount,
-                  assessAvg / 100, assessCount,
-                  ltWeightDecimal,
-                  desiredGrade / 100,
-                  futureLT / 100, futureAssess / 100
-              );
-              displayNeededResult(neededResultsContainer, result.finalQuarterGrade * 100, 'finalGrade');
           }
       } catch (error) {
           neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
@@ -1106,10 +1091,6 @@
       } else if (solveForType === 'assessment') {
           document.getElementById('futureScoresInputs').style.display = 'flex';
           document.getElementById('futureLTInputGroup').style.display = 'block';
-      } else if (solveForType === 'finalGrade') {
-          document.getElementById('futureScoresInputs').style.display = 'flex';
-          document.getElementById('futureLTInputGroup').style.display = 'block';
-          document.getElementById('futureAssessInputGroup').style.display = 'block';
       }
   }
 
@@ -1306,7 +1287,6 @@
               <option value="">Select...</option>
               <option value="learnerTask">Needed Learner Task Score</option>
               <option value="assessment">Needed Assessment Score</option>
-              <option value="finalGrade">Projected Final Quarter Grade</option>
           </select>
       </div>
 
