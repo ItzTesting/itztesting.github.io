@@ -854,8 +854,7 @@
   }
 
   /**
-   * Calculate the needed score on one remaining assignment to hit a desired quarter grade,
-   * considering both learner tasks and assessments — including optional future scores for one or the other.
+   * Calculate the needed score on one remaining assignment to hit a desired quarter grade.
    *
    * @param {number} ltAvg       - Current learner task average (decimal)
    * @param {number} ltCount     - Number of completed learner tasks
@@ -863,8 +862,7 @@
    * @param {number} assessCount - Number of completed assessments
    * @param {number} ltWeight    - Learner task category weight (decimal)
    * @param {number} desired     - Desired overall quarter grade (decimal)
-   * @param {number|null} futureLT - Future learner task score (decimal) or null to solve for it
-   * @param {number|null} futureAssess - Future assessment score (decimal) or null to solve for it
+   * @param {string} solveFor    - 'learnerTask' or 'assessment'
    * @return {Object} - Returns the missing score needed, rounded to 2 decimals
    */
   function solveForRemainingScore(
@@ -874,42 +872,52 @@
     assessCount,
     ltWeight,
     desired,
-    futureLT = null,
-    futureAssess = null
+    solveFor
   ) {
     const assessWeight = 1 - ltWeight;
-    const totalLT = ltCount + (futureLT !== null ? 1 : 0);
-    const totalAssess = assessCount + (futureAssess !== null ? 1 : 0);
 
-    // Total current points earned
+    // Current total points earned
     const ltPoints = ltAvg * ltCount;
     const assessPoints = assessAvg * assessCount;
 
-    if (futureLT === null && futureAssess !== null) {
+    if (solveFor === 'learnerTask') {
       // Solving for missing Learner Task
-      const finalAssessAvg = (assessPoints + futureAssess) / (totalAssess > 0 ? totalAssess : 1); // Avoid division by zero if no assessments
-      const requiredFinalLTAvg = (desired - (finalAssessAvg * assessWeight)) / (ltWeight > 0 ? ltWeight : 1);
-      const requiredLT = (requiredFinalLTAvg * totalLT) - ltPoints;
-      return { neededLearnerTaskScore: Number(requiredLT.toFixed(2)) };
-    }
+      // Assume current assessAvg and assessCount are final for assessments
+      const currentAssessWeightedContribution = assessAvg * assessWeight;
+      const remainingDesiredContribution = desired - currentAssessWeightedContribution;
 
-    if (futureLT !== null && futureAssess === null) {
+      if (ltWeight === 0) {
+          throw new Error("Learner Task weight is 0%, cannot solve for Learner Task score.");
+      }
+
+      // Calculate the required average for Learner Tasks
+      const requiredFinalLTAvg = remainingDesiredContribution / ltWeight;
+
+      // Calculate the score needed on the *next* Learner Task
+      // (requiredFinalLTAvg * (ltCount + 1)) = ltPoints + neededScore
+      const neededScore = (requiredFinalLTAvg * (ltCount + 1)) - ltPoints;
+      return { neededLearnerTaskScore: Number(neededScore.toFixed(2)) };
+
+    } else if (solveFor === 'assessment') {
       // Solving for missing Assessment
-      const finalLTAverage = (ltPoints + futureLT) / (totalLT > 0 ? totalLT : 1); // Avoid division by zero if no learner tasks
-      const requiredFinalAssessAvg = (desired - (finalLTAverage * ltWeight)) / (assessWeight > 0 ? assessWeight : 1);
-      const requiredAssess = (requiredFinalAssessAvg * totalAssess) - assessPoints;
-      return { neededAssessmentScore: Number(requiredAssess.toFixed(2)) };
+      // Assume current ltAvg and ltCount are final for learner tasks
+      const currentLTWeightedContribution = ltAvg * ltWeight;
+      const remainingDesiredContribution = desired - currentLTWeightedContribution;
+
+      if (assessWeight === 0) {
+          throw new Error("Assessment weight is 0%, cannot solve for Assessment score.");
+      }
+
+      // Calculate the required average for Assessments
+      const requiredFinalAssessAvg = remainingDesiredContribution / assessWeight;
+
+      // Calculate the score needed on the *next* Assessment
+      // (requiredFinalAssessAvg * (assessCount + 1)) = assessPoints + neededScore
+      const neededScore = (requiredFinalAssessAvg * (assessCount + 1)) - assessPoints;
+      return { neededAssessmentScore: Number(neededScore.toFixed(2)) };
     }
 
-    // If both are known, you can verify or return the final quarter grade
-    if (futureLT !== null && futureAssess !== null) {
-      const finalLTAvg = (ltPoints + futureLT) / (totalLT > 0 ? totalLT : 1);
-      const finalAssessAvg = (assessPoints + futureAssess) / (totalAssess > 0 ? totalAssess : 1);
-      const finalGrade = ltWeight * finalLTAvg + assessWeight * finalAssessAvg;
-      return { finalQuarterGrade: Number(finalGrade.toFixed(4)) };
-    }
-
-    throw new Error("You must provide exactly one of futureLT or futureAssess, or both for final grade calculation.");
+    throw new Error("Invalid solveFor type provided.");
   }
 
   function getQuarterGradeComponentsForNeededCalculation() {
@@ -998,49 +1006,28 @@
       const ltWeightDecimal = ltOverallWeight / 100;
       const assessWeightDecimal = assessOverallWeight / 100;
 
-      let futureLT = null;
-      let futureAssess = null;
       let result;
 
       try {
           if (solveForType === 'learnerTask') {
-              if (ltWeightDecimal === 0) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Learner Task weight is 0%, cannot solve for Learner Task score.</p>';
-                  return;
-              }
-              futureAssess = parseFloat(document.getElementById('futureAssessScore').value);
-              if (isNaN(futureAssess) || futureAssess < 0 || futureAssess > 100) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid future Assessment score (0-100%).</p>';
-                  return;
-              }
               result = solveForRemainingScore(
                   ltAvg / 100, ltCount,
                   assessAvg / 100, assessCount,
                   ltWeightDecimal,
                   desiredGrade / 100,
-                  null, futureAssess / 100
+                  'learnerTask'
               );
               displayNeededResult(neededResultsContainer, result.neededLearnerTaskScore * 100, 'learnerTask');
 
           } else if (solveForType === 'assessment') {
-              if (assessWeightDecimal === 0) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Assessment weight is 0%, cannot solve for Assessment score.</p>';
-                  return;
-              }
-              futureLT = parseFloat(document.getElementById('futureLTScore').value);
-              if (isNaN(futureLT) || futureLT < 0 || futureLT > 100) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid future Learner Task score (0-100%).</p>';
-                  return;
-              }
               result = solveForRemainingScore(
                   ltAvg / 100, ltCount,
                   assessAvg / 100, assessCount,
                   ltWeightDecimal,
                   desiredGrade / 100,
-                  futureLT / 100, null
+                  'assessment'
               );
               displayNeededResult(neededResultsContainer, result.neededAssessmentScore * 100, 'assessment');
-
           }
       } catch (error) {
           neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
@@ -1071,27 +1058,15 @@
               html = `<h3>Needed Assessment Score: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
                       <p style="color: var(--text-secondary);">You need to score this on your next Assessment to achieve your desired quarter grade.</p>`;
           }
-      } else if (type === 'finalGrade') {
-          html = `<h3>Calculated Final Quarter Grade: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
-                  <p style="color: var(--text-secondary);">This is your projected quarter grade with the entered future scores.</p>`;
       }
       container.innerHTML = html;
   }
 
   function toggleNeededGradeInputs() {
       const solveForType = document.getElementById('solveForType').value;
-      document.getElementById('futureScoresInputs').style.display = 'none';
-      document.getElementById('futureLTInputGroup').style.display = 'none';
-      document.getElementById('futureAssessInputGroup').style.display = 'none';
-      document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
-
-      if (solveForType === 'learnerTask') {
-          document.getElementById('futureScoresInputs').style.display = 'flex';
-          document.getElementById('futureAssessInputGroup').style.display = 'block';
-      } else if (solveForType === 'assessment') {
-          document.getElementById('futureScoresInputs').style.display = 'flex';
-          document.getElementById('futureLTInputGroup').style.display = 'block';
-      }
+      // Clear results when changing selection
+      document.getElementById('neededGradesResults').innerHTML = ''; 
+      // No need to show/hide future score inputs as they are removed
   }
 
   function clearQuarterFields() {
@@ -1109,8 +1084,7 @@
       // Clear needed grades section inputs and results
       document.getElementById('desiredQuarterGradeNeeded').value = '';
       document.getElementById('solveForType').value = ''; // Reset dropdown
-      document.getElementById('futureLTScore').value = '';
-      document.getElementById('futureAssessScore').value = '';
+      // Removed futureLTScore and futureAssessScore as they are no longer in HTML
       document.getElementById('neededGradesResults').innerHTML = '';
       toggleNeededGradeInputs(); // Reset visibility
 
@@ -1290,16 +1264,7 @@
           </select>
       </div>
 
-      <div id="futureScoresInputs" class="input-row" style="display: none;">
-          <div class="input-group" id="futureLTInputGroup" style="display: none;">
-              <label for="futureLTScore">Future Learner Task Score (%)</label>
-              <input type="number" id="futureLTScore" min="0" max="100" placeholder="e.g., 95">
-          </div>
-          <div class="input-group" id="futureAssessInputGroup" style="display: none;">
-              <label for="futureAssessScore">Future Assessment Score (%)</label>
-              <input type="number" id="futureAssessScore" min="0" max="100" placeholder="e.g., 88">
-          </div>
-      </div>
+      <!-- Removed futureScoresInputs div and its children -->
 
       <div class="btn-group">
           <button id="calculateNeededGradesBtn">
