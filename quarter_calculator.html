@@ -415,7 +415,7 @@
 
   // Modified toggleGroupView to accept a boolean for explicit control
   function toggleGroupView(shouldBeGroupView) {
-      currentViewIsGrouped = shouldBeGroupBiew; // Update the global state
+      currentViewIsGrouped = shouldBeGroupView; // Update the global state
       document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
       document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
       document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
@@ -1041,8 +1041,21 @@
               );
               displayNeededResult(neededResultsContainer, result.neededAssessmentScore * 100, 'assessment');
 
-          } else {
-              neededResultsContainer.innerHTML = '<p style="color: #f44336;">Invalid selection for solving. Please choose Learner Task or Assessment.</p>';
+          } else if (solveForType === 'finalGrade') {
+              futureLT = parseFloat(document.getElementById('futureLTScore').value);
+              futureAssess = parseFloat(document.getElementById('futureAssessScore').value);
+              if (isNaN(futureLT) || futureLT < 0 || futureLT > 100 || isNaN(futureAssess) || futureAssess < 0 || futureAssess > 100) {
+                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter valid future Learner Task and Assessment scores (0-100%).</p>';
+                  return;
+              }
+              result = solveForRemainingScore(
+                  ltAvg / 100, ltCount,
+                  assessAvg / 100, assessCount,
+                  ltWeightDecimal,
+                  desiredGrade / 100,
+                  futureLT / 100, futureAssess / 100
+              );
+              displayNeededResult(neededResultsContainer, result.finalQuarterGrade * 100, 'finalGrade');
           }
       } catch (error) {
           neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
@@ -1073,6 +1086,9 @@
               html = `<h3>Needed Assessment Score: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
                       <p style="color: var(--text-secondary);">You need to score this on your next Assessment to achieve your desired quarter grade.</p>`;
           }
+      } else if (type === 'finalGrade') {
+          html = `<h3>Calculated Final Quarter Grade: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
+                  <p style="color: var(--text-secondary);">This is your projected quarter grade with the entered future scores.</p>`;
       }
       container.innerHTML = html;
   }
@@ -1090,8 +1106,11 @@
       } else if (solveForType === 'assessment') {
           document.getElementById('futureScoresInputs').style.display = 'flex';
           document.getElementById('futureLTInputGroup').style.display = 'block';
+      } else if (solveForType === 'finalGrade') {
+          document.getElementById('futureScoresInputs').style.display = 'flex';
+          document.getElementById('futureLTInputGroup').style.display = 'block';
+          document.getElementById('futureAssessInputGroup').style.display = 'block';
       }
-      // Removed the 'finalGrade' case as per user request
   }
 
   function clearQuarterFields() {
@@ -1287,6 +1306,7 @@
               <option value="">Select...</option>
               <option value="learnerTask">Needed Learner Task Score</option>
               <option value="assessment">Needed Assessment Score</option>
+              <option value="finalGrade">Projected Final Quarter Grade</option>
           </select>
       </div>
 
