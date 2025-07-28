@@ -990,12 +990,13 @@
           return;
       }
 
-      const { ltAvg, assessAvg, ltOverallWeight, assessOverallWeight, customAssignments } = getQuarterGradeComponentsForNeededCalculation();
+      const { ltAvg, ltCount, assessAvg, assessCount, ltOverallWeight, assessOverallWeight, customAssignments } = getQuarterGradeComponentsForNeededCalculation();
 
-      let result;
+      let neededCategoryAverageResult;
+      let neededSingleAssignmentScore = null;
 
       try {
-          result = calculateNeededCategoryAverage(
+          neededCategoryAverageResult = calculateNeededCategoryAverage(
               ltAvg,
               assessAvg,
               ltOverallWeight,
@@ -1004,25 +1005,59 @@
               desiredGrade,
               solveForType
           );
-          displayNeededResult(neededResultsContainer, result, solveForType);
+
+          let currentCategoryAvg;
+          let currentCategoryCount;
+          let targetCategoryAvg = neededCategoryAverageResult; // This is the average the category needs to be
+
+          if (solveForType === 'learnerTask') {
+              currentCategoryAvg = ltAvg;
+              currentCategoryCount = ltCount;
+          } else if (solveForType === 'assessment') {
+              currentCategoryAvg = assessAvg;
+              currentCategoryCount = assessCount;
+          }
+
+          // Calculate the score needed on the next single assignment in that category
+          // This formula works whether currentCategoryCount is 0 or greater than 0.
+          neededSingleAssignmentScore = (targetCategoryAvg * (currentCategoryCount + 1)) - (currentCategoryAvg * currentCategoryCount);
+          neededSingleAssignmentScore = Number(neededSingleAssignmentScore.toFixed(2));
+
+          displayNeededResult(neededResultsContainer, neededCategoryAverageResult, solveForType, neededSingleAssignmentScore);
       } catch (error) {
           neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
       }
   }
 
-  function displayNeededResult(container, resultValue, type) {
+  function displayNeededResult(container, categoryAverage, type, singleAssignmentScore) {
       let html = '';
       const categoryName = type === 'learnerTask' ? 'Learner Task' : 'Assessment';
 
-      if (resultValue > 100) {
-          html = `<h3>Needed ${categoryName} Average: <span style="color: #f44336;">Not Possible</span></h3>
-                  <p style="color: var(--text-secondary);">You need an average of ${resultValue.toFixed(2)}% in the ${categoryName} category, which is likely not achievable.</p>`;
-      } else if (resultValue < 0) {
-          html = `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-                  <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
+      // Display for Needed Category Average
+      if (categoryAverage > 100) {
+          html += `<h3>Needed ${categoryName} Average: <span style="color: #f44336;">Not Possible</span></h3>
+                   <p style="color: var(--text-secondary);">You need an average of ${categoryAverage.toFixed(2)}% in the ${categoryName} category, which is likely not achievable.</p>`;
+      } else if (categoryAverage < 0) {
+          html += `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+                   <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
       } else {
-          html = `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
-                  <p style="color: var(--text-secondary);">You need to achieve this average in the ${categoryName} category to reach your desired quarter grade.</p>`;
+          html += `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">${categoryAverage.toFixed(2)}%</span></h3>
+                   <p style="color: var(--text-secondary);">You need to achieve this average in the ${categoryName} category to reach your desired quarter grade.</p>`;
+      }
+
+      // Display for Needed Single Assignment Score (if applicable)
+      if (singleAssignmentScore !== null) {
+          html += `<h3 style="margin-top: 1rem;">Needed Single ${categoryName} Score: `;
+          if (singleAssignmentScore > 100) {
+              html += `<span style="color: #f44336;">Not Possible</span></h3>
+                       <p style="color: var(--text-secondary);">You would need to score ${singleAssignmentScore.toFixed(2)}% on a single ${categoryName} assignment, which is likely not achievable.</p>`;
+          } else if (singleAssignmentScore < 0) {
+              html += `<span style="color: var(--accent-color);">Already Achieved!</span></h3>
+                       <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade, even with a 0% on the next ${categoryName} assignment.</p>`;
+          } else {
+              html += `<span style="color: var(--accent-color);">${singleAssignmentScore.toFixed(2)}%</span></h3>
+                       <p style="color: var(--text-secondary);">You need to score this on your next single ${categoryName} assignment to achieve your desired quarter grade.</p>`;
+          }
       }
       container.innerHTML = html;
   }
