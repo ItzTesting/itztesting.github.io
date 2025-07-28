@@ -1,565 +1,505 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LNMT1VXJW1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-gtag('config', 'G-LNMT1VXJW1');
-</script>
+        gtag('config', 'G-LNMT1VXJW1');
+    </script>
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Half-Semester Grade Calculator</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-<style>
-    :root {
-        --primary-bg: #1a1a1a;
-        --secondary-bg: #2E2E2E;
-        --input-bg: #3B3B3B;
-        --text-color: #F1F1F1;
-        --text-secondary: #D1D1D1;
-        --accent-color: #4CAF50;
-        --accent-hover: #45a049;
-        --link-color: #64B5F6;
-        --border-color: #555;
-        --card-bg: #333333;
-        --nav-bg: #222222;
-        --highlight-bg: rgba(76, 175, 80, 0.15);
-    }
-
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        background-color: var(--primary-bg);
-        color: var(--text-color);
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        padding-bottom: 2rem;
-    }
-
-    .navbar {
-        background-color: var(--nav-bg);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-
-    .container {
-        width: 100%;
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 1rem;
-    }
-
-    .nav-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-    }
-
-    .logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--text-color);
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-    }
-
-    .logo i {
-        margin-right: 0.5rem;
-        color: var(--accent-color);
-    }
-
-    .nav-links {
-        display: flex;
-        list-style: none;
-    }
-
-    .nav-links li {
-        margin-left: 1.5rem;
-    }
-
-    .nav-links a {
-        color: var(--text-color);
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.3s;
-        display: flex;
-        align-items: center;
-    }
-
-    .nav-links a:hover {
-        color: var(--accent-color);
-    }
-
-    .nav-links a.active {
-        color: var(--accent-color);
-        font-weight: 600;
-    }
-
-    .nav-links a i {
-        margin-right: 0.5rem;
-    }
-
-    .mobile-menu-btn {
-        display: none;
-        background: none;
-        border: none;
-        color: var(--text-color);
-        font-size: 1.5rem;
-        cursor: pointer;
-    }
-
-    .card {
-        background-color: var(--card-bg);
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        padding: 2rem;
-        margin: 2rem 0;
-    }
-
-    h2 {
-        color: var(--text-color);
-        margin-bottom: 1.5rem;
-        font-weight: 600;
-        text-align: center;
-        font-size: 1.8rem;
-    }
-
-    h3 {
-        color: var(--text-color);
-        margin: 1rem 0;
-        font-weight: 500;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
-    }
-
-    label {
-        display: block;
-        color: var(--text-secondary);
-        margin-bottom: 0.5rem;
-        font-weight: 500;
-    }
-
-    input, select {
-        background-color: var(--input-bg);
-        color: var(--text-color);
-        border: 1px solid var(--border-color);
-        border-radius: 5px;
-        padding: 0.75rem;
-        width: 100%;
-        font-size: 1rem;
-        transition: border-color 0.3s;
-    }
-
-    input:focus, select:focus {
-        outline: none;
-        border-color: var(--accent-color);
-    }
-
-    .input-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .input-group {
-        flex: 1;
-        min-width: 200px;
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 1rem;
-        margin: 1.5rem 0;
-        flex-wrap: wrap;
-    }
-
-    button {
-        cursor: pointer;
-        background-color: var(--accent-color);
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 0.75rem 1.5rem;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: background-color 0.3s;
-        flex: 1;
-        min-width: 150px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    button:hover {
-        background-color: var(--accent-hover);
-    }
-
-    button i {
-        margin-right: 0.5rem;
-    }
-
-    .btn-clear {
-        background-color: #f44336;
-    }
-
-    .btn-clear:hover {
-        background-color: #d32f2f;
-    }
-
-    .result-section {
-        background-color: var(--secondary-bg);
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-top: 1.5rem;
-    }
-
-    .result-section h3 {
-        margin-top: 0;
-        color: var(--accent-color);
-    }
-
-    .footer {
-        text-align: center;
-        padding: 1rem 0;
-        margin-top: 2rem;
-        color: var(--text-secondary);
-        font-size: 0.9rem;
-    }
-
-    /* Specific styles for Half-Semester Calculator */
-    .quarter-inputs {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-
-    .quarter-input-group {
-        flex: 1;
-        min-width: 250px;
-    }
-
-    .quarter-input-group label {
-        margin-bottom: 0.25rem;
-    }
-
-    /* Styles for needed grades section */
-    #neededGradesSection .input-group {
-        min-width: 150px; /* Adjust as needed for this section */
-    }
-    #neededGradesSection .input-row {
-        align-items: flex-end; /* Align inputs and labels nicely */
-    }
-</style>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add event listeners for Half-Semester Calculator
-        document.getElementById('calculateHalfSemesterBtn').addEventListener('click', calculateHalfSemesterGrade);
-        document.getElementById('clearHalfSemesterFieldsBtn').addEventListener('click', clearHalfSemesterFields);
-
-        // Add event listeners for Needed Grades section
-        document.getElementById('solveForType').addEventListener('change', toggleNeededGradeInputs);
-        document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFinalGrade);
-
-        // Initial state for needed grades section
-        toggleNeededGradeInputs();
-    });
-
-    function toggleMenu() {
-        const navLinks = document.querySelector('.nav-links');
-        navLinks.classList.toggle('active');
-    }
-
-    function calculateHalfSemesterGrade() {
-        const q1 = parseFloat(document.getElementById('q1Grade').value) || 0;
-        const q2 = parseFloat(document.getElementById('q2Grade').value) || 0;
-        const midterm = parseFloat(document.getElementById('midtermGrade').value) || 0;
-
-        const q1Weight = parseFloat(document.getElementById('q1Weight').value) || 0;
-        const q2Weight = parseFloat(document.getElementById('q2Weight').value) || 0;
-        const midtermWeight = parseFloat(document.getElementById('midtermWeight').value) || 0;
-
-        let weightedSum = 0;
-        let totalWeight = 0;
-
-        if (q1 > 0 && q1Weight > 0) { weightedSum += q1 * q1Weight; totalWeight += q1Weight; }
-        if (q2 > 0 && q2Weight > 0) { weightedSum += q2 * q2Weight; totalWeight += q2Weight; }
-        if (midterm > 0 && midtermWeight > 0) { weightedSum += midterm * midtermWeight; totalWeight += midtermWeight; }
-
-        let resultHtml = "";
-        if (totalWeight > 0) {
-            const finalGrade = weightedSum / totalWeight;
-            resultHtml += `<h3>Your Half-Semester Grade: <span id="halfSemesterResultValue">${finalGrade.toFixed(3)}%</span></h3>`;
-        } else {
-            resultHtml += `<h3>Your Half-Semester Grade: <span id="halfSemesterResultValue">Please enter grades and weights to calculate.</span></h3>`;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unweighted GPA Calculator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-bg: #1a1a1a;
+            --secondary-bg: #2E2E2E;
+            --input-bg: #3B3B3B;
+            --text-color: #F1F1F1;
+            --text-secondary: #D1D1D1;
+            --accent-color: #4CAF50;
+            --accent-hover: #45a049;
+            --link-color: #64B5F6;
+            --border-color: #555;
+            --card-bg: #333333;
+            --nav-bg: #222222;
+            --highlight-bg: rgba(76, 175, 80, 0.15);
         }
 
-        document.getElementById('halfSemesterResultsContainer').innerHTML = resultHtml;
-    }
-
-    function neededFinalGrade(q1, q2, q1Weight, q2Weight, midtermWeight, desiredOverallGrade) {
-        // Convert weights to decimals for calculation
-        q1Weight /= 100;
-        q2Weight /= 100;
-        midtermWeight /= 100;
-        desiredOverallGrade /= 100;
-
-        // Calculate the sum of weighted grades for known quarters
-        let knownWeightedSum = 0;
-        let knownTotalWeight = 0;
-
-        if (q1Weight > 0) { knownWeightedSum += q1 * q1Weight; knownTotalWeight += q1Weight; }
-        if (q2Weight > 0) { knownWeightedSum += q2 * q2Weight; knownTotalWeight += q2Weight; }
-
-        // If midtermWeight is 0, it's impossible to solve for it
-        if (midtermWeight === 0) {
-            return Infinity; // Or handle as an error
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        // Desired overall grade = (knownWeightedSum + (neededMidtermGrade * midtermWeight)) / (knownTotalWeight + midtermWeight)
-        // Rearrange to solve for neededMidtermGrade:
-        // desiredOverallGrade * (knownTotalWeight + midtermWeight) = knownWeightedSum + (neededMidtermGrade * midtermWeight)
-        // (desiredOverallGrade * (knownTotalWeight + midtermWeight)) - knownWeightedSum = neededMidtermGrade * midtermWeight
-        // neededMidtermGrade = ((desiredOverallGrade * (knownTotalWeight + midtermWeight)) - knownWeightedSum) / midtermWeight
-
-        const needed = ((desiredOverallGrade * (knownTotalWeight + midtermWeight)) - knownWeightedSum) / midtermWeight;
-
-        return needed * 100; // Convert back to percentage
-    }
-
-    function calculateNeededFinalGrade() {
-        const desiredGrade = parseFloat(document.getElementById('desiredGradeNeeded').value);
-        const solveForType = document.getElementById('solveForType').value;
-        const neededResultsContainer = document.getElementById('neededGradesResults');
-        neededResultsContainer.innerHTML = ''; // Clear previous results
-
-        if (isNaN(desiredGrade) || desiredGrade < 0 || desiredGrade > 100) {
-            neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid desired grade (0-100%).</p>';
-            return;
-        }
-        if (!solveForType) {
-            neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please select what you want to solve for.</p>';
-            return;
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding-bottom: 2rem;
         }
 
-        const q1 = parseFloat(document.getElementById('q1Grade').value) || 0;
-        const q2 = parseFloat(document.getElementById('q2Grade').value) || 0;
+        .navbar {
+            background-color: var(--nav-bg);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-        const q1Weight = parseFloat(document.getElementById('q1Weight').value) || 0;
-        const q2Weight = parseFloat(document.getElementById('q2Weight').value) || 0;
-        const midtermWeight = parseFloat(document.getElementById('midtermWeight').value) || 0;
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
 
-        let result;
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+        }
 
-        if (solveForType === 'midterm') {
-            if (midtermWeight === 0) {
-                neededResultsContainer.innerHTML = '<p style="color: #f44336;">Midterm weight is 0%, cannot solve for Midterm score.</p>';
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 1.5rem;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-color);
+        }
+
+        .nav-links a.active {
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        .nav-links a i {
+            margin-right: 0.5rem;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        h2 {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+
+        h3 {
+            color: var(--text-color);
+            margin: 1rem 0;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, select {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 0.75rem;
+            width: 100%;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        button {
+            cursor: pointer;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            flex: 1;
+            min-width: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-clear {
+            background-color: #f44336;
+        }
+
+        .btn-clear:hover {
+            background-color: #d32f2f;
+        }
+
+        .result-section {
+            background-color: var(--secondary-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .result-section h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 1rem 0;
+            margin-top: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Specific styles for GPA Calculator */
+        .class-input-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: flex-end; /* Align items at the bottom */
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            background-color: var(--secondary-bg);
+        }
+
+        .class-input-group {
+            flex: 1;
+            min-width: 150px; /* Adjust as needed */
+        }
+
+        .class-input-group label {
+            white-space: nowrap; /* Prevent label from wrapping */
+        }
+
+        .remove-class-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+            min-width: auto;
+        }
+    </style>
+    <script>
+        let classCounter = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for GPA Calculator
+            document.getElementById('addCourseBtn').addEventListener('click', addCourseInput);
+            document.getElementById('calculateGPABtn').addEventListener('click', calculateGPA);
+            document.getElementById('clearGPAFieldsBtn').addEventListener('click', clearGPAFields);
+        });
+
+        function toggleMenu() {
+            const navLinks = document.querySelector('.nav-links');
+            navLinks.classList.toggle('active');
+        }
+
+        function addCourseInput() {
+            classCounter++;
+            const container = document.getElementById('courseInputs');
+
+            const classRow = document.createElement('div');
+            classRow.classList.add('class-input-row');
+            classRow.setAttribute('data-class-index', classCounter); // Store index for re-numbering
+
+            // Class Name input
+            const nameInputGroup = document.createElement('div');
+            nameInputGroup.classList.add('class-input-group');
+            const nameLabel = document.createElement('label');
+            nameLabel.setAttribute('for', `className${classCounter}`);
+            nameLabel.innerText = `Class ${classCounter} Name`;
+            const nameInput = document.createElement('input');
+            nameInput.setAttribute('type', 'text');
+            nameInput.setAttribute('id', `className${classCounter}`);
+            nameInput.setAttribute('placeholder', `e.g., Algebra I`);
+            nameInputGroup.appendChild(nameLabel);
+            nameInputGroup.appendChild(nameInput);
+            classRow.appendChild(nameInputGroup);
+
+            // Grade input
+            const gradeInputGroup = document.createElement('div');
+            gradeInputGroup.classList.add('class-input-group');
+            const gradeLabel = document.createElement('label');
+            gradeLabel.setAttribute('for', `grade${classCounter}`);
+            gradeLabel.innerText = `Grade (%)`;
+            const gradeInput = document.createElement('input');
+            gradeInput.setAttribute('type', 'number');
+            gradeInput.setAttribute('id', `grade${classCounter}`);
+            gradeInput.setAttribute('min', '0');
+            gradeInput.setAttribute('max', '100');
+            gradeInput.setAttribute('placeholder', 'Enter grade');
+            gradeInputGroup.appendChild(gradeLabel);
+            gradeInputGroup.appendChild(gradeInput);
+            classRow.appendChild(gradeInputGroup);
+
+            // Credits input
+            const creditsInputGroup = document.createElement('div');
+            creditsInputGroup.classList.add('class-input-group');
+            const creditsLabel = document.createElement('label');
+            creditsLabel.setAttribute('for', `credits${classCounter}`);
+            creditsLabel.innerText = `Credits`;
+            const creditsInput = document.createElement('input');
+            creditsInput.setAttribute('type', 'number');
+            creditsInput.setAttribute('id', `credits${classCounter}`);
+            creditsInput.setAttribute('min', '0');
+            creditsInput.setAttribute('value', '1'); // Default to 1 credit
+            creditsInput.setAttribute('placeholder', 'e.g., 1');
+            creditsInputGroup.appendChild(creditsLabel);
+            creditsInputGroup.appendChild(creditsInput);
+            classRow.appendChild(creditsInputGroup);
+
+            // Remove button
+            const removeButton = document.createElement('button');
+            removeButton.classList.add('remove-class-btn');
+            removeButton.innerText = 'Remove';
+            removeButton.onclick = function() {
+                classRow.remove();
+                updateClassNumbers();
+                calculateGPA();
+            };
+            classRow.appendChild(removeButton);
+
+            container.appendChild(classRow);
+            updateClassNumbers();
+        }
+
+        function updateClassNumbers() {
+            const classRows = document.querySelectorAll('#courseInputs .class-input-row');
+            classRows.forEach((row, index) => {
+                const classNum = index + 1;
+                const oldIndex = row.getAttribute('data-class-index');
+
+                // Update labels and IDs for name input
+                const nameLabel = row.querySelector(`label[for="className${oldIndex}"]`);
+                const nameInput = row.querySelector(`input[id="className${oldIndex}"]`);
+                if (nameLabel && nameInput) {
+                    nameLabel.setAttribute('for', `className${classNum}`);
+                    nameInput.setAttribute('id', `className${classNum}`);
+                    nameLabel.innerText = `Class ${classNum} Name`;
+                }
+
+                // Update labels and IDs for grade input
+                const gradeLabel = row.querySelector(`label[for="grade${oldIndex}"]`);
+                const gradeInput = row.querySelector(`input[id="grade${oldIndex}"]`);
+                if (gradeLabel && gradeInput) {
+                    gradeLabel.setAttribute('for', `grade${classNum}`);
+                    gradeInput.setAttribute('id', `grade${classNum}`);
+                }
+
+                // Update labels and IDs for credits input
+                const creditsLabel = row.querySelector(`label[for="credits${oldIndex}"]`);
+                const creditsInput = row.querySelector(`input[id="credits${oldIndex}"]`);
+                if (creditsLabel && creditsInput) {
+                    creditsLabel.setAttribute('for', `credits${classNum}`);
+                    creditsInput.setAttribute('id', `credits${classNum}`);
+                }
+
+                row.setAttribute('data-class-index', classNum); // Update stored index
+            });
+        }
+
+        function calculateGPA() {
+            const gradeInputs = document.querySelectorAll('#courseInputs input[id^="grade"]');
+            const creditsInputs = document.querySelectorAll('#courseInputs input[id^="credits"]');
+
+            let totalGradePoints = 0;
+            let totalCredits = 0;
+            let resultHtml = "";
+
+            if (gradeInputs.length === 0) {
+                resultHtml = `<h3>Your Unweighted GPA: <span id="gpaResultValue">Please add courses to calculate.</span></h3>`;
+                document.getElementById('gpaResultsContainer').innerHTML = resultHtml;
                 return;
             }
-            result = neededFinalGrade(q1, q2, q1Weight, q2Weight, midtermWeight, desiredGrade);
-            displayNeededResult(neededResultsContainer, result, 'midterm');
-        } else if (solveForType === 'projectedFinalGrade') {
-            const futureMidterm = parseFloat(document.getElementById('futureMidtermScore').value);
-            if (isNaN(futureMidterm) || futureMidterm < 0 || futureMidterm > 100) {
-                neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid future Midterm score (0-100%).</p>';
-                return;
+
+            for (let i = 0; i < gradeInputs.length; i++) {
+                const grade = parseFloat(gradeInputs[i].value);
+                const credits = parseFloat(creditsInputs[i].value);
+
+                if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(credits) && credits > 0) {
+                    let gpaEquivalent;
+                    if (grade >= 90) {
+                        gpaEquivalent = 4.0;
+                    } else if (grade >= 80) {
+                        gpaEquivalent = 3.0;
+                    } else if (grade >= 70) {
+                        gpaEquivalent = 2.0;
+                    } else if (grade >= 60) {
+                        gpaEquivalent = 1.0;
+                    } else {
+                        gpaEquivalent = 0.0;
+                    }
+                    totalGradePoints += gpaEquivalent * credits;
+                    totalCredits += credits;
+                }
             }
 
-            let weightedSum = 0;
-            let totalWeight = 0;
-
-            if (q1Weight > 0) { weightedSum += q1 * q1Weight; totalWeight += q1Weight; }
-            if (q2Weight > 0) { weightedSum += q2 * q2Weight; totalWeight += q2Weight; }
-            if (midtermWeight > 0) { weightedSum += futureMidterm * midtermWeight; totalWeight += midtermWeight; }
-
-            if (totalWeight > 0) {
-                result = weightedSum / totalWeight;
-                displayNeededResult(neededResultsContainer, result, 'projectedFinalGrade');
+            if (totalCredits > 0) {
+                const gpa = totalGradePoints / totalCredits;
+                resultHtml += `<h3>Your Unweighted GPA: <span id="gpaResultValue">${gpa.toFixed(2)}</span></h3>`;
             } else {
-                neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter grades and weights to calculate projected grade.</p>';
+                resultHtml += `<h3>Your Unweighted GPA: <span id="gpaResultValue">Please enter valid grades and credits.</span></h3>`;
             }
+
+            document.getElementById('gpaResultsContainer').innerHTML = resultHtml;
         }
-    }
 
-    function displayNeededResult(container, resultValue, type) {
-        let html = '';
-        if (type === 'midterm') {
-            if (resultValue > 100) {
-                html = `<h3>Needed Midterm Score: <span style="color: #f44336;">Not Possible</span></h3>
-                        <p style="color: var(--text-secondary);">You need a ${resultValue.toFixed(2)}% on your Midterm, which is likely not achievable.</p>`;
-            } else if (resultValue < 0) {
-                html = `<h3>Needed Midterm Score: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-                        <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
-            } else {
-                html = `<h3>Needed Midterm Score: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
-                        <p style="color: var(--text-secondary);">You need to score this on your Midterm to achieve your desired overall grade.</p>`;
-            }
-        } else if (type === 'projectedFinalGrade') {
-            html = `<h3>Projected Half-Semester Grade: <span style="color: var(--accent-color);">${resultValue.toFixed(2)}%</span></h3>
-                    <p style="color: var(--text-secondary);">This is your projected half-semester grade with the entered future Midterm score.</p>`;
+        function clearGPAFields() {
+            document.getElementById('courseInputs').innerHTML = '';
+            document.getElementById('gpaResultsContainer').innerHTML = '';
+            classCounter = 0; // Reset counter
         }
-        container.innerHTML = html;
-    }
-
-    function toggleNeededGradeInputs() {
-        const solveForType = document.getElementById('solveForType').value;
-        document.getElementById('futureMidtermInputGroup').style.display = 'none';
-        document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
-
-        if (solveForType === 'projectedFinalGrade') {
-            document.getElementById('futureMidtermInputGroup').style.display = 'block';
-        }
-    }
-
-    function clearHalfSemesterFields() {
-        document.getElementById('q1Grade').value = '';
-        document.getElementById('q2Grade').value = '';
-        document.getElementById('midtermGrade').value = '';
-
-        document.getElementById('q1Weight').value = '40';
-        document.getElementById('q2Weight').value = '40';
-        document.getElementById('midtermWeight').value = '20';
-
-        document.getElementById('halfSemesterResultsContainer').innerHTML = '';
-
-        // Clear needed grades section inputs and results
-        document.getElementById('desiredGradeNeeded').value = '';
-        document.getElementById('solveForType').value = ''; // Reset dropdown
-        document.getElementById('futureMidtermScore').value = '';
-        document.getElementById('neededGradesResults').innerHTML = '';
-        toggleNeededGradeInputs(); // Reset visibility
-    }
-</script>
+    </script>
 </head>
 <body>
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.html" class="logo">
-            <i class="fas fa-calculator"></i>
-            Grade Calculator
-        </a>
-        <button class="mobile-menu-btn" onclick="toggleMenu()">
-            <i class="fas fa-bars"></i>
-        </button>
-        <ul class="nav-links">
-            <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
-            <li><a href="half_semester_calculator.html" class="active"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
-            <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
-            <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
-        </ul>
-    </div>
-</nav>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-calculator"></i>
+                Grade Calculator
+            </a>
+            <button class="mobile-menu-btn" onclick="toggleMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html"><i class="fas fa-home"></i> Full-Year Calculator</a></li>
+                <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
+                <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
+                <li><a href="unweighted_gpa_calculator.html" class="active"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
+            </ul>
+        </div>
+    </nav>
 
-<div class="container">
-    <div class="card">
-        <h2>Half-Semester Grade Calculator</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-            Calculate your half-semester grade by entering your quarter grades and midterm score, along with their respective weights.
-        </p>
-        <div class="quarter-inputs">
-            <div class="input-group quarter-input-group">
-                <label for="q1Grade">Quarter 1 Grade (%)</label>
-                <input type="number" id="q1Grade" min="0" max="100" placeholder="e.g., 85">
+    <div class="container">
+        <div class="card">
+            <h2>Unweighted GPA Calculator</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+                Calculate your unweighted GPA by entering your course grades and credits.
+                (Based on a standard 4.0 scale: A=4, B=3, C=2, D=1, F=0)
+            </p>
+            <div id="courseInputs">
+                <!-- Course inputs will be added here -->
             </div>
-            <div class="input-group quarter-input-group">
-                <label for="q1Weight">Quarter 1 Weight (%)</label>
-                <input type="number" id="q1Weight" min="0" max="100" value="40" placeholder="e.g., 40">
-            </div>
-        </div>
-        <div class="quarter-inputs">
-            <div class="input-group quarter-input-group">
-                <label for="q2Grade">Quarter 2 Grade (%)</label>
-                <input type="number" id="q2Grade" min="0" max="100" placeholder="e.g., 90">
-            </div>
-            <div class="input-group quarter-input-group">
-                <label for="q2Weight">Quarter 2 Weight (%)</label>
-                <input type="number" id="q2Weight" min="0" max="100" value="40" placeholder="e.g., 40">
-            </div>
-        </div>
-        <div class="quarter-inputs">
-            <div class="input-group quarter-input-group">
-                <label for="midtermGrade">Midterm Grade (%)</label>
-                <input type="number" id="midtermGrade" min="0" max="100" placeholder="e.g., 95">
-            </div>
-            <div class="input-group quarter-input-group">
-                <label for="midtermWeight">Midterm Weight (%)</label>
-                <input type="number" id="midtermWeight" min="0" max="100" value="20" placeholder="e.g., 20">
-            </div>
-        </div>
-        <div class="btn-group">
-            <button id="calculateHalfSemesterBtn">
-                <i class="fas fa-calculator"></i> Calculate Half-Semester Grade
+            <button id="addCourseBtn" style="margin-top: 1rem;">
+                <i class="fas fa-plus-circle"></i> Add Course
             </button>
-            <button class="btn-clear" id="clearHalfSemesterFieldsBtn">
-                <i class="fas fa-trash-alt"></i> Clear All Fields
-            </button>
-        </div>
-        <div class="result-section">
-            <div id="halfSemesterResultsContainer">
-                <!-- Results will be displayed here -->
+            <div class="btn-group">
+                <button id="calculateGPABtn">
+                    <i class="fas fa-calculator"></i> Calculate GPA
+                </button>
+                <button class="btn-clear" id="clearGPAFieldsBtn">
+                    <i class="fas fa-trash-alt"></i> Clear All Fields
+                </button>
+            </div>
+            <div class="result-section">
+                <div id="gpaResultsContainer">
+                    <!-- Results will be displayed here -->
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- New Card for Needed Grades -->
-    <div class="card" id="neededGradesSection">
-        <h2>Calculate Needed Grades</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-            Determine the score you need on your midterm to achieve your desired half-semester grade, or project your final grade.
-        </p>
-
-        <div class="form-group">
-            <label for="desiredGradeNeeded">Desired Overall Grade (%)</label>
-            <input type="number" id="desiredGradeNeeded" min="0" max="100" placeholder="e.g., 90">
+    <footer class="footer">
+        <div class="container">
+            <p>Created by Advaith S, 2025</p>
         </div>
-
-        <div class="form-group">
-            <label for="solveForType">Solve for:</label>
-            <select id="solveForType">
-                <option value="">Select...</option>
-                <option value="midterm">Needed Midterm Score</option>
-                <option value="projectedFinalGrade">Projected Half-Semester Grade</option>
-            </select>
-        </div>
-
-        <div class="input-group" id="futureMidtermInputGroup" style="display: none;">
-            <label for="futureMidtermScore">Future Midterm Score (%)</label>
-            <input type="number" id="futureMidtermScore" min="0" max="100" placeholder="e.g., 95">
-        </div>
-
-        <div class="btn-group">
-            <button id="calculateNeededGradesBtn">
-                <i class="fas fa-calculator"></i> Calculate Needed Grades
-            </button>
-        </div>
-
-        <div class="result-section">
-            <div id="neededGradesResults">
-                <!-- Needed grades results will be displayed here -->
-            </div>
-        </div>
-    </div>
-</div>
-<footer class="footer">
-  <div class="container">
-      <p>Created by Advaith S, 2025</p>
-  </div>
-</footer>
+    </footer>
 </body>
 </html>
