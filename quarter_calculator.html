@@ -431,7 +431,7 @@
       const assignmentRow = document.createElement('div');
       assignmentRow.classList.add('class-input-row'); // Use GPA calculator's row style
       assignmentRow.setAttribute('data-category', category); // Store category for re-numbering
-      assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]);
+      assignmentRow.setAttribute('data-assignment-index', categoryCounters[category]); // Store original index
 
       // Assignment Name input
       const nameInputGroup = document.createElement('div');
@@ -853,52 +853,39 @@
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
   }
 
-  /**
-   * Calculate the needed score on one remaining assignment to hit a desired quarter grade,
-   * considering both learner tasks and assessments — including optional future scores for one or the other.
-   *
-   * @param {number} ltAvg       - Current learner task average (decimal)
-   * @param {number} ltCount     - Number of completed learner tasks
-   * @param {number} assessAvg   - Current assessment average (decimal)
-   * @param {number} assessCount - Number of completed assessments
-   * @param {number} ltWeight    - Learner task category weight (decimal)
-   * @param {number} desired     - Desired overall quarter grade (decimal)
-   * @param {string} solveForType  - 'learnerTask' or 'assessment'
-   * @return {Object} - Returns the missing score needed, rounded to 2 decimals
-   */
   function solveForRemainingScore(
-    ltAvg,        // Current learner task average (decimal)
-    ltCount,      // Number of completed learner tasks
-    assessAvg,    // Current assessment average (decimal)
-    assessCount,  // Number of completed assessments
-    ltWeight,     // Learner task category weight (decimal)
-    desired,      // Desired overall quarter grade (decimal)
-    solveForType  // 'learnerTask' or 'assessment'
-  ) {
-    const assessWeight = 1 - ltWeight;
+  ltAvg,        // Current learner task average (decimal)
+  ltCount,      // Number of completed learner tasks
+  assessAvg,    // Current assessment average (decimal)
+  assessCount,  // Number of completed assessments
+  ltWeight,     // Learner task category weight (decimal)
+  desired,      // Desired overall quarter grade (decimal)
+  solveForType  // 'learnerTask' or 'assessment'
+) {
+  const assessWeight = 1 - ltWeight;
 
-    // Current points earned from existing assignments
-    const ltPoints = ltAvg * ltCount;
-    const assessPoints = assessAvg * assessCount;
+  // Current points earned from existing assignments
+  const ltPoints = ltAvg * ltCount;
+  const assessPoints = assessAvg * assessCount;
 
-    if (solveForType === 'learnerTask') {
-      // Solving for missing Learner Task (X)
-      // Desired = ( (ltPoints + X) / (ltCount + 1) ) * ltWeight + (assessAvg * assessWeight)
-      const requiredFinalLTAvg = (desired - (assessAvg * assessWeight)) / (ltWeight > 0 ? ltWeight : 1);
-      const requiredLT = (requiredFinalLTAvg * (ltCount + 1)) - ltPoints;
-      return { neededLearnerTaskScore: Number(requiredLT.toFixed(2)) };
-    }
-
-    if (solveForType === 'assessment') {
-      // Solving for missing Assessment (Y)
-      // Desired = (ltAvg * ltWeight) + ( (assessPoints + Y) / (assessCount + 1) ) * assessWeight
-      const requiredFinalAssessAvg = (desired - (ltAvg * ltWeight)) / (assessWeight > 0 ? assessWeight : 1);
-      const requiredAssess = (requiredFinalAssessAvg * (assessCount + 1)) - assessPoints;
-      return { neededAssessmentScore: Number(requiredAssess.toFixed(2)) };
-    }
-
-    throw new Error("Invalid solveForType. Must be 'learnerTask' or 'assessment'.");
+  if (solveForType === 'learnerTask') {
+    // Solving for missing Learner Task (X)
+    // Desired = ( (ltPoints + X) / (ltCount + 1) ) * ltWeight + (assessAvg * assessWeight)
+    const requiredFinalLTAvg = (desired - (assessAvg * assessWeight)) / (ltWeight > 0 ? ltWeight : 1);
+    const requiredLT = (requiredFinalLTAvg * (ltCount + 1)) - ltPoints;
+    return { neededLearnerTaskScore: Number(requiredLT.toFixed(2)) };
   }
+
+  if (solveForType === 'assessment') {
+    // Solving for missing Assessment (Y)
+    // Desired = (ltAvg * ltWeight) + ( (assessPoints + Y) / (assessCount + 1) ) * assessWeight
+    const requiredFinalAssessAvg = (desired - (ltAvg * ltWeight)) / (assessWeight > 0 ? assessWeight : 1);
+    const requiredAssess = (requiredFinalAssessAvg * (assessCount + 1)) - assessPoints;
+    return { neededAssessmentScore: Number(requiredAssess.toFixed(2)) };
+  }
+
+  throw new Error("Invalid solveForType. Must be 'learnerTask' or 'assessment'.");
+}
 
   function getQuarterGradeComponentsForNeededCalculation() {
       const isGroupView = currentViewIsGrouped;
@@ -966,64 +953,64 @@
   }
 
   function calculateNeededFutureGrades() {
-      const desiredGrade = parseFloat(document.getElementById('desiredQuarterGradeNeeded').value);
-      const solveForType = document.getElementById('solveForType').value;
-      const neededResultsContainer = document.getElementById('neededGradesResults');
-      neededResultsContainer.innerHTML = ''; // Clear previous results
+    const desiredGrade = parseFloat(document.getElementById('desiredQuarterGradeNeeded').value);
+    const solveForType = document.getElementById('solveForType').value;
+    const neededResultsContainer = document.getElementById('neededGradesResults');
+    neededResultsContainer.innerHTML = ''; // Clear previous results
 
-      if (isNaN(desiredGrade) || desiredGrade < 0 || desiredGrade > 100) {
-          neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid desired quarter grade (0-100%).</p>';
-          return;
-      }
-      if (!solveForType) {
-          neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please select what you want to solve for.</p>';
-          return;
-      }
+    if (isNaN(desiredGrade) || desiredGrade < 0 || desiredGrade > 100) {
+        neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please enter a valid desired quarter grade (0-100%).</p>';
+        return;
+    }
+    if (!solveForType) {
+        neededResultsContainer.innerHTML = '<p style="color: #f44336;">Please select what you want to solve for.</p>';
+        return;
+    }
 
-      const { ltAvg, ltCount, assessAvg, assessCount, ltOverallWeight, assessOverallWeight, customAssignments } = getQuarterGradeComponentsForNeededCalculation();
+    const { ltAvg, ltCount, assessAvg, assessCount, ltOverallWeight, assessOverallWeight, customAssignments } = getQuarterGradeComponentsForNeededCalculation();
 
-      // Convert overall weights to decimal for the solveForRemainingScore function
-      const ltWeightDecimal = ltOverallWeight / 100;
-      const assessWeightDecimal = assessOverallWeight / 100;
+    // Convert overall weights to decimal for the solveForRemainingScore function
+    const ltWeightDecimal = ltOverallWeight / 100;
+    const assessWeightDecimal = assessOverallWeight / 100;
 
-      let result;
+    let result;
 
-      try {
-          if (solveForType === 'learnerTask') {
-              if (ltWeightDecimal === 0) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Learner Task weight is 0%, cannot solve for Learner Task score.</p>';
-                  return;
-              }
-              result = solveForRemainingScore(
-                  ltAvg / 100, ltCount,
-                  assessAvg / 100, assessCount,
-                  ltWeightDecimal,
-                  desiredGrade / 100,
-                  'learnerTask'
-              );
-              displayNeededResult(neededResultsContainer, result.neededLearnerTaskScore * 100, 'learnerTask');
+    try {
+        if (solveForType === 'learnerTask') {
+            if (ltWeightDecimal === 0) {
+                neededResultsContainer.innerHTML = '<p style="color: #f44336;">Learner Task weight is 0%, cannot solve for Learner Task score.</p>';
+                return;
+            }
+            result = solveForRemainingScore(
+                ltAvg / 100, ltCount,
+                assessAvg / 100, assessCount,
+                ltWeightDecimal,
+                desiredGrade / 100,
+                'learnerTask'
+            );
+            displayNeededResult(neededResultsContainer, result.neededLearnerTaskScore * 100, 'learnerTask');
 
-          } else if (solveForType === 'assessment') {
-              if (assessWeightDecimal === 0) {
-                  neededResultsContainer.innerHTML = '<p style="color: #f44336;">Assessment weight is 0%, cannot solve for Assessment score.</p>';
-                  return;
-              }
-              result = solveForRemainingScore(
-                  ltAvg / 100, ltCount,
-                  assessAvg / 100, assessCount,
-                  ltWeightDecimal,
-                  desiredGrade / 100,
-                  'assessment'
-              );
-              displayNeededResult(neededResultsContainer, result.neededAssessmentScore * 100, 'assessment');
+        } else if (solveForType === 'assessment') {
+            if (assessWeightDecimal === 0) {
+                neededResultsContainer.innerHTML = '<p style="color: #f44336;">Assessment weight is 0%, cannot solve for Assessment score.</p>';
+                return;
+            }
+            result = solveForRemainingScore(
+                ltAvg / 100, ltCount,
+                assessAvg / 100, assessCount,
+                ltWeightDecimal,
+                desiredGrade / 100,
+                'assessment'
+            );
+            displayNeededResult(neededResultsContainer, result.neededAssessmentScore * 100, 'assessment');
 
-          } else {
-              neededResultsContainer.innerHTML = '<p style="color: #f44336;">Invalid selection for solving. Please choose Learner Task or Assessment.</p>';
-          }
-      } catch (error) {
-          neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
-      }
-  }
+        } else {
+            neededResultsContainer.innerHTML = '<p style="color: #f44336;">Invalid selection for solving. Please choose Learner Task or Assessment.</p>';
+        }
+    } catch (error) {
+        neededResultsContainer.innerHTML = `<p style="color: #f44336;">Error: ${error.message}</p>`;
+    }
+}
 
   function displayNeededResult(container, resultValue, type) {
       let html = '';
@@ -1054,13 +1041,13 @@
   }
 
   function toggleNeededGradeInputs() {
-      // Hide both input groups as they are no longer needed for the calculation
-      document.getElementById('futureLTInputGroup').style.display = 'none';
-      document.getElementById('futureAssessInputGroup').style.display = 'none';
-      document.getElementById('futureScoresInputs').style.display = 'none'; // Hide the container as well
+    // Hide both input groups as they are no longer needed for the calculation
+    document.getElementById('futureLTInputGroup').style.display = 'none';
+    document.getElementById('futureAssessInputGroup').style.display = 'none';
+    document.getElementById('futureScoresInputs').style.display = 'none'; // Hide the container as well
 
-      document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
-  }
+    document.getElementById('neededGradesResults').innerHTML = ''; // Clear results when changing selection
+}
 
   function clearQuarterFields() {
       document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
