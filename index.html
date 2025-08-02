@@ -81,6 +81,34 @@ gtag('config', 'G-LNMT1VXJW1');
           color: var(--accent-color);
       }
 
+      /* Typing animation styles */
+      #typing-text {
+          overflow: hidden; /* Ensures the text is hidden until typed */
+          white-space: nowrap; /* Prevents text from wrapping */
+          border-right: .15em solid var(--accent-color); /* The blinking caret */
+          font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Monospace for typing effect */
+          width: 0; /* Start with 0 width */
+          display: inline-block; /* Allows width animation */
+          vertical-align: middle; /* Align with icon */
+      }
+
+      #typing-text.typewriter {
+          animation:
+              typing 3.5s steps(17, end) forwards, /* 17 steps for "Grade Calculator" */
+              blink-caret .75s step-end infinite;
+      }
+
+      @keyframes typing {
+          from { width: 0 }
+          to { width: 100% }
+      }
+
+      @keyframes blink-caret {
+          from, to { border-color: transparent }
+          50% { border-color: var(--accent-color); }
+      }
+      /* End typing animation styles */
+
       .nav-links {
           display: flex;
           list-style: none;
@@ -511,6 +539,18 @@ gtag('config', 'G-LNMT1VXJW1');
               hideModal(featureModalBackdrop, 'shownFeaturePopup'); // New key
           }
       });
+
+      // Typing animation for "Grade Calculator"
+      const typingTextElement = document.getElementById('typing-text');
+      const fullText = "Grade Calculator";
+      typingTextElement.textContent = ''; // Clear content initially
+      typingTextElement.setAttribute('data-text', fullText); // Store full text
+
+      // Add a class to trigger the animation after a slight delay to ensure CSS is applied
+      setTimeout(() => {
+          typingTextElement.classList.add('typewriter');
+          typingTextElement.textContent = fullText; // Set full text after animation starts
+      }, 100); // Small delay
   });
 
   function toggleMenu() {
@@ -889,6 +929,7 @@ gtag('config', 'G-LNMT1VXJW1');
       
       // Update strategy descriptions for AP
       document.getElementById('strategy1Desc').innerText = 'This strategy maximizes your Quarter 3 grade while minimizing your Quarter 4 performance.';
+      
       document.getElementById('strategy2Desc').innerText = 'This strategy maximizes your Quarter 4 grade while minimizing your Quarter 3 performance.';
       
       // Update labels for AP - Ensure Q3 comes before Q4 in display
@@ -1003,7 +1044,7 @@ gtag('config', 'G-LNMT1VXJW1');
       <div class="nav-container">
           <a href="index.html" class="logo">
               <i class="fas fa-calculator"></i>
-              Grade Calculator
+              <span id="typing-text"></span>
           </a>
           <button class="mobile-menu-btn" onclick="toggleMenu()">
               <i class="fas fa-bars"></i>
