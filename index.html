@@ -462,22 +462,53 @@ gtag('config', 'G-LNMT1VXJW1');
       document.getElementById('clearBtn').addEventListener('click', clearFields);
 
       // Modal Logic
-      const modalBackdrop = document.getElementById('welcomeModalBackdrop');
-      const modalGotItButton = document.getElementById('welcomeModalGotIt');
+      const welcomeModalBackdrop = document.getElementById('welcomeModalBackdrop');
+      const welcomeModalGotItButton = document.getElementById('welcomeModalGotIt');
+      const featureModalBackdrop = document.getElementById('featureModalBackdrop');
+      const featureModalGotItButton = document.getElementById('featureModalGotIt');
 
-      if (sessionStorage.getItem('shownPopup') !== 'true') {
-          modalBackdrop.classList.add('show');
-          sessionStorage.setItem('shownPopup', 'true');
+      function showModal(modalElement) {
+          modalElement.classList.add('show');
       }
 
-      function hideModal() {
-          modalBackdrop.classList.remove('show');
+      function hideModal(modalElement, sessionStorageKey) {
+          modalElement.classList.remove('show');
+          if (sessionStorageKey) {
+              sessionStorage.setItem(sessionStorageKey, 'true');
+          }
       }
 
-      modalGotItButton.addEventListener('click', hideModal);
-      modalBackdrop.addEventListener('click', function(event) {
-          if (event.target === modalBackdrop) {
-              hideModal();
+      // Handle Welcome Modal
+      if (sessionStorage.getItem('shownWelcomePopup') !== 'true') { // Changed key
+          showModal(welcomeModalBackdrop);
+      }
+
+      welcomeModalGotItButton.addEventListener('click', function() {
+          hideModal(welcomeModalBackdrop, 'shownWelcomePopup'); // Changed key
+          // After welcome modal is dismissed, show feature modal if not shown before
+          if (sessionStorage.getItem('shownFeaturePopup') !== 'true') { // New key
+              showModal(featureModalBackdrop);
+          }
+      });
+
+      welcomeModalBackdrop.addEventListener('click', function(event) {
+          if (event.target === welcomeModalBackdrop) {
+              hideModal(welcomeModalBackdrop, 'shownWelcomePopup'); // Changed key
+              // After welcome modal is dismissed, show feature modal if not shown before
+              if (sessionStorage.getItem('shownFeaturePopup') !== 'true') { // New key
+                  showModal(featureModalBackdrop);
+              }
+          }
+      });
+
+      // Handle Feature Modal
+      featureModalGotItButton.addEventListener('click', function() {
+          hideModal(featureModalBackdrop, 'shownFeaturePopup'); // New key
+      });
+
+      featureModalBackdrop.addEventListener('click', function(event) {
+          if (event.target === featureModalBackdrop) {
+              hideModal(featureModalBackdrop, 'shownFeaturePopup'); // New key
           }
       });
   });
@@ -1120,9 +1151,24 @@ gtag('config', 'G-LNMT1VXJW1');
               <h3 id="modalTitle">Welcome to the Grade Calculator!</h3>
           </div>
           <div class="modal-body">
-              <p>This tool helps you calculate your grades and plan for future assignments across different academic periods.EIFJOWEIFJOWEFIJOWEFIJOWEFIJOWEFIJOWEFIJOWEFIJEOWFIJEFWEWF</p>
+              <p>This tool helps you calculate your grades and plan for future assignments across different academic periods.</p>
               <p style="margin-top: 1rem;">Explore the various calculators using the navigation bar above.</p>
               <button id="welcomeModalGotIt" class="btn-group" style="margin-top: 1.5rem; width: 100%;">Got it!</button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Feature Modal Popup -->
+  <div id="featureModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="featureModalTitle">
+      <div class="modal-container">
+          <div class="modal-header">
+              <h3 id="featureModalTitle">Want to Be Featured Here?</h3>
+          </div>
+          <div class="modal-body">
+              <p>If you're part of a club, organization, or have something valuable to share with the school community, this space is for you. Submit your info - events, updates, sign-ups, or anything else - and we’ll display it here for everyone to see.</p>
+              <p style="margin-top: 1rem;">Reach out to Advaith S by emailing <a href="mailto:as31819@example.com" style="color: var(--link-color);">as31819@example.com</a>.</p>
+              <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">Terms & Conditions: <a href="https://docs.google.com/document/d/1fp5M_WUj-endh9G_lekxrO9LK7H1lZ4q9Sn6mUIOAXg/edit?usp=sharing" target="_blank" style="color: var(--link-color);">https://docs.google.com/document/d/1fp5M_WUj-endh9G_lekxrO9LK7H1lZ4q9Sn6mUIOAXg/edit?usp=sharing</a> By emailing to request it, you accept those Terms & Conditions</p>
+              <button id="featureModalGotIt" class="btn-group" style="margin-top: 1.5rem; width: 100%;">Got it!</button>
           </div>
       </div>
   </div>
