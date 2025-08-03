@@ -384,6 +384,36 @@
   #neededGradesSection .input-row {
       align-items: flex-end; /* Align inputs and labels nicely */
   }
+
+  /* Media query for mobile navigation */
+  @media (max-width: 768px) {
+      .nav-links {
+          display: none; /* Hidden by default on mobile */
+          position: absolute;
+          top: 60px; /* Adjust based on navbar height */
+          left: 0;
+          right: 0;
+          background-color: var(--nav-bg);
+          flex-direction: column;
+          padding: 1rem;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+
+      .nav-links.active {
+          display: flex; /* Shown when active */
+      }
+
+      .nav-links li {
+          margin: 0.5rem 0;
+          opacity: 1; /* Ensure visible when menu is active */
+          transform: translateX(0); /* No animation when toggled */
+          animation: none; /* Disable animation when mobile menu is active */
+      }
+
+      .mobile-menu-btn {
+          display: block; /* Show hamburger button on mobile */
+      }
+  }
 </style>
 <script>
   let categoryCounters = {
@@ -770,14 +800,13 @@
               const grade = parseFloat(row.querySelector('.assignment-grade-input').value);
               const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
               if (!isNaN(grade) && grade >= 0 && grade <= 100 && !isNaN(weight) && weight >= 0) {
-                  customGrades.push(grade);
-                  customWeights.push(weight);
+                  customGrades.push({ score: grade, weight: weight });
               }
           });
 
           const avgLearnerTasks = learnerTaskGrades.length > 0 ? learnerTaskGrades.reduce((sum, g) => sum + g, 0) / learnerTaskGrades.length : 0;
           const avgAssessments = assessmentGrades.length > 0 ? assessmentGrades.reduce((sum, g) => sum + g, 0) / assessmentGrades.length : 0;
-          const avgCustom = customWeights.reduce((sum, w) => sum + w, 0) > 0 ? customGrades.reduce((sum, g, i) => sum + (g * customWeights[i]), 0) / customWeights.reduce((sum, w) => sum + w, 0) : 0;
+          const avgCustom = customWeights.reduce((sum, w) => sum + w, 0) > 0 ? customGrades.reduce((sum, g, i) => sum + (g.score * g.weight), 0) / customWeights.reduce((sum, w) => sum + w, 0) : 0;
 
           if (learnerTaskGrades.length > 0) {
               resultHtml += `<h3>Learner Tasks Average: <span id="learnerTasksAvg">${avgLearnerTasks.toFixed(3)}%</span></h3>`;
