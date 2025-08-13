@@ -81,6 +81,34 @@ gtag('config', 'G-LNMT1VXJW1');
       color: var(--accent-color);
   }
 
+  /* Typing animation styles */
+  #typing-text {
+      overflow: hidden; /* Ensures the text is hidden until typed */
+      white-space: nowrap; /* Prevents text from wrapping */
+      border-right: .15em solid var(--accent-color); /* The blinking caret */
+      font-family: 'monospace', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Monospace for typing effect */
+      width: 0; /* Start with 0 width */
+      display: inline-block; /* Allows width animation */
+      vertical-align: middle; /* Align with icon */
+  }
+
+  #typing-text.typewriter {
+      animation:
+          typing 3.5s steps(17, end) forwards, /* 17 steps for "Grade Calculator" */
+          blink-caret .75s step-end infinite;
+  }
+
+  @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+  }
+
+  @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: var(--accent-color); }
+  }
+  /* End typing animation styles */
+
   .nav-links {
       display: flex;
       list-style: none;
@@ -249,6 +277,11 @@ function toggleMenu() {
     const navLinks = document.querySelector('.nav-links');
     navLinks.classList.toggle('active');
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const typingText = document.getElementById('typing-text');
+    typingText.classList.add('typewriter');
+});
 </script>
 </head>
 <body>
@@ -256,7 +289,7 @@ function toggleMenu() {
       <div class="nav-container">
           <a href="index.html" class="logo">
               <i class="fas fa-calculator"></i>
-              Grade Calculator
+              <span id="typing-text">Grade Calculator</span>
           </a>
           <button class="mobile-menu-btn" onclick="toggleMenu()">
               <i class="fas fa-bars"></i>
@@ -292,26 +325,19 @@ function toggleMenu() {
               <li>GPA Calculator</li>
           </ul>
 
-          <h2>3. Use License</h2>
-          <p>Permission is granted to temporarily use the Grade Calculator for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
-          <ul>
-              <li>Modify or copy the materials</li>
-              <li>Use the materials for any commercial purpose or for any public display (commercial or non-commercial)</li>
-              <li>Attempt to decompile or reverse engineer any software contained on the website</li>
-              <li>Remove any copyright or other proprietary notations from the materials</li>
-          </ul>
+          <!-- Removed section #3 (Use License) as requested -->
 
-          <h2>4. Disclaimer</h2>
+          <h2>3. Disclaimer</h2>
           <p>The information and calculations provided by this Service are for educational purposes only. While we strive for accuracy, we make no warranties or representations about the accuracy, reliability, completeness, or timeliness of the calculations or results.</p>
           <p>Users should verify all calculations independently and consult with their educational institutions for official grade calculations and academic policies.</p>
 
-          <h2>5. Limitations</h2>
+          <h2>4. Limitations</h2>
           <p>In no event shall Grade Calculator or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Grade Calculator's website, even if Grade Calculator or a Grade Calculator authorized representative has been notified orally or in writing of the possibility of such damage. Because some jurisdictions do not allow limitations on implied warranties, or limitations of liability for consequential or incidental damages, these limitations may not apply to you.</p>
 
-          <h2>6. Privacy Policy</h2>
+          <h2>5. Privacy Policy</h2>
           <p>Your privacy is important to us. Please review our <a href="privacy-policy.html">Privacy Policy</a>, which also governs your use of the Service, to understand our practices.</p>
 
-          <h2>7. User Conduct</h2>
+          <h2>6. User Conduct</h2>
           <p>You agree to use the Service only for lawful purposes and in a way that does not infringe the rights of, restrict, or inhibit anyone else's use and enjoyment of the Service. Prohibited behavior includes:</p>
           <ul>
               <li>Harassing or causing distress or inconvenience to any other user</li>
@@ -320,28 +346,32 @@ function toggleMenu() {
               <li>Attempting to gain unauthorized access to the Service or its related systems</li>
           </ul>
 
-          <h2>8. Modifications to Service</h2>
+          <h2>7. Modifications to Service</h2>
           <p>Grade Calculator reserves the right to modify or discontinue, temporarily or permanently, the Service (or any part thereof) with or without notice. You agree that Grade Calculator shall not be liable to you or to any third party for any modification, suspension, or discontinuance of the Service.</p>
 
-          <h2>9. Termination</h2>
+          <h2>8. Termination</h2>
           <p>We may terminate or suspend your access immediately, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms.</p>
 
-          <h2>10. Featured Content Policy</h2>
+          <h2>9. Featured Content Policy</h2>
           <p>Grade Calculator may feature content from clubs, organizations, or individuals within the school community. By submitting content for potential featuring:</p>
+          <!-- Replaced bulleted content with new submission guidelines from pasted text -->
           <ul>
-              <li>You grant us permission to display your content on our platform</li>
-              <li>You confirm that you have the right to submit the content</li>
-              <li>You agree that the content is appropriate for an educational environment</li>
-              <li>We reserve the right to reject or remove any content at our discretion</li>
+              <li><strong>Right to Refuse or Modify Submissions:</strong> We reserve the right to refuse, edit, or remove any submission at our discretion for any reason, including but not limited to inappropriate content, spam, or content that doesn't align with the purpose of this platform.</li>
+              <li><strong>Relevance to the Community:</strong> Submissions must be relevant to students, school-related events, or clubs. Off-topic content may not be accepted.</li>
+              <li><strong>Accuracy and Truthfulness:</strong> By submitting, you confirm that all information is accurate to the best of your knowledge and that you have permission to share it publicly.</li>
+              <li><strong>No Promotional or Commercial Advertising:</strong> This platform is not intended for commercial promotion. Business-related ads or marketing will not be accepted unless approved under special circumstances.</li>
+              <li><strong>Respectful Content:</strong> Submissions must not include offensive, discriminatory, or otherwise inappropriate material.</li>
+              <li><strong>No Guarantee of Posting Timeframe:</strong> We do our best to post approved submissions in a timely manner, but cannot guarantee a specific time for when your content will be visible.</li>
+              <li><strong>Edits for Clarity or Formatting:</strong> We may edit your submission for clarity, grammar, or formatting, but will not alter the core message without your consent.</li>
+              <li><strong>Submission Does Not Guarantee Publication:</strong> All submissions are subject to review and approval. Publication is not guaranteed.</li>
           </ul>
 
-          <h2>11. Governing Law</h2>
-          <p>These terms and conditions are governed by and construed in accordance with the laws of the jurisdiction in which the Service operates, and you irrevocably submit to the exclusive jurisdiction of the courts in that state or location.</p>
-
-          <h2>12. Changes to Terms</h2>
+          <h2>10. Changes to Terms</h2>
           <p>We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material, we will try to provide at least 30 days notice prior to any new terms taking effect.</p>
 
-          <h2>13. Contact Information</h2>
+          <!-- Removed section #11 (Governing Law) as requested and renumbered remaining sections -->
+
+          <h2>11. Contact Information</h2>
           <p>If you have any questions about these Terms of Service, please contact us at: as31819</p>
       </div>
   </div>
