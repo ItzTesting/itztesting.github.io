@@ -32,6 +32,7 @@ gtag('config', 'G-LNMT1VXJW1');
       --card-bg: #333333;
       --nav-bg: #222222;
       --highlight-bg: rgba(76, 175, 80, 0.15);
+      --primary-color: #64B5F6; /* Added primary color for link styling */
   }
 
   * {
@@ -1237,13 +1238,12 @@ function clearFields() {
   <div id="featureModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="featureModalTitle">
       <div class="modal-container">
           <div class="modal-header">
-              <h4 id="featureModalTitle" style="font-size: 1.3rem;">Want to Be Featured Here?</h4>
+              <h3 id="featureModalTitle">Want to Be Featured Here?</h3>
           </div>
           <div class="modal-body">
               <p>If you're part of a club, organization, or have something valuable to share with the school community, this space is for you. Submit your info - events, updates, sign-ups, or anything else - and we'll display it here for everyone to see.</p>
               <p style="margin-top: 1rem;">Reach out to Advaith S by emailing as31819.</p>
-              <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid var(--border-color); opacity: 0.3;">
-              <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">Terms of Service: <a href="terms-of-service.html" style="color: var(--link-color);">Terms of Service</a> By emailing to request it, you accept those Terms & Conditions</p>
+              <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">If you want your content to be featured here, see the <a href="popup-info.html" style="color: var(--primary-color); text-decoration: none;">Popup Info page</a> for more information.</p>
               <button id="featureModalGotIt" class="btn-group" style="margin-top: 1.5rem; width: 100%;">Got it!</button>
           </div>
       </div>
