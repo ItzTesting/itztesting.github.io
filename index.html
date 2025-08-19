@@ -602,6 +602,13 @@ gtag('config', 'G-LNMT1VXJW1');
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+  // Check for consent first, before showing other modals
+  const consentPopup = document.getElementById('consentPopup');
+  if (localStorage.getItem('consentAccepted') !== 'true') {
+    consentPopup.classList.remove('hidden');
+    return; // Don't show other modals until consent is given
+  }
+
   // Initialize the page
   toggleFinalField();
   
@@ -686,7 +693,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // Consent Popup Functionality
-  const consentPopup = document.getElementById('consentPopup');
   const termsCheckbox = document.getElementById('termsCheckbox');
   const privacyCheckbox = document.getElementById('privacyCheckbox');
   const acceptButton = document.getElementById('acceptButton');
@@ -702,6 +708,15 @@ document.addEventListener('DOMContentLoaded', function() {
   acceptButton.addEventListener('click', function() {
       localStorage.setItem('consentAccepted', 'true');
       consentPopup.classList.add('hidden');
+      
+      // After consent is given, show welcome modal if not already shown
+      if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
+          showModal(welcomeModalBackdrop);
+      } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+          showModal(featureModalBackdrop);
+      } else {
+          checkAndStartAnimation();
+      }
   });
 
   // Decline button functionality
@@ -1218,7 +1233,7 @@ function clearFields() {
       </div>
   </nav>
 
-  <div id="consentPopup" class="consent-popup hidden">
+  <div id="consentPopup" class="consent-popup">
       <div class="consent-container">
           <h3>Terms and Privacy Consent</h3>
           <p>Before accessing this website, please review and accept our terms and privacy policy.</p>
