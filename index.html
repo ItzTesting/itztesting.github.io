@@ -696,33 +696,45 @@ document.addEventListener('DOMContentLoaded', function() {
   const termsCheckbox = document.getElementById('termsCheckbox');
   const privacyCheckbox = document.getElementById('privacyCheckbox');
   const acceptButton = document.getElementById('acceptButton');
+  const consentPopup = document.getElementById('consentPopup');
 
   function validateCheckboxes() {
-      acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
+      if (termsCheckbox && privacyCheckbox && acceptButton) {
+          acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
+      }
   }
 
-  termsCheckbox.addEventListener('change', validateCheckboxes);
-  privacyCheckbox.addEventListener('change', validateCheckboxes);
+  if (termsCheckbox && privacyCheckbox) {
+      termsCheckbox.addEventListener('change', validateCheckboxes);
+      privacyCheckbox.addEventListener('change', validateCheckboxes);
+  }
 
   // Accept button functionality
-  acceptButton.addEventListener('click', function() {
-      localStorage.setItem('consentAccepted', 'true');
-      consentPopup.classList.add('hidden');
-      
-      // After consent is given, show welcome modal if not already shown
-      if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
-          showModal(welcomeModalBackdrop);
-      } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
-          showModal(featureModalBackdrop);
-      } else {
-          checkAndStartAnimation();
-      }
-  });
+  if (acceptButton) {
+      acceptButton.addEventListener('click', function() {
+          localStorage.setItem('consentAccepted', 'true');
+          if (consentPopup) {
+              consentPopup.classList.add('hidden');
+          }
+          
+          // After consent is given, show welcome modal if not already shown
+          if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
+              showModal(welcomeModalBackdrop);
+          } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+              showModal(featureModalBackdrop);
+          } else {
+              checkAndStartAnimation();
+          }
+      });
+  }
 
   // Decline button functionality
-  document.getElementById('declineButton').addEventListener('click', function() {
-      window.location.href = 'https://example.com/rejected.html';
-  });
+  const declineButton = document.getElementById('declineButton');
+  if (declineButton) {
+      declineButton.addEventListener('click', function() {
+          window.location.href = 'https://example.com/rejected.html';
+      });
+  }
 });
 
 function toggleMenu() {
