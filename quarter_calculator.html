@@ -16,7 +16,7 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quarter Grade Calculator</title>
+<title>Quarter Calculator</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
   :root {
@@ -434,6 +434,106 @@
           display: block; /* Show hamburger button on mobile */
       }
   }
+
+  /* Added consent popup styling */
+  .consent-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+  }
+
+  .consent-popup.hidden {
+      display: none;
+  }
+
+  .consent-container {
+      background-color: var(--card-bg);
+      border-radius: 10px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .consent-container h3 {
+      color: var(--text-color);
+      margin-bottom: 1rem;
+      text-align: center;
+  }
+
+  .consent-container p {
+      color: var(--text-secondary);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+  }
+
+  .consent-checkboxes {
+      margin: 1.5rem 0;
+  }
+
+  .consent-checkbox {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+  }
+
+  .consent-checkbox input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+  }
+
+  .consent-checkbox label {
+      color: var(--text-color);
+      margin-bottom: 0;
+      cursor: pointer;
+  }
+
+  .consent-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+  }
+
+  .consent-btn {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+  }
+
+  .consent-accept {
+      background-color: var(--accent-color);
+      color: white;
+  }
+
+  .consent-accept:hover:not(:disabled) {
+      background-color: var(--accent-hover);
+  }
+
+  .consent-accept:disabled {
+      background-color: #666;
+      cursor: not-allowed;
+      opacity: 0.6;
+  }
+
+  .consent-decline {
+      background-color: #f44336;
+      color: white;
+  }
+
+  .consent-decline:hover {
+      background-color: #d32f2f;
+  }
 </style>
 <script>
   let categoryCounters = {
@@ -472,6 +572,34 @@
       toggleGroupView(false); // Explicitly set group view OFF on page load
       toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
       toggleNeededGradeInputs(); // Initial state for needed grades section
+
+      // Check if consent has already been given
+      if (!localStorage.getItem('consentAccepted')) {
+          document.getElementById('consentPopup').classList.remove('hidden');
+      }
+
+      // Checkbox validation
+      const termsCheckbox = document.getElementById('termsCheckbox');
+      const privacyCheckbox = document.getElementById('privacyCheckbox');
+      const acceptButton = document.getElementById('acceptButton');
+
+      function validateCheckboxes() {
+          acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
+      }
+
+      termsCheckbox.addEventListener('change', validateCheckboxes);
+      privacyCheckbox.addEventListener('change', validateCheckboxes);
+
+      // Accept button functionality
+      acceptButton.addEventListener('click', function() {
+          localStorage.setItem('consentAccepted', 'true');
+          document.getElementById('consentPopup').classList.add('hidden');
+      });
+
+      // Decline button functionality
+      document.getElementById('declineButton').addEventListener('click', function() {
+          window.location.href = 'https://example.com/rejected.html';
+      });
   });
 
   function toggleMenu() {
@@ -1176,6 +1304,30 @@
 </script>
 </head>
 <body>
+  <!-- Added consent popup HTML -->
+  <div id="consentPopup" class="consent-popup hidden">
+      <div class="consent-container">
+          <h3>Terms and Privacy Consent</h3>
+          <p>Before accessing this website, please review and accept our terms and privacy policy.</p>
+          
+          <div class="consent-checkboxes">
+              <div class="consent-checkbox">
+                  <input type="checkbox" id="termsCheckbox">
+                  <label for="termsCheckbox">I have read and agree to the <a href="terms-of-service.html" target="_blank" style="color: var(--link-color);">Terms of Service</a></label>
+              </div>
+              <div class="consent-checkbox">
+                  <input type="checkbox" id="privacyCheckbox">
+                  <label for="privacyCheckbox">I have read and agree to the <a href="privacy-policy.html" target="_blank" style="color: var(--link-color);">Privacy Policy</a></label>
+              </div>
+          </div>
+          
+          <div class="consent-buttons">
+              <button id="acceptButton" class="consent-btn consent-accept" disabled>Accept and Continue</button>
+              <button id="declineButton" class="consent-btn consent-decline">Decline</button>
+          </div>
+      </div>
+  </div>
+
 <nav class="navbar">
   <div class="nav-container">
       <a href="index.html" class="logo">
