@@ -500,7 +500,7 @@ gtag('config', 'G-LNMT1VXJW1');
       font-size: 1.1rem;
   }
 
-  /* Consent Popup Styling */
+  /* Replaced broken consent popup styling with working version from terms of service page */
   .consent-popup {
       position: fixed;
       top: 0;
@@ -602,55 +602,51 @@ gtag('config', 'G-LNMT1VXJW1');
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Check for consent first, before showing other modals
-  const consentPopup = document.getElementById('consentPopup');
-  if (localStorage.getItem('consentAccepted') !== 'true') {
-    consentPopup.classList.remove('hidden');
-    return; // Don't show other modals until consent is given
-  }
+    // Check if consent has already been given
+    if (!localStorage.getItem('consentAccepted')) {
+        document.getElementById('consentPopup').classList.remove('hidden');
+    } else {
+        // If consent already given, proceed with normal page functionality
+        if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
+            showModal(welcomeModalBackdrop);
+        } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+            showModal(featureModalBackdrop);
+        } else {
+            checkAndStartAnimation();
+        }
+    }
 
-  // Consent Popup Functionality
-  const termsCheckbox = document.getElementById('termsCheckbox');
-  const privacyCheckbox = document.getElementById('privacyCheckbox');
-  const acceptButton = document.getElementById('acceptButton');
+    // Checkbox validation
+    const termsCheckbox = document.getElementById('termsCheckbox');
+    const privacyCheckbox = document.getElementById('privacyCheckbox');
+    const acceptButton = document.getElementById('acceptButton');
 
-  function validateCheckboxes() {
-      if (termsCheckbox && privacyCheckbox && acceptButton) {
-          acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
-      }
-  }
+    function validateCheckboxes() {
+        acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
+    }
 
-  if (termsCheckbox && privacyCheckbox) {
-      termsCheckbox.addEventListener('change', validateCheckboxes);
-      privacyCheckbox.addEventListener('change', validateCheckboxes);
-  }
+    termsCheckbox.addEventListener('change', validateCheckboxes);
+    privacyCheckbox.addEventListener('change', validateCheckboxes);
 
-  // Accept button functionality
-  if (acceptButton) {
-      acceptButton.addEventListener('click', function() {
-          localStorage.setItem('consentAccepted', 'true');
-          if (consentPopup) {
-              consentPopup.classList.add('hidden');
-          }
-          
-          // After consent is given, show welcome modal if not already shown
-          if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
-              showModal(welcomeModalBackdrop);
-          } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
-              showModal(featureModalBackdrop);
-          } else {
-              checkAndStartAnimation();
-          }
-      });
-  }
+    // Accept button functionality
+    acceptButton.addEventListener('click', function() {
+        localStorage.setItem('consentAccepted', 'true');
+        document.getElementById('consentPopup').classList.add('hidden');
+        
+        // After consent is given, show welcome modal if not already shown
+        if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
+            showModal(welcomeModalBackdrop);
+        } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+            showModal(featureModalBackdrop);
+        } else {
+            checkAndStartAnimation();
+        }
+    });
 
-  // Decline button functionality
-  const declineButton = document.getElementById('declineButton');
-  if (declineButton) {
-      declineButton.addEventListener('click', function() {
-          window.location.href = 'https://example.com/rejected.html';
-      });
-  }
+    // Decline button functionality
+    document.getElementById('declineButton').addEventListener('click', function() {
+        window.location.href = 'https://example.com/rejected.html';
+    });
 
   // Only show other modals if consent has been given
   if (localStorage.getItem('consentAccepted') === 'true') {
@@ -1213,7 +1209,7 @@ function updateAPFinalField() {
 }
 
 function clearFields() {
-  document.querySelectorAll("input[type='number']").forEach(input => input.value = "";
+  document.querySelectorAll("input[type='number']").forEach(input => input.value = "");
   document.getElementById("desiredGrade").value = "";
   document.getElementById("classType").value = "CP";
   document.getElementById("apHasFinal").checked = false;
@@ -1247,28 +1243,29 @@ function clearFields() {
       </div>
   </nav>
 
-  <div id="consentPopup" class="consent-popup">
-      <div class="consent-container">
-          <h3>Terms and Privacy Consent</h3>
-          <p>Before accessing this website, please review and accept our terms and privacy policy.</p>
-          
-          <div class="consent-checkboxes">
-              <div class="consent-checkbox">
-                  <input type="checkbox" id="termsCheckbox">
-                  <label for="termsCheckbox">I have read and agree to the <a href="terms-of-service.html" target="_blank" style="color: var(--link-color);">Terms of Service</a></label>
-              </div>
-              <div class="consent-checkbox">
-                  <input type="checkbox" id="privacyCheckbox">
-                  <label for="privacyCheckbox">I have read and agree to the <a href="privacy-policy.html" target="_blank" style="color: var(--link-color);">Privacy Policy</a></label>
-              </div>
-          </div>
-          
-          <div class="consent-buttons">
-              <button id="acceptButton" class="consent-btn consent-accept" disabled>Accept and Continue</button>
-              <button id="declineButton" class="consent-btn consent-decline">Decline</button>
-          </div>
-      </div>
-  </div>
+  <!-- Replaced broken consent popup HTML with working version from terms of service page -->
+<div id="consentPopup" class="consent-popup hidden">
+    <div class="consent-container">
+        <h3>Terms and Privacy Consent</h3>
+        <p>Before accessing this website, please review and accept our terms and privacy policy.</p>
+        
+        <div class="consent-checkboxes">
+            <div class="consent-checkbox">
+                <input type="checkbox" id="termsCheckbox">
+                <label for="termsCheckbox">I have read and agree to the <a href="terms-of-service.html" target="_blank" style="color: var(--link-color);">Terms of Service</a></label>
+            </div>
+            <div class="consent-checkbox">
+                <input type="checkbox" id="privacyCheckbox">
+                <label for="privacyCheckbox">I have read and agree to the <a href="privacy-policy.html" target="_blank" style="color: var(--link-color);">Privacy Policy</a></label>
+            </div>
+        </div>
+        
+        <div class="consent-buttons">
+            <button id="acceptButton" class="consent-btn consent-accept" disabled>Accept and Continue</button>
+            <button id="declineButton" class="consent-btn consent-decline">Decline</button>
+        </div>
+    </div>
+</div>
 
   <div class="container">
       <div class="card">
