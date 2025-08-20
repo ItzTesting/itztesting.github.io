@@ -601,54 +601,8 @@ gtag('config', 'G-LNMT1VXJW1');
   }
 </style>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check if consent has already been given
-        if (!localStorage.getItem('consentAccepted')) {
-            document.getElementById('consentPopup').classList.remove('hidden');
-        }
-
-        // Checkbox validation
-        const termsCheckbox = document.getElementById('termsCheckbox');
-        const privacyCheckbox = document.getElementById('privacyCheckbox');
-        const acceptButton = document.getElementById('acceptButton');
-
-        function validateCheckboxes() {
-            acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
-        }
-
-        termsCheckbox.addEventListener('change', validateCheckboxes);
-        privacyCheckbox.addEventListener('change', validateCheckboxes);
-
-        // Accept button functionality
-        acceptButton.addEventListener('click', function() {
-            localStorage.setItem('consentAccepted', 'true');
-            document.getElementById('consentPopup').classList.add('hidden');
-            
-            // After consent is given, show welcome modal if not already shown
-            if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
-                showModal(welcomeModalBackdrop);
-            } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
-                showModal(featureModalBackdrop);
-            } else {
-                checkAndStartAnimation();
-            }
-        });
-
-        // Decline button functionality
-        document.getElementById('declineButton').addEventListener('click', function() {
-            window.location.href = 'https://example.com/rejected.html';
-        });
-
-    // Only show other modals if consent has been given
-    if (localStorage.getItem('consentAccepted') === 'true') {
-    // Initialize the page
-    toggleFinalField();
-    
-    // Add event listeners to buttons
-    document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
-    document.getElementById('clearBtn').addEventListener('click', clearFields);
-
-    // Modal Logic
+document.addEventListener('DOMContentLoaded', function() {
+    // Modal Logic - needs to be available for consent popup to trigger
     const welcomeModalBackdrop = document.getElementById('welcomeModalBackdrop');
     const welcomeModalGotItButton = document.getElementById('welcomeModalGotIt');
     const featureModalBackdrop = document.getElementById('featureModalBackdrop');
@@ -665,14 +619,6 @@ gtag('config', 'G-LNMT1VXJW1');
         }
     }
 
-    function startTypingAnimation() {
-        const typingTextElement = document.getElementById('typing-text');
-        // Only add the class if it hasn't been added already
-        if (!typingTextElement.classList.contains('typewriter')) {
-            typingTextElement.classList.add('typewriter');
-        }
-    }
-
     function checkAndStartAnimation() {
         const welcomeDismissed = sessionStorage.getItem('shownWelcomePopup') === 'true';
         const featureDismissed = sessionStorage.getItem('shownFeaturePopup') === 'true';
@@ -682,22 +628,57 @@ gtag('config', 'G-LNMT1VXJW1');
         }
     }
 
-    // Initial check on page load
-    if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
-        showModal(welcomeModalBackdrop);
-    } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
-        showModal(featureModalBackdrop);
+    // Check if consent has already been given
+    if (!localStorage.getItem('consentAccepted')) {
+        document.getElementById('consentPopup').classList.remove('hidden');
     } else {
-        // Both already dismissed, start animation immediately
-        checkAndStartAnimation();
+        if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
+            showModal(welcomeModalBackdrop);
+        } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+            showModal(featureModalBackdrop);
+        } else {
+            checkAndStartAnimation();
+        }
     }
 
+    // Checkbox validation
+    const termsCheckbox = document.getElementById('termsCheckbox');
+    const privacyCheckbox = document.getElementById('privacyCheckbox');
+    const acceptButton = document.getElementById('acceptButton');
+
+    function validateCheckboxes() {
+        acceptButton.disabled = !(termsCheckbox.checked && privacyCheckbox.checked);
+    }
+
+    termsCheckbox.addEventListener('change', validateCheckboxes);
+    privacyCheckbox.addEventListener('change', validateCheckboxes);
+
+    // Accept button functionality
+    acceptButton.addEventListener('click', function() {
+        localStorage.setItem('consentAccepted', 'true');
+        document.getElementById('consentPopup').classList.add('hidden');
+        
+        if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
+            showModal(welcomeModalBackdrop);
+        } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+            showModal(featureModalBackdrop);
+        } else {
+            checkAndStartAnimation();
+        }
+    });
+
+    // Decline button functionality
+    document.getElementById('declineButton').addEventListener('click', function() {
+        window.location.href = 'https://example.com/rejected.html';
+    });
+
+    // Modal event listeners
     welcomeModalGotItButton.addEventListener('click', function() {
         hideModal(welcomeModalBackdrop, 'shownWelcomePopup');
         if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
             showModal(featureModalBackdrop);
         } else {
-            checkAndStartAnimation(); // Both dismissed now
+            checkAndStartAnimation();
         }
     });
 
@@ -707,23 +688,27 @@ gtag('config', 'G-LNMT1VXJW1');
             if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
                 showModal(featureModalBackdrop);
             } else {
-                checkAndStartAnimation(); // Both dismissed now
+                checkAndStartAnimation();
             }
         }
     });
 
     featureModalGotItButton.addEventListener('click', function() {
         hideModal(featureModalBackdrop, 'shownFeaturePopup');
-        checkAndStartAnimation(); // Feature modal dismissed, check if animation can start
+        checkAndStartAnimation();
     });
 
     featureModalBackdrop.addEventListener('click', function(event) {
         if (event.target === featureModalBackdrop) {
             hideModal(featureModalBackdrop, 'shownFeaturePopup');
-            checkAndStartAnimation(); // Feature modal dismissed, check if animation can start
+            checkAndStartAnimation();
         }
     });
-    }
+
+    // Initialize the page functionality
+    toggleFinalField();
+    document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
+    document.getElementById('clearBtn').addEventListener('click', clearFields);
 });
 
 function toggleMenu() {
