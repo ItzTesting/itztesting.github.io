@@ -627,6 +627,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    function startTypingAnimation() {
+        const typingElement = document.getElementById('typing-text');
+        if (typingElement) {
+            typingElement.classList.add('typewriter');
+        }
+    }
+
     function checkAndStartAnimation() {
         const welcomeDismissed = sessionStorage.getItem('shownWelcomePopup') === 'true';
         const featureDismissed = sessionStorage.getItem('shownFeaturePopup') === 'true';
@@ -645,7 +652,8 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
             showModal(featureModalBackdrop);
         } else {
-            checkAndStartAnimation();
+            // Start typing animation immediately if no popups need to show
+            setTimeout(startTypingAnimation, 100);
         }
     }
 
