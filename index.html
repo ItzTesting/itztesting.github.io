@@ -299,6 +299,13 @@ gtag('config', 'G-LNMT1VXJW1');
   }
 
   @media (max-width: 768px) {
+      /* Fix typing animation on mobile */
+      #typing-text {
+          width: auto !important; /* Override animation width on mobile */
+          animation: none !important; /* Disable typing animation on mobile */
+          border-right: none !important; /* Remove caret on mobile */
+      }
+      
       .nav-links {
           display: none;
           position: absolute;
