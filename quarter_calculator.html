@@ -696,7 +696,6 @@
           typeSelect.value = "Learner Tasks"; // Default type
           typeSelect.onchange = function() {
               toggleCustomWeightInput(assignmentRow, typeSelect.value);
-              calculateQuarterGrade(); // Recalculate when type changes
           };
           typeInputGroup.appendChild(typeLabel);
           typeInputGroup.appendChild(typeSelect);
@@ -747,7 +746,6 @@
       removeButton.onclick = function() {
           assignmentRow.remove();
           updateAssignmentNumbers(category);
-          calculateQuarterGrade();
       };
       assignmentRow.appendChild(removeButton);
 
