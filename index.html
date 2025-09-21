@@ -710,8 +710,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     featureModalGotItButton.addEventListener('click', function() {
-        hideModal(featureModalBackdrop, 'shownFeaturePopup');
-        checkAndStartAnimation();
+        featureModalGotItButton.disabled = true;
+        featureModalGotItButton.textContent = 'Please wait...';
+        
+        setTimeout(function() {
+            hideModal(featureModalBackdrop, 'shownFeaturePopup');
+            checkAndStartAnimation();
+        }, 1500);
     });
 
     featureModalBackdrop.addEventListener('click', function(event) {
