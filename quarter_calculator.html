@@ -1478,18 +1478,11 @@
       return;
     }
 
-    let output = '<h3>Detected assignments:</h3>';
-    output += '<pre style="background-color: var(--input-bg); padding: 1rem; border-radius: 5px; overflow-x: auto;">';
-    output += `${"Category".padEnd(15)} ${"Earned".padStart(16)}  /  ${"Possible".padStart(16)}\n`;
-    output += "-".repeat(56) + "\n";
-
-    for (const a of assignments) {
-      output += `${a.category.padEnd(15)} ${fmtFull(a.earned).padStart(16)}  /  ${fmtFull(a.possible).padStart(16)}\n`;
-    }
+    let output = '<pre style="background-color: var(--input-bg); padding: 1rem; border-radius: 5px; overflow-x: auto;">';
 
     // Points-based totals
     const { e, p, pct } = summarize(assignments);
-    output += '\n<strong>Points-based total:</strong>\n';
+    output += '<strong>Points-based total:</strong>\n';
     output += `  Earned:   ${fmtFull(e)}\n`;
     output += `  Possible: ${fmtFull(p)}\n`;
     output += `  Percent (full precision): ${fmtFull(pct * 100)}%\n`;
@@ -1618,6 +1611,35 @@
 </nav>
 
 <div class="container">
+  <!-- Moved PowerSchool Parser card to top, renamed from "PowerSchool Document Parser" to "PowerSchool Parser" -->
+  <div class="card">
+      <h2>PowerSchool Parser</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+          Paste text from your PowerSchool gradebook to automatically calculate your grades.
+      </p>
+
+      <div class="form-group">
+          <label for="powerschoolInput">Paste PowerSchool Text Here:</label>
+          <textarea 
+              id="powerschoolInput" 
+              rows="10" 
+              style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 0.75rem; width: 100%; font-size: 1rem; font-family: monospace; resize: vertical;"
+              placeholder="Paste your PowerSchool gradebook rows here..."></textarea>
+      </div>
+
+      <div class="btn-group">
+          <button id="parsePowerschoolBtn">
+              <i class="fas fa-file-import"></i> Parse and Calculate
+          </button>
+      </div>
+
+      <div class="result-section">
+          <div id="powerschoolOutput">
+              <!-- Parser output will be displayed here -->
+          </div>
+      </div>
+  </div>
+
   <div class="card">
       <h2>Quarter Grade Calculator</h2>
       <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
@@ -1767,35 +1789,6 @@
       <div class="result-section">
           <div id="neededGradesResults">
               <!-- Needed grades results will be displayed here -->
-          </div>
-      </div>
-  </div>
-
-  <!-- New Card for PowerSchool Document Parser -->
-  <div class="card">
-      <h2>PowerSchool Document Parser</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-          Paste text from your PowerSchool gradebook to automatically calculate your grades.
-      </p>
-
-      <div class="form-group">
-          <label for="powerschoolInput">Paste PowerSchool Text Here:</label>
-          <textarea 
-              id="powerschoolInput" 
-              rows="10" 
-              style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 0.75rem; width: 100%; font-size: 1rem; font-family: monospace; resize: vertical;"
-              placeholder="Paste your PowerSchool gradebook rows here..."></textarea>
-      </div>
-
-      <div class="btn-group">
-          <button id="parsePowerschoolBtn">
-              <i class="fas fa-file-import"></i> Parse and Calculate
-          </button>
-      </div>
-
-      <div class="result-section">
-          <div id="powerschoolOutput">
-              <!-- Parser output will be displayed here -->
           </div>
       </div>
   </div>
