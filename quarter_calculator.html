@@ -1465,42 +1465,29 @@
   function processPowerSchoolText() {
     const inputText = document.getElementById('powerschoolInput').value;
     const outputContainer = document.getElementById('powerschoolOutput');
+    const statusContainer = document.getElementById('powerschoolStatus');
+    
+    statusContainer.innerHTML = '';
     
     if (!inputText.trim()) {
-      outputContainer.innerHTML = '<p style="color: #f44336;">Please paste some text to parse.</p>';
+      statusContainer.innerHTML = '<p style="color: #f44336;">Please paste some text to parse.</p>';
       return;
     }
 
     const assignments = parseTextBlock(inputText);
 
     if (!assignments.length) {
-      outputContainer.innerHTML = '<p style="color: #f44336;">No valid scores found. Tip: Select only the rows (not the page title or footer) before copying.</p>';
+      statusContainer.innerHTML = '<p style="color: #f44336;">No valid scores found.</p>';
       return;
     }
 
-    let output = '<pre style="background-color: var(--input-bg); padding: 1rem; border-radius: 5px; overflow-x: auto;">';
-
-    // Points-based totals
-    const { e, p, pct } = summarize(assignments);
-    output += '<strong>Points-based total:</strong>\n';
-    output += `  Earned:   ${fmtFull(e)}\n`;
-    output += `  Possible: ${fmtFull(p)}\n`;
-    output += `  Percent (full precision): ${fmtFull(pct * 100)}%\n`;
-    output += `  Percent (rounded at end to 2 decimals): ${(pct * 100).toFixed(2)}%\n`;
-
-    // Weighted (Assessment=80%, Learner Tasks=20%)
-    const { total, details } = summarizeWeighted(assignments);
-    output += '\n<strong>Weighted grade (Assessment=80%, Learner Tasks=20%):</strong>\n';
-    for (const { cat, avg, w } of details) {
-      output += `  ${cat}: avg=${fmtFull(avg * 100)}%  weight=${w}\n`;
-    }
-    output += `Weighted overall (full precision): ${fmtFull(total * 100)}%\n`;
-    output += `Weighted overall (rounded at end to 2 decimals): ${(total * 100).toFixed(2)}%\n`;
-    output += '</pre>';
-
-    outputContainer.innerHTML = output;
-
     autofillAssignmentsFromParsed(assignments);
+    
+    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
+    
+    setTimeout(() => {
+      statusContainer.innerHTML = '';
+    }, 3000);
   }
 
   function autofillAssignmentsFromParsed(assignments) {
@@ -1612,32 +1599,29 @@
 
 <div class="container">
   <!-- Moved PowerSchool Parser card to top, renamed from "PowerSchool Document Parser" to "PowerSchool Parser" -->
-  <div class="card">
-      <h2>PowerSchool Parser</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-          Paste text from your PowerSchool gradebook to automatically calculate your grades.
+  <div class="card" style="padding: 1rem; margin: 1rem 0;">
+      <h2 style="font-size: 1.3rem; margin-bottom: 0.75rem;">PowerSchool Parser</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 0.75rem; text-align: center; font-size: 0.9rem;">
+          Paste text from your PowerSchool gradebook to automatically fill in assignments.
       </p>
 
-      <div class="form-group">
-          <label for="powerschoolInput">Paste PowerSchool Text Here:</label>
+      <div class="form-group" style="margin-bottom: 0.75rem;">
           <textarea 
               id="powerschoolInput" 
-              rows="10" 
-              style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 0.75rem; width: 100%; font-size: 1rem; font-family: monospace; resize: vertical;"
-              placeholder="Paste your PowerSchool gradebook rows here..."></textarea>
+              rows="4" 
+              style="background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 5px; padding: 0.5rem; width: 100%; font-size: 0.9rem; font-family: monospace; resize: vertical;"
+              placeholder="Paste PowerSchool text here..."></textarea>
       </div>
 
-      <div class="btn-group">
-          <button id="parsePowerschoolBtn">
-              <i class="fas fa-file-import"></i> Parse and Calculate
+      <div class="btn-group" style="margin: 0;">
+          <button id="parsePowerschoolBtn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+              <i class="fas fa-file-import"></i> Parse and Fill
           </button>
       </div>
 
-      <div class="result-section">
-          <div id="powerschoolOutput">
-              <!-- Parser output will be displayed here -->
-          </div>
-      </div>
+      <!-- Hidden output display, will show brief success message instead -->
+      <div id="powerschoolOutput" style="display: none;"></div>
+      <div id="powerschoolStatus" style="margin-top: 0.5rem; text-align: center; font-size: 0.9rem;"></div>
   </div>
 
   <div class="card">
