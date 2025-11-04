@@ -534,63 +534,6 @@
   .consent-decline:hover {
       background-color: #d32f2f;
   }
-
-  /* Added styles for condensed assignment view */
-  .condensed-assignments {
-      background-color: var(--secondary-bg);
-      border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-  }
-
-  .condensed-assignment-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem;
-      border-bottom: 1px solid var(--border-color);
-  }
-
-  .condensed-assignment-item:last-child {
-      border-bottom: none;
-  }
-
-  .condensed-assignment-category {
-      font-weight: 500;
-      color: var(--text-color);
-  }
-
-  .condensed-assignment-score {
-      color: var(--accent-color);
-      font-weight: 600;
-  }
-
-  .view-toggle-container {
-      display: flex;
-      justify-content: center;
-      margin: 1rem 0;
-  }
-
-  .view-toggle-btn {
-      background-color: var(--secondary-bg);
-      color: var(--text-color);
-      border: 1px solid var(--border-color);
-      padding: 0.5rem 1rem;
-      font-size: 0.9rem;
-      min-width: auto;
-  }
-
-  .view-toggle-btn:hover {
-      background-color: var(--input-bg);
-  }
-
-  .assignments-view-container {
-      display: block;
-  }
-
-  .assignments-view-container.hidden {
-      display: none;
-  }
 </style>
 <script>
   let categoryCounters = {
@@ -602,8 +545,6 @@
 
   // Global variable to track the current view state
   let currentViewIsGrouped = false; 
-
-  let isCondensedView = false;
 
   document.addEventListener('DOMContentLoaded', function() {
       // Add event listeners for Quarter Calculator
@@ -624,16 +565,6 @@
       // Add event listeners for Needed Grades section
       document.getElementById('solveForType').addEventListener('change', toggleNeededGradeInputs);
       document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFutureGrades);
-
-      const toggleViewBtn = document.getElementById('toggleAssignmentViewBtn');
-      if (toggleViewBtn) {
-        toggleViewBtn.addEventListener('click', toggleAssignmentView);
-      }
-      // Added listener for the second toggle button as well
-      const toggleViewBtn2 = document.getElementById('toggleAssignmentViewBtn2');
-      if (toggleViewBtn2) {
-        toggleViewBtn2.addEventListener('click', toggleAssignmentView);
-      }
 
       // Initial visibility check for assignment names and group view
       document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
@@ -682,30 +613,14 @@
       navLinks.classList.toggle('active');
   }
 
+  // Modified toggleGroupView to accept a boolean for explicit control
   function toggleGroupView(shouldBeGroupView) {
-      currentViewIsGrouped = shouldBeGroupView;
+      currentViewIsGrouped = shouldBeGroupView; // Update the global state
       document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
-      
-      if (shouldBeGroupView) {
-          // If group view is enabled, always show expanded grouped view and hide single assignment view
-          isCondensedView = false;
-          document.getElementById('condensedAssignmentsView').classList.add('hidden');
-          document.getElementById('singleAssignmentCategory').classList.add('hidden');
-          document.getElementById('overallWeightsSection').style.display = 'none';
-      } else {
-          // If group view is disabled, respect the current condensed/expanded state
-          document.getElementById('overallWeightsSection').style.display = 'flex';
-          
-          if (isCondensedView) {
-              document.getElementById('condensedAssignmentsView').classList.remove('hidden');
-              document.getElementById('singleAssignmentCategory').classList.add('hidden');
-          } else {
-              document.getElementById('condensedAssignmentsView').classList.add('hidden');
-              document.getElementById('singleAssignmentCategory').classList.remove('hidden');
-          }
-      }
+      document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
+      document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
 
-      calculateQuarterGrade();
+      calculateQuarterGrade(); // Recalculate based on new view
   }
 
   function addAssignmentInput(category) {
@@ -837,10 +752,6 @@
       removeButton.onclick = function() {
           assignmentRow.remove();
           updateAssignmentNumbers(category);
-          // After removing an assignment, update the condensed view if it's active
-          if (isCondensedView) {
-            populateCondensedView();
-          }
       };
       assignmentRow.appendChild(removeButton);
 
@@ -1149,11 +1060,6 @@
       }
       
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
-      
-      // Update the condensed view if it's active
-      if (isCondensedView) {
-          populateCondensedView();
-      }
   }
 
   function calculateNeededCategoryAverage(
@@ -1429,13 +1335,6 @@
       // Explicitly set group view OFF after clearing
       document.getElementById('groupViewCheckbox').checked = false;
       toggleGroupView(false); 
-
-      // Clear and reset condensed view state
-      document.getElementById('condensedAssignmentsList').innerHTML = '';
-      isCondensedView = false;
-      document.getElementById('condensedAssignmentsView').classList.add('hidden');
-      document.getElementById('singleAssignmentCategory').classList.remove('hidden');
-      document.getElementById('toggleAssignmentViewBtn').innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
       
       calculateQuarterGrade(); // Recalculate after clearing and setting initial view
   }
@@ -1584,80 +1483,19 @@
 
     autofillAssignmentsFromParsed(assignments);
     
-    statusContainer.innerHTML = '<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>';
+    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
     
     setTimeout(() => {
       statusContainer.innerHTML = '';
     }, 3000);
   }
 
-  function toggleAssignmentView() {
-      // Don't allow toggle if group view is enabled
-      if (currentViewIsGrouped) {
-          return;
-      }
-      
-      isCondensedView = !isCondensedView;
-      const condensedView = document.getElementById('condensedAssignmentsView');
-      const expandedView = document.getElementById('singleAssignmentCategory');
-      const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
-      const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2');
-
-      if (isCondensedView) {
-          // Show ONLY condensed view
-          populateCondensedView();
-          condensedView.classList.remove('hidden');
-          expandedView.classList.add('hidden');
-          toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          if (toggleBtn2) toggleBtn2.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-      } else {
-          // Show ONLY expanded view
-          condensedView.classList.add('hidden');
-          expandedView.classList.remove('hidden');
-          toggleBtn.innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-          if (toggleBtn2) toggleBtn2.innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-      }
-  }
-
-  function populateCondensedView() {
-      const condensedContainer = document.getElementById('condensedAssignmentsList');
-      condensedContainer.innerHTML = '';
-
-      const assignmentRows = document.querySelectorAll('#assignmentsAssignments .class-input-row');
-      
-      if (assignmentRows.length === 0) {
-          condensedContainer.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No assignments added yet.</p>';
-          return;
-      }
-
-      assignmentRows.forEach((row, index) => {
-          const earned = row.querySelector('.assignment-grade-input').value;
-          const possible = row.querySelector('.assignment-possible-input').value;
-          const type = row.querySelector('.assignment-type-select').value;
-
-          const item = document.createElement('div');
-          item.classList.add('condensed-assignment-item');
-
-          const categorySpan = document.createElement('span');
-          categorySpan.classList.add('condensed-assignment-category');
-          categorySpan.textContent = `${type} ${index + 1}`;
-
-          const scoreSpan = document.createElement('span');
-          scoreSpan.classList.add('condensed-assignment-score');
-          scoreSpan.textContent = `${earned || '?'}/${possible || '?'} points`;
-
-          item.appendChild(categorySpan);
-          item.appendChild(scoreSpan);
-          condensedContainer.appendChild(item);
-      });
-  }
-
-
   function autofillAssignmentsFromParsed(assignments) {
     // Clear existing assignments first
     clearQuarterFields();
     
-    // Ensure group view is OFF
+    // Determine if we should use group view or single view
+    // For simplicity, we'll use single assignment view since it's more flexible
     document.getElementById('groupViewCheckbox').checked = false;
     toggleGroupView(false);
     
@@ -1706,23 +1544,6 @@
         }
       }
     });
-    
-    // Populate and switch to condensed view - ONLY condensed view should be visible
-    populateCondensedView();
-    isCondensedView = true;
-    
-    const condensedView = document.getElementById('condensedAssignmentsView');
-    const expandedView = document.getElementById('singleAssignmentCategory');
-    const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
-    const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2');
-    
-    // Show ONLY condensed view, hide expanded view
-    condensedView.classList.remove('hidden');
-    expandedView.classList.add('hidden');
-    
-    // Update button text
-    if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-    if (toggleBtn2) toggleBtn2.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
     
     // Scroll to the top of the page to show the filled assignments
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1884,22 +1705,8 @@
           </div>
       </div>
 
-      <!-- Added condensed assignments view -->
-      <div id="condensedAssignmentsView" class="assignments-view-container hidden">
-          <div class="condensed-assignments">
-              <div id="condensedAssignmentsList">
-                  <!-- Condensed assignment items will be added here -->
-              </div>
-          </div>
-          <div class="view-toggle-container">
-              <button id="toggleAssignmentViewBtn" class="view-toggle-btn" onclick="toggleAssignmentView()">
-                  <i class="fas fa-expand"></i> Expand Assignment Fields
-              </button>
-          </div>
-      </div>
-
       <!-- Single Assignment Category Section (Default) -->
-      <div id="singleAssignmentCategory" class="assignments-view-container">
+      <div id="singleAssignmentCategory">
           <div class="category-section">
               <div class="category-header">
                   <h3>Assignments</h3>
@@ -1910,12 +1717,6 @@
               </div>
               <button id="addAssignmentBtn" style="margin-top: 1rem;">
                   <i class="fas fa-plus-circle"></i> Add Assignment Grade
-              </button>
-          </div>
-          <!-- Added toggle button to expanded view -->
-          <div class="view-toggle-container">
-              <button id="toggleAssignmentViewBtn2" class="view-toggle-btn" onclick="toggleAssignmentView()">
-                  <i class="fas fa-compress"></i> Condense Assignment Fields
               </button>
           </div>
       </div>
