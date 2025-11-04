@@ -629,11 +629,6 @@
       if (toggleViewBtn) {
         toggleViewBtn.addEventListener('click', toggleAssignmentView);
       }
-      // Added listener for the second toggle button as well
-      const toggleViewBtn2 = document.getElementById('toggleAssignmentViewBtn2');
-      if (toggleViewBtn2) {
-        toggleViewBtn2.addEventListener('click', toggleAssignmentView);
-      }
 
       // Initial visibility check for assignment names and group view
       document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
@@ -688,27 +683,6 @@
       document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
       document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
       document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
-
-      // Update visibility of condensed view based on group view
-      if (shouldBeGroupView) {
-          // If group view is enabled, hide condensed view and show expanded view
-          isCondensedView = false;
-          document.getElementById('condensedAssignmentsView').classList.add('hidden');
-          document.getElementById('singleAssignmentCategory').classList.remove('hidden');
-          document.getElementById('toggleAssignmentViewBtn').innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-      } else {
-          // If group view is disabled, ensure the condensed view is handled by its own toggle
-          // The visibility of 'singleAssignmentCategory' is already managed above
-          if (isCondensedView) {
-            document.getElementById('condensedAssignmentsView').classList.remove('hidden');
-            document.getElementById('singleAssignmentCategory').classList.add('hidden');
-            document.getElementById('toggleAssignmentViewBtn').innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          } else {
-            document.getElementById('condensedAssignmentsView').classList.add('hidden');
-            document.getElementById('singleAssignmentCategory').classList.remove('hidden');
-            document.getElementById('toggleAssignmentViewBtn').innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-          }
-      }
 
       calculateQuarterGrade(); // Recalculate based on new view
   }
@@ -842,10 +816,6 @@
       removeButton.onclick = function() {
           assignmentRow.remove();
           updateAssignmentNumbers(category);
-          // After removing an assignment, update the condensed view if it's active
-          if (isCondensedView) {
-            populateCondensedView();
-          }
       };
       assignmentRow.appendChild(removeButton);
 
@@ -1154,11 +1124,6 @@
       }
       
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
-      
-      // Update the condensed view if it's active
-      if (isCondensedView) {
-          populateCondensedView();
-      }
   }
 
   function calculateNeededCategoryAverage(
@@ -1601,19 +1566,15 @@
       const condensedView = document.getElementById('condensedAssignmentsView');
       const expandedView = document.getElementById('singleAssignmentCategory');
       const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
-      const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2');
 
       if (isCondensedView) {
-          populateCondensedView();
           condensedView.classList.remove('hidden');
           expandedView.classList.add('hidden');
           toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          if (toggleBtn2) toggleBtn2.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
       } else {
           condensedView.classList.add('hidden');
           expandedView.classList.remove('hidden');
           toggleBtn.innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-          if (toggleBtn2) toggleBtn2.innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
       }
   }
 
@@ -1713,12 +1674,10 @@
     const condensedView = document.getElementById('condensedAssignmentsView');
     const expandedView = document.getElementById('singleAssignmentCategory');
     const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
-    const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2'); // Get the second toggle button
     
     condensedView.classList.remove('hidden');
     expandedView.classList.add('hidden');
-    if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-    if (toggleBtn2) toggleBtn2.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields'; // Update second button too
+    toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
     
     // Scroll to the top of the page to show the filled assignments
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1888,7 +1847,7 @@
               </div>
           </div>
           <div class="view-toggle-container">
-              <button id="toggleAssignmentViewBtn" class="view-toggle-btn" onclick="toggleAssignmentView()">
+              <button id="toggleAssignmentViewBtn" class="view-toggle-btn">
                   <i class="fas fa-expand"></i> Expand Assignment Fields
               </button>
           </div>
@@ -1906,12 +1865,6 @@
               </div>
               <button id="addAssignmentBtn" style="margin-top: 1rem;">
                   <i class="fas fa-plus-circle"></i> Add Assignment Grade
-              </button>
-          </div>
-          <!-- Added toggle button to expanded view -->
-          <div class="view-toggle-container">
-              <button id="toggleAssignmentViewBtn2" class="view-toggle-btn" onclick="toggleAssignmentView()">
-                  <i class="fas fa-compress"></i> Condense Assignment Fields
               </button>
           </div>
       </div>
