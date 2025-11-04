@@ -1506,6 +1506,67 @@
     output += '</pre>';
 
     outputContainer.innerHTML = output;
+
+    autofillAssignmentsFromParsed(assignments);
+  }
+
+  function autofillAssignmentsFromParsed(assignments) {
+    // Clear existing assignments first
+    clearQuarterFields();
+    
+    // Determine if we should use group view or single view
+    // For simplicity, we'll use single assignment view since it's more flexible
+    document.getElementById('groupViewCheckbox').checked = false;
+    toggleGroupView(false);
+    
+    // Set default weights for Learner Tasks and Assessments
+    document.getElementById('overallLearnerTaskWeight').value = '20';
+    document.getElementById('overallAssessmentWeight').value = '80';
+    
+    // Add each parsed assignment to the form
+    assignments.forEach(assignment => {
+      // Add a new assignment row
+      addAssignmentInput('assignments');
+      
+      // Get the most recently added assignment row
+      const container = document.getElementById('assignmentsAssignments');
+      const rows = container.querySelectorAll('.class-input-row');
+      const lastRow = rows[rows.length - 1];
+      
+      // Fill in the earned points
+      const earnedInput = lastRow.querySelector('.assignment-grade-input');
+      if (earnedInput) {
+        earnedInput.value = assignment.earned;
+      }
+      
+      // Fill in the possible points
+      const possibleInput = lastRow.querySelector('.assignment-possible-input');
+      if (possibleInput) {
+        possibleInput.value = assignment.possible;
+      }
+      
+      // Set the assignment type based on category
+      const typeSelect = lastRow.querySelector('.assignment-type-select');
+      if (typeSelect) {
+        const category = assignment.category.toLowerCase();
+        if (category.includes('learner')) {
+          typeSelect.value = 'Learner Tasks';
+        } else if (category.includes('assess')) {
+          typeSelect.value = 'Assessments';
+        } else {
+          typeSelect.value = 'Custom';
+          // If custom, show the custom weight input and set a default
+          toggleCustomWeightInput(lastRow, 'Custom');
+          const customWeightInput = lastRow.querySelector('.assignment-custom-weight-input');
+          if (customWeightInput) {
+            customWeightInput.value = '100';
+          }
+        }
+      }
+    });
+    
+    // Scroll to the top of the page to show the filled assignments
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
 </head>
