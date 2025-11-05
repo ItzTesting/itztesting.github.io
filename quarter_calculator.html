@@ -553,37 +553,51 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.5rem;
-      margin-bottom: 0.5rem;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
       background-color: var(--input-bg);
       border-radius: 5px;
       border: 1px solid var(--border-color);
   }
 
   .condensed-assignment-category {
-      font-weight: 500;
+      font-weight: 600;
       color: var(--accent-color);
+      font-size: 1rem;
   }
 
   .condensed-assignment-points {
       color: var(--text-secondary);
+      font-size: 0.95rem;
   }
 
   .toggle-view-btn {
       margin-top: 1rem;
       background-color: #2196F3;
+      width: 100%;
   }
 
   .toggle-view-btn:hover {
       background-color: #1976D2;
   }
 
-  /* Updated condensed view styles to ensure proper hiding of expanded view */
-  #singleAssignmentCategory {
-      display: block; /* Visible by default */
+  /* Updated condensed view styles to ensure proper visibility control */
+  .condensed-assignments-view {
+      display: none; /* Hidden by default */
   }
+
+  .condensed-assignments-view.active {
+      display: block; /* Shown when active */
+  }
+
+  /* Ensure expanded view is visible by default */
+  #singleAssignmentCategory {
+      display: block;
+  }
+  
+  /* Hide expanded view when condensed is active */
   #singleAssignmentCategory.condensed {
-      display: none !important; /* Added !important to override inline styles */
+      display: none !important;
   }
   /* End of condensed view styles */
 </style>
@@ -1595,15 +1609,22 @@
       const condensedView = document.getElementById('condensedAssignmentsView');
       const expandedView = document.getElementById('singleAssignmentCategory');
       const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
-      const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2'); // Get the second button
+      const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2');
       
       if (isCondensedView) {
           // Show condensed view, hide expanded view
           condensedView.classList.add('active');
           expandedView.classList.add('condensed');
-          expandedView.style.display = 'none'; // Explicitly hide
-          if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          if (toggleBtn2) toggleBtn2.style.display = 'none'; // Hide the second button
+          expandedView.style.display = 'none';
+          
+          // Update button text to "Expand" or "Show More"
+          if (toggleBtn) {
+              toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Show More';
+          }
+          if (toggleBtn2) {
+              toggleBtn2.innerHTML = '<i class="fas fa-expand"></i> Show More';
+              toggleBtn2.style.display = 'none'; // Hide second button when in condensed view
+          }
 
           // Populate condensed view with current assignments
           populateCondensedView();
@@ -1611,9 +1632,16 @@
           // Show expanded view, hide condensed view
           condensedView.classList.remove('active');
           expandedView.classList.remove('condensed');
-          expandedView.style.display = 'block'; // Explicitly show
-          if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-          if (toggleBtn2) toggleBtn2.style.display = 'block'; // Show the second button
+          expandedView.style.display = 'block';
+          
+          // Update button text to "Condense" or "Show Less"
+          if (toggleBtn) {
+              toggleBtn.innerHTML = '<i class="fas fa-compress"></i> Show Less';
+          }
+          if (toggleBtn2) {
+              toggleBtn2.innerHTML = '<i class="fas fa-compress"></i> Show Less';
+              toggleBtn2.style.display = 'block'; // Show second button when in expanded view
+          }
       }
   }
 
@@ -1622,6 +1650,11 @@
       condensedList.innerHTML = '';
       
       const assignmentRows = document.querySelectorAll('#assignmentsAssignments .class-input-row');
+      
+      if (assignmentRows.length === 0) {
+          condensedList.innerHTML = '<p style="color: var(--text-secondary); text-align: center;">No assignments added yet.</p>';
+          return;
+      }
       
       assignmentRows.forEach((row, index) => {
           const earnedInput = row.querySelector('.assignment-grade-input');
@@ -1632,7 +1665,7 @@
           const possible = possibleInput ? possibleInput.value : '';
           const type = typeSelect ? typeSelect.value : 'Assignment';
           
-          if (earned && possible) { // Only add if both earned and possible are filled
+          if (earned && possible) {
               const item = document.createElement('div');
               item.classList.add('condensed-assignment-item');
               
@@ -1646,43 +1679,36 @@
       });
   }
 
-
   function autofillAssignmentsFromParsed(assignments) {
       // Clear existing assignments first
       clearQuarterFields();
       
-      // Determine if we should use group view or single view
-      // For simplicity, we'll use single assignment view since it's more flexible
+      // Use single assignment view
       document.getElementById('groupViewCheckbox').checked = false;
       toggleGroupView(false);
       
-      // Set default weights for Learner Tasks and Assessments
+      // Set default weights
       document.getElementById('overallLearnerTaskWeight').value = '20';
       document.getElementById('overallAssessmentWeight').value = '80';
       
-      // Add each parsed assignment to the form
+      // Add each parsed assignment
       assignments.forEach(assignment => {
-          // Add a new assignment row
           addAssignmentInput('assignments');
           
-          // Get the most recently added assignment row
           const container = document.getElementById('assignmentsAssignments');
           const rows = container.querySelectorAll('.class-input-row');
           const lastRow = rows[rows.length - 1];
           
-          // Fill in the earned points
           const earnedInput = lastRow.querySelector('.assignment-grade-input');
           if (earnedInput) {
               earnedInput.value = assignment.earned;
           }
           
-          // Fill in the possible points
           const possibleInput = lastRow.querySelector('.assignment-possible-input');
           if (possibleInput) {
               possibleInput.value = assignment.possible;
           }
           
-          // Set the assignment type based on category
           const typeSelect = lastRow.querySelector('.assignment-type-select');
           if (typeSelect) {
               const category = assignment.category.toLowerCase();
@@ -1692,7 +1718,6 @@
                   typeSelect.value = 'Assessments';
               } else {
                   typeSelect.value = 'Custom';
-                  // If custom, show the custom weight input and set a default
                   toggleCustomWeightInput(lastRow, 'Custom');
                   const customWeightInput = lastRow.querySelector('.assignment-custom-weight-input');
                   if (customWeightInput) {
@@ -1702,24 +1727,25 @@
           }
       });
       
-      // Switch to condensed view
-      if (document.getElementById('condensedAssignmentsView')) {
-          isCondensedView = true;
-          const condensedView = document.getElementById('condensedAssignmentsView');
-          const expandedView = document.getElementById('singleAssignmentCategory');
-          const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
-          const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2'); // Get the second button
+      isCondensedView = true;
+      const condensedView = document.getElementById('condensedAssignmentsView');
+      const expandedView = document.getElementById('singleAssignmentCategory');
+      const toggleBtn = document.getElementById('toggleAssignmentViewBtn');
+      const toggleBtn2 = document.getElementById('toggleAssignmentViewBtn2');
 
-          condensedView.classList.add('active');
-          expandedView.classList.add('condensed');
-          expandedView.style.display = 'none'; // Explicitly hide expanded view
-          if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          if (toggleBtn2) toggleBtn2.style.display = 'none'; // Hide the second button
-          
-          populateCondensedView();
+      condensedView.classList.add('active');
+      expandedView.classList.add('condensed');
+      expandedView.style.display = 'none';
+      
+      if (toggleBtn) {
+          toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Show More';
+      }
+      if (toggleBtn2) {
+          toggleBtn2.style.display = 'none';
       }
       
-      // Scroll to the top of the page to show the filled assignments
+      populateCondensedView();
+      
       window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 </script>
@@ -1881,21 +1907,20 @@
 
       <!-- Single Assignment Category Section (Default) -->
       <div id="singleAssignmentCategory">
-          <!-- Added condensed assignments view -->
+          <!-- Updated condensed view with better button placement and labeling -->
           <div id="condensedAssignmentsView" class="condensed-assignments-view">
               <h3 style="margin-bottom: 1rem; color: var(--accent-color);">Your Assignments</h3>
               <div id="condensedAssignmentsList">
                   <!-- Condensed assignment items will be added here -->
               </div>
               <button id="toggleAssignmentViewBtn" class="toggle-view-btn">
-                  <i class="fas fa-compress"></i> Condense Assignment Fields
+                  <i class="fas fa-expand"></i> Show More
               </button>
           </div>
           
           <div class="category-section">
               <div class="category-header">
                   <h3>Assignments</h3>
-                  <!-- The overall weight input for "Assignments" category is now removed -->
               </div>
               <div id="assignmentsAssignments" class="assignment-inputs">
                   <!-- Single assignment inputs will be added here -->
@@ -1903,9 +1928,9 @@
               <button id="addAssignmentBtn" style="margin-top: 1rem;">
                   <i class="fas fa-plus-circle"></i> Add Assignment Grade
               </button>
-              <!-- Added toggle button below expanded view -->
+              <!-- Updated second toggle button with better labeling -->
               <button id="toggleAssignmentViewBtn2" class="toggle-view-btn" style="display: none;">
-                  <i class="fas fa-compress"></i> Condense Assignment Fields
+                  <i class="fas fa-compress"></i> Show Less
               </button>
           </div>
       </div>
