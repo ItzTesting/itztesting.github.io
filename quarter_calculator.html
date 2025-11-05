@@ -578,8 +578,9 @@
       background-color: #1976D2;
   }
 
+  /* Updated condensed view styles to ensure proper hiding of expanded view */
   #singleAssignmentCategory.condensed {
-      display: none;
+      display: none !important; /* Added !important to override inline styles */
   }
   /* End of condensed view styles */
 </style>
@@ -672,11 +673,15 @@
       navLinks.classList.toggle('active');
   }
 
-  // Modified toggleGroupView to accept a boolean for explicit control
   function toggleGroupView(shouldBeGroupView) {
       currentViewIsGrouped = shouldBeGroupView; // Update the global state
       document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
-      document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
+      
+      // Only set display if not in condensed view
+      if (!isCondensedView) {
+          document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
+      }
+      
       document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
 
       // If switching to group view, ensure condensed view is off
@@ -1593,8 +1598,9 @@
           // Show condensed view, hide expanded view
           condensedView.classList.add('active');
           expandedView.classList.add('condensed');
+          expandedView.style.display = 'none'; // Explicitly hide
           if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          if (toggleBtn2) toggleBtn2.style.display = 'block'; // Show the second button
+          if (toggleBtn2) toggleBtn2.style.display = 'none'; // Hide the second button
 
           // Populate condensed view with current assignments
           populateCondensedView();
@@ -1602,8 +1608,9 @@
           // Show expanded view, hide condensed view
           condensedView.classList.remove('active');
           expandedView.classList.remove('condensed');
+          expandedView.style.display = 'block'; // Explicitly show
           if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-compress"></i> Condense Assignment Fields';
-          if (toggleBtn2) toggleBtn2.style.display = 'none'; // Hide the second button
+          if (toggleBtn2) toggleBtn2.style.display = 'block'; // Show the second button
       }
   }
 
@@ -1692,7 +1699,7 @@
           }
       });
       
-      // Only do this if the condensed view element exists
+      // Switch to condensed view
       if (document.getElementById('condensedAssignmentsView')) {
           isCondensedView = true;
           const condensedView = document.getElementById('condensedAssignmentsView');
@@ -1702,8 +1709,9 @@
 
           condensedView.classList.add('active');
           expandedView.classList.add('condensed');
+          expandedView.style.display = 'none'; // Explicitly hide expanded view
           if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-expand"></i> Expand Assignment Fields';
-          if (toggleBtn2) toggleBtn2.style.display = 'block'; // Show the second button
+          if (toggleBtn2) toggleBtn2.style.display = 'none'; // Hide the second button
           
           populateCondensedView();
       }
