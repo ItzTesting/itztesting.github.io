@@ -540,7 +540,7 @@
       display: none;
       border: 1px solid var(--border-color);
       border-radius: 8px;
-      padding: 1rem;
+      padding: 1.5rem;
       background-color: var(--secondary-bg);
       margin-bottom: 1rem;
   }
@@ -549,26 +549,46 @@
       display: block;
   }
 
-  .condensed-assignment-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem;
-      margin-bottom: 0.75rem;
+  /* Updated condensed view to show summary statistics instead of individual items */
+  .condensed-assignment-summary {
+      text-align: center;
+      padding: 1rem;
       background-color: var(--input-bg);
       border-radius: 5px;
       border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
   }
 
-  .condensed-assignment-category {
+  .condensed-summary-title {
+      font-size: 1.1rem;
       font-weight: 600;
       color: var(--accent-color);
-      font-size: 1rem;
+      margin-bottom: 0.75rem;
   }
 
-  .condensed-assignment-points {
+  .condensed-summary-stats {
+      display: flex;
+      justify-content: space-around;
+      gap: 1rem;
+      margin-top: 0.75rem;
+  }
+
+  .condensed-stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .condensed-stat-number {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-color);
+  }
+
+  .condensed-stat-label {
+      font-size: 0.9rem;
       color: var(--text-secondary);
-      font-size: 0.95rem;
+      margin-top: 0.25rem;
   }
 
   .toggle-view-btn {
@@ -1656,7 +1676,12 @@
           return;
       }
       
-      assignmentRows.forEach((row, index) => {
+      // Count total assignments, assessments, and learner tasks
+      let totalAssignments = 0;
+      let assessmentCount = 0;
+      let learnerTaskCount = 0;
+      
+      assignmentRows.forEach((row) => {
           const earnedInput = row.querySelector('.assignment-grade-input');
           const possibleInput = row.querySelector('.assignment-possible-input');
           const typeSelect = row.querySelector('.assignment-type-select');
@@ -1666,17 +1691,37 @@
           const type = typeSelect ? typeSelect.value : 'Assignment';
           
           if (earned && possible) {
-              const item = document.createElement('div');
-              item.classList.add('condensed-assignment-item');
-              
-              item.innerHTML = `
-                  <span class="condensed-assignment-category">${type}</span>
-                  <span class="condensed-assignment-points">${earned} / ${possible} points</span>
-              `;
-              
-              condensedList.appendChild(item);
+              totalAssignments++;
+              if (type === 'Assessment') {
+                  assessmentCount++;
+              } else if (type === 'Learner Tasks') {
+                  learnerTaskCount++;
+              }
           }
       });
+      
+      // Create summary display
+      const summaryHTML = `
+          <div class="condensed-assignment-summary">
+              <div class="condensed-summary-title">Assignments Imported</div>
+              <div class="condensed-summary-stats">
+                  <div class="condensed-stat-item">
+                      <div class="condensed-stat-number">${totalAssignments}</div>
+                      <div class="condensed-stat-label">Total</div>
+                  </div>
+                  <div class="condensed-stat-item">
+                      <div class="condensed-stat-number">${assessmentCount}</div>
+                      <div class="condensed-stat-label">Assessments</div>
+                  </div>
+                  <div class="condensed-stat-item">
+                      <div class="condensed-stat-number">${learnerTaskCount}</div>
+                      <div class="condensed-stat-label">Learner Tasks</div>
+                  </div>
+              </div>
+          </div>
+      `;
+      
+      condensedList.innerHTML = summaryHTML;
   }
 
   function autofillAssignmentsFromParsed(assignments) {
@@ -1909,9 +1954,10 @@
       <div id="singleAssignmentCategory">
           <!-- Updated condensed view with better button placement and labeling -->
           <div id="condensedAssignmentsView" class="condensed-assignments-view">
-              <h3 style="margin-bottom: 1rem; color: var(--accent-color);">Your Assignments</h3>
+              <!-- Simplified condensed view to show summary statistics -->
+              <h3 style="margin-bottom: 1rem; color: var(--accent-color);">Imported Assignments</h3>
               <div id="condensedAssignmentsList">
-                  <!-- Condensed assignment items will be added here -->
+                  <!-- Summary statistics will be added here -->
               </div>
               <button id="toggleAssignmentViewBtn" class="toggle-view-btn">
                   <i class="fas fa-expand"></i> Show More
