@@ -405,6 +405,83 @@
       align-items: flex-end; /* Align inputs and labels nicely */
   }
 
+  /* Added styles for condensed/expanded assignment view toggle */
+  .condensed-assignments-container {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      background-color: var(--secondary-bg);
+      margin-bottom: 1.5rem;
+  }
+
+  .condensed-assignments-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+  }
+
+  .condensed-assignments-table th,
+  .condensed-assignments-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+  }
+
+  .condensed-assignments-table th {
+      background-color: var(--input-bg);
+      color: var(--accent-color);
+      font-weight: 600;
+  }
+
+  .condensed-assignments-table tr:last-child td {
+      border-bottom: none;
+  }
+
+  .condensed-assignments-table tr:hover {
+      background-color: var(--highlight-bg);
+  }
+
+  .view-toggle-btn {
+      background-color: var(--link-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      min-width: 200px;
+  }
+
+  .view-toggle-btn:hover {
+      background-color: #42A5F5;
+  }
+
+  .view-toggle-btn i {
+      margin-right: 0.5rem;
+  }
+
+  .expanded-assignments-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background-color: var(--secondary-bg);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+  }
+
+  .expanded-assignments-header h3 {
+      margin: 0;
+      color: var(--accent-color);
+  }
+
   /* Media query for mobile navigation */
   @media (max-width: 768px) {
       .nav-links {
@@ -545,6 +622,8 @@
 
   // Global variable to track the current view state
   let currentViewIsGrouped = false; 
+  let currentAssignmentView = 'expanded'; // 'condensed' or 'expanded'
+
 
   document.addEventListener('DOMContentLoaded', function() {
       // Add event listeners for Quarter Calculator
@@ -605,6 +684,15 @@
       const parseButton = document.getElementById('parsePowerschoolBtn');
       if (parseButton) {
         parseButton.addEventListener('click', processPowerSchoolText);
+      }
+
+      const expandViewBtn = document.getElementById('expandViewBtn');
+      const condenseViewBtn = document.getElementById('condenseViewBtn');
+      if (expandViewBtn) {
+        expandViewBtn.addEventListener('click', () => toggleAssignmentView('expanded'));
+      }
+      if (condenseViewBtn) {
+        condenseViewBtn.addEventListener('click', () => toggleAssignmentView('condensed'));
       }
   });
 
@@ -1335,6 +1423,13 @@
       // Explicitly set group view OFF after clearing
       document.getElementById('groupViewCheckbox').checked = false;
       toggleGroupView(false); 
+
+      // Reset assignment view to expanded and clear condensed view
+      currentAssignmentView = 'expanded';
+      document.getElementById('condensedAssignmentsContainer').style.display = 'none';
+      document.getElementById('expandedAssignmentsContainer').style.display = 'block';
+      document.getElementById('expandedAssignmentsHeader').style.display = 'none'; // Hide header if no assignments
+      document.getElementById('condensedAssignmentsTableBody').innerHTML = ''; // Clear table
       
       calculateQuarterGrade(); // Recalculate after clearing and setting initial view
   }
@@ -1491,62 +1586,130 @@
   }
 
   function autofillAssignmentsFromParsed(assignments) {
-    // Clear existing assignments first
-    clearQuarterFields();
-    
-    // Determine if we should use group view or single view
-    // For simplicity, we'll use single assignment view since it's more flexible
-    document.getElementById('groupViewCheckbox').checked = false;
-    toggleGroupView(false);
-    
-    // Set default weights for Learner Tasks and Assessments
-    document.getElementById('overallLearnerTaskWeight').value = '20';
-    document.getElementById('overallAssessmentWeight').value = '80';
-    
-    // Add each parsed assignment to the form
-    assignments.forEach(assignment => {
-      // Add a new assignment row
-      addAssignmentInput('assignments');
+      // Clear existing assignments first
+      clearQuarterFields();
       
-      // Get the most recently added assignment row
-      const container = document.getElementById('assignmentsAssignments');
-      const rows = container.querySelectorAll('.class-input-row');
-      const lastRow = rows[rows.length - 1];
+      // Determine if we should use group view or single view
+      // For simplicity, we'll use single assignment view since it's more flexible
+      document.getElementById('groupViewCheckbox').checked = false;
+      toggleGroupView(false);
       
-      // Fill in the earned points
-      const earnedInput = lastRow.querySelector('.assignment-grade-input');
-      if (earnedInput) {
-        earnedInput.value = assignment.earned;
-      }
+      // Set default weights for Learner Tasks and Assessments
+      document.getElementById('overallLearnerTaskWeight').value = '20';
+      document.getElementById('overallAssessmentWeight').value = '80';
       
-      // Fill in the possible points
-      const possibleInput = lastRow.querySelector('.assignment-possible-input');
-      if (possibleInput) {
-        possibleInput.value = assignment.possible;
-      }
-      
-      // Set the assignment type based on category
-      const typeSelect = lastRow.querySelector('.assignment-type-select');
-      if (typeSelect) {
-        const category = assignment.category.toLowerCase();
-        if (category.includes('learner')) {
-          typeSelect.value = 'Learner Tasks';
-        } else if (category.includes('assess')) {
-          typeSelect.value = 'Assessments';
-        } else {
-          typeSelect.value = 'Custom';
-          // If custom, show the custom weight input and set a default
-          toggleCustomWeightInput(lastRow, 'Custom');
-          const customWeightInput = lastRow.querySelector('.assignment-custom-weight-input');
-          if (customWeightInput) {
-            customWeightInput.value = '100';
+      // Add each parsed assignment to the form
+      assignments.forEach(assignment => {
+          // Add a new assignment row
+          addAssignmentInput('assignments');
+          
+          // Get the most recently added assignment row
+          const container = document.getElementById('assignmentsAssignments');
+          const rows = container.querySelectorAll('.class-input-row');
+          const lastRow = rows[rows.length - 1];
+          
+          // Fill in the earned points
+          const earnedInput = lastRow.querySelector('.assignment-grade-input');
+          if (earnedInput) {
+              earnedInput.value = assignment.earned;
           }
-        }
+          
+          // Fill in the possible points
+          const possibleInput = lastRow.querySelector('.assignment-possible-input');
+          if (possibleInput) {
+              possibleInput.value = assignment.possible;
+          }
+          
+          // Set the assignment type based on category
+          const typeSelect = lastRow.querySelector('.assignment-type-select');
+          if (typeSelect) {
+              const category = assignment.category.toLowerCase();
+              if (category.includes('learner')) {
+                  typeSelect.value = 'Learner Tasks';
+              } else if (category.includes('assess')) {
+                  typeSelect.value = 'Assessments';
+              } else {
+                  typeSelect.value = 'Custom';
+                  // If custom, show the custom weight input and set a default
+                  toggleCustomWeightInput(lastRow, 'Custom');
+                  const customWeightInput = lastRow.querySelector('.assignment-custom-weight-input');
+                  if (customWeightInput) {
+                      customWeightInput.value = '100';
+                  }
+              }
+          }
+      });
+      
+      populateCondensedView(assignments);
+      toggleAssignmentView('condensed');
+      
+      // Scroll to the assignments section to show the condensed view
+      const condensedContainer = document.getElementById('condensedAssignmentsContainer');
+      if (condensedContainer) {
+          condensedContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    });
-    
-    // Scroll to the top of the page to show the filled assignments
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function populateCondensedView(assignments) {
+      const tableBody = document.getElementById('condensedAssignmentsTableBody');
+      if (!tableBody) return;
+      
+      tableBody.innerHTML = ''; // Clear existing rows
+      
+      assignments.forEach((assignment, index) => {
+          const row = document.createElement('tr');
+          
+          // Assignment number
+          const numCell = document.createElement('td');
+          numCell.textContent = index + 1;
+          row.appendChild(numCell);
+          
+          // Type
+          const typeCell = document.createElement('td');
+          const category = assignment.category.toLowerCase();
+          if (category.includes('learner')) {
+              typeCell.textContent = 'Learner Task';
+          } else if (category.includes('assess')) {
+              typeCell.textContent = 'Assessment';
+          } else {
+              typeCell.textContent = 'Custom';
+          }
+          row.appendChild(typeCell);
+          
+          // Points
+          const pointsCell = document.createElement('td');
+          pointsCell.textContent = `${assignment.earned} / ${assignment.possible}`;
+          row.appendChild(pointsCell);
+          
+          // Percentage
+          const percentCell = document.createElement('td');
+          const percentage = (assignment.earned / assignment.possible * 100).toFixed(2);
+          percentCell.textContent = `${percentage}%`;
+          row.appendChild(percentCell);
+          
+          tableBody.appendChild(row);
+      });
+  }
+
+  function toggleAssignmentView(viewType) {
+      currentAssignmentView = viewType;
+      
+      const condensedContainer = document.getElementById('condensedAssignmentsContainer');
+      const expandedContainer = document.getElementById('expandedAssignmentsContainer');
+      const expandedHeader = document.getElementById('expandedAssignmentsHeader');
+
+      if (viewType === 'condensed') {
+          // Show condensed view, hide expanded view
+          if (condensedContainer) condensedContainer.style.display = 'block';
+          if (expandedContainer) expandedContainer.style.display = 'none';
+          if (expandedHeader) expandedHeader.style.display = 'none';
+      } else {
+          // Show expanded view, hide condensed view
+          if (condensedContainer) condensedContainer.style.display = 'none';
+          if (expandedContainer) expandedContainer.style.display = 'block';
+          // Show expanded header only if there are assignments to display
+          if (expandedHeader) expandedHeader.style.display = assignments.length > 0 ? 'flex' : 'none';
+      }
   }
 </script>
 </head>
@@ -1630,109 +1793,141 @@
           Calculate your quarter grade by entering grades for different assignment categories and their weights.
       </p>
       
-      <!-- Group View Checkbox (New) -->
-      <div class="checkbox-option-container">
-          <input type="checkbox" id="groupViewCheckbox">
-          <label for="groupViewCheckbox">Group View</label>
-      </div>
-
-      <!-- Show Assignment Names Checkbox -->
-      <div class="checkbox-option-container">
-          <input type="checkbox" id="showAssignmentNamesCheckbox" checked>
-          <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
-      </div>
-
-      <!-- Overall Weights Section (visible when Group View is OFF) -->
-      <div id="overallWeightsSection" class="overall-weights-section">
-          <div class="input-group">
-              <label for="overallLearnerTaskWeight">Learner Task Weight (%)</label>
-              <input type="number" id="overallLearnerTaskWeight" min="0" max="100" placeholder="e.g., 20">
-          </div>
-          <div class="input-group">
-              <label for="overallAssessmentWeight">Assessment Weight (%)</label>
-              <input type="number" id="overallAssessmentWeight" min="0" max="100" placeholder="e.g., 80">
-          </div>
-      </div>
-
-      <!-- Grouped Categories Section (Hidden by Default) -->
-      <div id="groupedCategories" style="display: none;">
-          <!-- Learner Tasks Category -->
-          <div class="category-section">
-              <div class="category-header">
-                  <h3>Learner Tasks</h3>
-                  <div class="input-group">
-                      <label for="learnerTasksWeight">Weight (%)</label>
-                      <input type="number" id="learnerTasksWeight" min="0" max="100" value="20" placeholder="e.g., 20">
-                  </div>
-              </div>
-              <div id="learnerTasksAssignments" class="assignment-inputs">
-                  <!-- Learner Tasks assignment inputs will be added here -->
-              </div>
-              <button id="addLearnerTasksBtn" style="margin-top: 1rem;">
-                  <i class="fas fa-plus-circle"></i> Add Learner Task Grade
-              </button>
-          </div>
-
-          <!-- Assessments Category -->
-          <div class="category-section">
-              <div class="category-header">
-                  <h3>Assessments</h3>
-                  <div class="input-group">
-                      <label for="assessmentsWeight">Weight (%)</label>
-                      <input type="number" id="assessmentsWeight" min="0" max="100" value="80" placeholder="e.g., 80">
-                  </div>
-              </div>
-              <div id="assessmentsAssignments" class="assignment-inputs">
-                  <!-- Assessments assignment inputs will be added here -->
-              </div>
-              <button id="addAssessmentsBtn" style="margin-top: 1rem;">
-                  <i class="fas fa-plus-circle"></i> Add Assessment Grade
-              </button>
-          </div>
-
-          <!-- Custom Category -->
-          <div class="category-section">
-              <div class="category-header">
-                  <h3>Custom</h3>
-                  <!-- Removed the overall weight input for Custom category -->
-              </div>
-              <div id="customAssignments" class="assignment-inputs">
-                  <!-- Custom assignment inputs will be added here -->
-              </div>
-              <button id="addCustomBtn" style="margin-top: 1rem;">
-                  <i class="fas fa-plus-circle"></i> Add Custom Grade
-              </button>
-          </div>
-      </div>
-
-      <!-- Single Assignment Category Section (Default) -->
-      <div id="singleAssignmentCategory">
-          <div class="category-section">
-              <div class="category-header">
-                  <h3>Assignments</h3>
-                  <!-- The overall weight input for "Assignments" category is now removed -->
-              </div>
-              <div id="assignmentsAssignments" class="assignment-inputs">
-                  <!-- Single assignment inputs will be added here -->
-              </div>
-              <button id="addAssignmentBtn" style="margin-top: 1rem;">
-                  <i class="fas fa-plus-circle"></i> Add Assignment Grade
-              </button>
-          </div>
-      </div>
-      
-      <div class="btn-group">
-          <button id="calculateQuarterBtn">
-              <i class="fas fa-calculator"></i> Calculate Quarter Grade
-          </button>
-          <button class="btn-clear" id="clearQuarterFieldsBtn">
-              <i class="fas fa-trash-alt"></i> Clear All Fields
+      <!-- Added condensed assignments view container -->
+      <div id="condensedAssignmentsContainer" class="condensed-assignments-container" style="display: none;">
+          <h3 style="text-align: center; margin-bottom: 1rem;">Parsed Assignments Summary</h3>
+          <table class="condensed-assignments-table">
+              <thead>
+                  <tr>
+                      <th>#</th>
+                      <th>Type</th>
+                      <th>Points</th>
+                      <th>Percentage</th>
+                  </tr>
+              </thead>
+              <tbody id="condensedAssignmentsTableBody">
+                  <!-- Condensed assignment rows will be added here -->
+              </tbody>
+          </table>
+          <button id="expandViewBtn" class="view-toggle-btn">
+              <i class="fas fa-chevron-down"></i> Show More
           </button>
       </div>
-      
-      <div class="result-section">
-          <div id="quarterResultsContainer">
-              <!-- Results will be displayed here -->
+
+      <!-- Wrapped existing assignment sections in expanded container -->
+      <div id="expandedAssignmentsContainer">
+          <!-- Added header with condense button for expanded view -->
+          <div class="expanded-assignments-header" style="display: none;" id="expandedAssignmentsHeader">
+              <h3>All Assignment Details</h3>
+              <button id="condenseViewBtn" class="view-toggle-btn" style="margin: 0; min-width: 150px;">
+                  <i class="fas fa-chevron-up"></i> Show Less
+              </button>
+          </div>
+
+          <!-- Group View Checkbox (New) -->
+          <div class="checkbox-option-container">
+              <input type="checkbox" id="groupViewCheckbox">
+              <label for="groupViewCheckbox">Group View</label>
+          </div>
+
+          <!-- Show Assignment Names Checkbox -->
+          <div class="checkbox-option-container">
+              <input type="checkbox" id="showAssignmentNamesCheckbox" checked>
+              <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
+          </div>
+
+          <!-- Overall Weights Section (visible when Group View is OFF) -->
+          <div id="overallWeightsSection" class="overall-weights-section">
+              <div class="input-group">
+                  <label for="overallLearnerTaskWeight">Learner Task Weight (%)</label>
+                  <input type="number" id="overallLearnerTaskWeight" min="0" max="100" placeholder="e.g., 20">
+              </div>
+              <div class="input-group">
+                  <label for="overallAssessmentWeight">Assessment Weight (%)</label>
+                  <input type="number" id="overallAssessmentWeight" min="0" max="100" placeholder="e.g., 80">
+              </div>
+          </div>
+
+          <!-- Grouped Categories Section (Hidden by Default) -->
+          <div id="groupedCategories" style="display: none;">
+              <!-- Learner Tasks Category -->
+              <div class="category-section">
+                  <div class="category-header">
+                      <h3>Learner Tasks</h3>
+                      <div class="input-group">
+                          <label for="learnerTasksWeight">Weight (%)</label>
+                          <input type="number" id="learnerTasksWeight" min="0" max="100" value="20" placeholder="e.g., 20">
+                      </div>
+                  </div>
+                  <div id="learnerTasksAssignments" class="assignment-inputs">
+                      <!-- Learner Tasks assignment inputs will be added here -->
+                  </div>
+                  <button id="addLearnerTasksBtn" style="margin-top: 1rem;">
+                      <i class="fas fa-plus-circle"></i> Add Learner Task Grade
+                  </button>
+              </div>
+
+              <!-- Assessments Category -->
+              <div class="category-section">
+                  <div class="category-header">
+                      <h3>Assessments</h3>
+                      <div class="input-group">
+                          <label for="assessmentsWeight">Weight (%)</label>
+                          <input type="number" id="assessmentsWeight" min="0" max="100" value="80" placeholder="e.g., 80">
+                      </div>
+                  </div>
+                  <div id="assessmentsAssignments" class="assignment-inputs">
+                      <!-- Assessments assignment inputs will be added here -->
+                  </div>
+                  <button id="addAssessmentsBtn" style="margin-top: 1rem;">
+                      <i class="fas fa-plus-circle"></i> Add Assessment Grade
+                  </button>
+              </div>
+
+              <!-- Custom Category -->
+              <div class="category-section">
+                  <div class="category-header">
+                      <h3>Custom</h3>
+                      <!-- Removed the overall weight input for Custom category -->
+                  </div>
+                  <div id="customAssignments" class="assignment-inputs">
+                      <!-- Custom assignment inputs will be added here -->
+                  </div>
+                  <button id="addCustomBtn" style="margin-top: 1rem;">
+                      <i class="fas fa-plus-circle"></i> Add Custom Grade
+                  </button>
+              </div>
+          </div>
+
+          <!-- Single Assignment Category Section (Default) -->
+          <div id="singleAssignmentCategory">
+              <div class="category-section">
+                  <div class="category-header">
+                      <h3>Assignments</h3>
+                      <!-- The overall weight input for "Assignments" category is now removed -->
+                  </div>
+                  <div id="assignmentsAssignments" class="assignment-inputs">
+                      <!-- Single assignment inputs will be added here -->
+                  </div>
+                  <button id="addAssignmentBtn" style="margin-top: 1rem;">
+                      <i class="fas fa-plus-circle"></i> Add Assignment Grade
+                  </button>
+              </div>
+          </div>
+          
+          <div class="btn-group">
+              <button id="calculateQuarterBtn">
+                  <i class="fas fa-calculator"></i> Calculate Quarter Grade
+              </button>
+              <button class="btn-clear" id="clearQuarterFieldsBtn">
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
+              </button>
+          </div>
+          
+          <div class="result-section">
+              <div id="quarterResultsContainer">
+                  <!-- Results will be displayed here -->
+              </div>
           </div>
       </div>
   </div>
