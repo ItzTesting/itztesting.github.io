@@ -1147,7 +1147,6 @@
       }
       
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
-      document.getElementById('condensedQuarterResultsContainer').innerHTML = resultHtml;
   }
 
   function calculateNeededCategoryAverage(
@@ -1407,8 +1406,7 @@
       toggleNeededGradeInputs(); // Reset visibility
 
       // Clear results container
-      document.getElementById('quarterResultsContainer').innerHTML = '';
-      document.getElementById('condensedQuarterResultsContainer').innerHTML = ''; // Also clear condensed results
+      document.getElementById('quarterResultsContainer').innerHTML = '<h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>';
 
       categoryCounters = {
           'learnerTasks': 0,
@@ -1833,26 +1831,11 @@
               </tbody>
           </table>
           
-          <!-- Add Calculate and Clear buttons in condensed view -->
-          <div class="btn-group">
-              <button onclick="calculateQuarterGrade()">
-                  <i class="fas fa-calculator"></i> Calculate Quarter Grade
-              </button>
-              <button class="btn-clear" onclick="clearQuarterFields()">
-                  <i class="fas fa-trash-alt"></i> Clear All Fields
-              </button>
-          </div>
-          
-          <!-- Add result section in condensed view -->
-          <div class="result-section">
-              <div id="condensedQuarterResultsContainer">
-                  <!-- Results will be displayed here in condensed view -->
-              </div>
-          </div>
-          
           <button id="expandViewBtn" class="view-toggle-btn">
               <i class="fas fa-chevron-down"></i> Show More
           </button>
+          
+          <!-- CHANGE: Moved Calculate/Clear buttons and results to be shared outside both views -->
       </div>
 
       <!-- Wrapped existing assignment sections in expanded container -->
@@ -1967,7 +1950,8 @@
           
           <div class="result-section">
               <div id="quarterResultsContainer">
-                  <!-- Results will be displayed here -->
+                  <!-- CHANGE: Initial state with placeholder text -->
+                  <h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>
               </div>
           </div>
       </div>
