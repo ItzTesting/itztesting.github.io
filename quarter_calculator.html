@@ -1577,7 +1577,7 @@
 
     autofillAssignmentsFromParsed(assignments);
     
-    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
+    statusContainer.innerHTML = '<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>';
     
     setTimeout(() => {
       statusContainer.innerHTML = '';
@@ -1700,6 +1700,7 @@
       const condensedContainer = document.getElementById('condensedAssignmentsContainer');
       const expandedContainer = document.getElementById('expandedAssignmentsContainer');
       const expandedHeader = document.getElementById('expandedAssignmentsHeader');
+      const condenseViewBtn = document.getElementById('condenseViewBtn');
 
       if (viewType === 'condensed') {
           // Show condensed view, hide expanded view
@@ -1710,6 +1711,7 @@
               assignmentSections.forEach(section => section.style.display = 'none');
           }
           if (expandedHeader) expandedHeader.style.display = 'none';
+          if (condenseViewBtn) condenseViewBtn.parentElement.style.display = 'none';
       } else {
           // Show expanded view, hide condensed view
           if (condensedContainer) condensedContainer.style.display = 'none';
@@ -1728,9 +1730,7 @@
               if (groupedCategories) groupedCategories.style.display = groupView ? 'block' : 'none';
               if (singleCategory) singleCategory.style.display = groupView ? 'none' : 'block';
           }
-          // Show expanded header only if there are assignments
-          const assignmentRows = document.querySelectorAll('#assignmentsAssignments .class-input-row');
-          if (expandedHeader) expandedHeader.style.display = assignmentRows.length > 0 ? 'flex' : 'none';
+          if (condenseViewBtn) condenseViewBtn.parentElement.style.display = 'block';
       }
   }
 </script>
