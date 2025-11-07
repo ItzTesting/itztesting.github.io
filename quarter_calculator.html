@@ -1842,12 +1842,9 @@
 
       <!-- Wrapped existing assignment sections in expanded container -->
       <div id="expandedAssignmentsContainer">
-          <!-- Added header with condense button for expanded view -->
+          <!-- Removed "Show Less" button from header, will move to bottom of assignments -->
           <div class="expanded-assignments-header" style="display: none;" id="expandedAssignmentsHeader">
               <h3>All Assignment Details</h3>
-              <button id="condenseViewBtn" class="view-toggle-btn" style="margin: 0; min-width: 150px;">
-                  <i class="fas fa-chevron-up"></i> Show Less
-              </button>
           </div>
 
           <!-- Group View Checkbox (New) -->
@@ -1939,6 +1936,13 @@
                       <i class="fas fa-plus-circle"></i> Add Assignment Grade
                   </button>
               </div>
+          </div>
+          
+          <!-- Added "Show Less" button here, after all assignment fields but before Calculate/Clear buttons -->
+          <div style="text-align: center; margin: 1.5rem 0;">
+              <button id="condenseViewBtn" class="view-toggle-btn" style="min-width: 150px;">
+                  <i class="fas fa-chevron-up"></i> Show Less
+              </button>
           </div>
           
           <div class="btn-group">
