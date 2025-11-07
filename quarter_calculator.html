@@ -694,6 +694,10 @@
       if (condenseViewBtn) {
         condenseViewBtn.addEventListener('click', () => toggleAssignmentView('condensed'));
       }
+
+      // Add event listeners for buttons specific to the condensed view
+      document.getElementById('calculateQuarterBtn2')?.addEventListener('click', calculateQuarterGrade);
+      document.getElementById('clearQuarterFieldsBtn2')?.addEventListener('click', clearQuarterFields);
   });
 
   function toggleMenu() {
@@ -708,6 +712,8 @@
       document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
       document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
 
+      // Clear and recalculate based on the new view, ensuring correct display containers are managed
+      clearQuarterFields(); // This will also recalculate and set initial view states
       calculateQuarterGrade(); // Recalculate based on new view
   }
 
@@ -840,11 +846,14 @@
       removeButton.onclick = function() {
           assignmentRow.remove();
           updateAssignmentNumbers(category);
+          // Recalculate after removal
+          calculateQuarterGrade(); 
       };
       assignmentRow.appendChild(removeButton);
 
       container.appendChild(assignmentRow);
       updateAssignmentNumbers(category);
+      calculateQuarterGrade(); // Recalculate after adding
   }
 
   function toggleCustomWeightInput(assignmentRow, selectedType) {
@@ -1123,7 +1132,8 @@
       
       for (const category in weights) {
           if (categoryTotals[category] && weights[category] > 0) {
-              const avg = categoryTotals[category].earned / categoryTotals[category].possible;
+              // Ensure possible points is greater than 0 to avoid division by zero
+              const avg = categoryTotals[category].possible > 0 ? categoryTotals[category].earned / categoryTotals[category].possible : 0;
               finalGrade += avg * weights[category];
               totalWeight += weights[category];
           }
@@ -1138,7 +1148,8 @@
           // Display category averages
           for (const category in categoryTotals) {
               if (weights[category] && weights[category] > 0) {
-                  const categoryAvg = (categoryTotals[category].earned / categoryTotals[category].possible) * 100;
+                  // Ensure possible points is greater than 0
+                  const categoryAvg = categoryTotals[category].possible > 0 ? (categoryTotals[category].earned / categoryTotals[category].possible) * 100 : 0;
                   const displayName = category.startsWith('Custom_') ? 'Custom' : category;
                   resultHtml += `<h3>${displayName} Average: <span>${categoryAvg.toFixed(2)}%</span></h3>`;
               }
@@ -1148,6 +1159,7 @@
       }
       
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
+      document.getElementById('quarterResultsContainerCondensed').innerHTML = resultHtml;
   }
 
   function calculateNeededCategoryAverage(
@@ -1386,9 +1398,11 @@
   }
 
   function clearQuarterFields() {
+      // Clear all number and text inputs within category sections
       document.querySelectorAll('.category-section input[type="number"]').forEach(input => input.value = '');
       document.querySelectorAll('.category-section input[type="text"]').forEach(input => input.value = '');
       
+      // Remove all dynamically added assignment rows from each category
       document.querySelectorAll('.assignment-inputs').forEach(container => {
           container.innerHTML = '';
       });
@@ -1400,15 +1414,15 @@
       // Clear needed grades section inputs and results
       document.getElementById('desiredQuarterGradeNeeded').value = '';
       document.getElementById('solveForType').value = ''; // Reset dropdown
-      // Removed futureLTScore and futureAssessScore as they are no longer in HTML
+      document.getElementById('assignmentPoints').value = ''; // Clear assignment points
       document.getElementById('neededGradesResults').innerHTML = '';
-      // Clear the assignment points input field
-      document.getElementById('assignmentPoints').value = '';
-      toggleNeededGradeInputs(); // Reset visibility
+      toggleNeededGradeInputs(); // Reset visibility/state
 
       // Clear results container
       document.getElementById('quarterResultsContainer').innerHTML = '';
+      document.getElementById('quarterResultsContainerCondensed').innerHTML = '';
 
+      // Reset category counters
       categoryCounters = {
           'learnerTasks': 0,
           'assessments': 0,
@@ -1431,7 +1445,8 @@
       document.getElementById('expandedAssignmentsHeader').style.display = 'none'; // Hide header if no assignments
       document.getElementById('condensedAssignmentsTableBody').innerHTML = ''; // Clear table
       
-      calculateQuarterGrade(); // Recalculate after clearing and setting initial view
+      // Recalculate with empty fields to show default message
+      calculateQuarterGrade(); 
   }
 
   // Regex patterns for parsing
@@ -1520,7 +1535,8 @@
       try {
         const { category, earned, possible } = parseRow(line);
         assignments.push({ category, earned, possible, raw });
-      } catch {
+      } catch (e) {
+        // console.warn(`Skipping line due to error: ${e.message} - "${line}"`);
         continue;
       }
     }
@@ -1708,7 +1724,13 @@
           if (condensedContainer) condensedContainer.style.display = 'none';
           if (expandedContainer) expandedContainer.style.display = 'block';
           // Show expanded header only if there are assignments to display
-          if (expandedHeader) expandedHeader.style.display = assignments.length > 0 ? 'flex' : 'none';
+          // Need to check actual assignments populated in the expanded view, not just length of parsed assignments
+          const hasExpandedAssignments = document.querySelectorAll('#assignmentsAssignments .class-input-row').length > 0 ||
+                                       document.querySelectorAll('#learnerTasksAssignments .class-input-row').length > 0 ||
+                                       document.querySelectorAll('#assessmentsAssignments .class-input-row').length > 0 ||
+                                       document.querySelectorAll('#customAssignments .class-input-row').length > 0;
+                                       
+          if (expandedHeader) expandedHeader.style.display = hasExpandedAssignments ? 'flex' : 'none';
       }
   }
 </script>
@@ -1809,7 +1831,25 @@
                   <!-- Condensed assignment rows will be added here -->
               </tbody>
           </table>
-          <button id="expandViewBtn" class="view-toggle-btn">
+          
+          <!-- Added Calculate and Clear buttons to condensed view -->
+          <div class="btn-group" style="margin-top: 1.5rem;">
+              <button id="calculateQuarterBtn2">
+                  <i class="fas fa-calculator"></i> Calculate Quarter Grade
+              </button>
+              <button class="btn-clear" id="clearQuarterFieldsBtn2">
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
+              </button>
+          </div>
+          
+          <!-- Added result section to condensed view -->
+          <div class="result-section" style="margin-top: 1rem;">
+              <div id="quarterResultsContainerCondensed">
+                  <h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>
+              </div>
+          </div>
+          
+          <button id="expandViewBtn" class="view-toggle-btn" style="margin-top: 1rem;">
               <i class="fas fa-chevron-down"></i> Show More
           </button>
       </div>
