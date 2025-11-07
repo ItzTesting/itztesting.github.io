@@ -412,6 +412,18 @@
       padding: 1.5rem;
       background-color: var(--secondary-bg);
       margin-bottom: 1.5rem;
+      /* Add smooth transitions for condensed view */
+      opacity: 1;
+      max-height: 5000px;
+      overflow: hidden;
+      transition: opacity 0.35s ease-in-out, max-height 0.35s ease-in-out;
+  }
+  .condensed-assignments-container.hiding {
+      opacity: 0;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-bottom: 0;
   }
 
   .condensed-assignments-table {
@@ -464,6 +476,24 @@
 
   .view-toggle-btn i {
       margin-right: 0.5rem;
+  }
+
+  /* Add animation classes for expanded view sections */
+  .assignment-section-animated {
+      opacity: 1;
+      max-height: 10000px;
+      overflow: visible;
+      transition: opacity 0.35s ease-in-out, max-height 0.35s ease-in-out;
+  }
+
+  .assignment-section-animated.hiding {
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      padding-top: 0;
+      padding-bottom: 0;
+      margin-top: 0;
+      margin-bottom: 0;
   }
 
   .expanded-assignments-header {
@@ -1703,37 +1733,85 @@
       const condenseViewBtn = document.getElementById('condenseViewBtn');
 
       if (viewType === 'condensed') {
-          // Show condensed view, hide expanded view
-          if (condensedContainer) condensedContainer.style.display = 'block';
+          // First, hide expanded view with animation
           if (expandedContainer) {
-              // Hide assignment input sections but keep buttons and results
               const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #groupedCategories, #singleAssignmentCategory');
-              assignmentSections.forEach(section => section.style.display = 'none');
+              assignmentSections.forEach(section => {
+                  section.classList.add('hiding');
+              });
           }
-          if (expandedHeader) expandedHeader.style.display = 'none';
+          if (expandedHeader) {
+              expandedHeader.style.opacity = '0';
+              expandedHeader.style.transition = 'opacity 0.35s ease-in-out';
+          }
           if (condenseViewBtn) condenseViewBtn.style.display = 'none';
+
+          // After animation completes, show condensed view
+          setTimeout(() => {
+              if (expandedContainer) {
+                  const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #groupedCategories, #singleAssignmentCategory');
+                  assignmentSections.forEach(section => {
+                      section.style.display = 'none';
+                      section.classList.remove('hiding');
+                  });
+              }
+              if (expandedHeader) expandedHeader.style.display = 'none';
+              
+              // Show condensed with animation
+              if (condensedContainer) {
+                  condensedContainer.style.display = 'block';
+                  condensedContainer.classList.remove('hiding');
+              }
+          }, 350);
       } else {
-          // Show expanded view, hide condensed view
-          if (condensedContainer) condensedContainer.style.display = 'none';
-          if (expandedContainer) {
-              // Show checkboxes
-              const checkboxes = expandedContainer.querySelectorAll('.checkbox-option-container');
-              checkboxes.forEach(checkbox => checkbox.style.display = 'flex');
-              
-              // Show/hide based on group view state
-              const groupView = document.getElementById('groupViewCheckbox').checked;
-              const overallWeights = document.getElementById('overallWeightsSection');
-              const groupedCategories = document.getElementById('groupedCategories');
-              const singleCategory = document.getElementById('singleAssignmentCategory');
-              
-              if (overallWeights) overallWeights.style.display = groupView ? 'none' : 'flex';
-              if (groupedCategories) groupedCategories.style.display = groupView ? 'block' : 'none';
-              if (singleCategory) singleCategory.style.display = groupView ? 'none' : 'block';
+          // First, hide condensed view with animation
+          if (condensedContainer) {
+              condensedContainer.classList.add('hiding');
           }
-          // Show expanded header only if there are assignments
-          const assignmentRows = document.querySelectorAll('#assignmentsAssignments .class-input-row');
-          if (expandedHeader) expandedHeader.style.display = assignmentRows.length > 0 ? 'flex' : 'none';
-          if (condenseViewBtn) condenseViewBtn.style.display = 'block';
+
+          // After animation completes, show expanded view
+          setTimeout(() => {
+              if (condensedContainer) condensedContainer.style.display = 'none';
+              
+              if (expandedContainer) {
+                  // Show checkboxes with animation
+                  const checkboxes = expandedContainer.querySelectorAll('.checkbox-option-container');
+                  checkboxes.forEach(checkbox => {
+                      checkbox.style.display = 'flex';
+                      checkbox.classList.remove('hiding');
+                  });
+                  
+                  // Show/hide based on group view state
+                  const groupView = document.getElementById('groupViewCheckbox').checked;
+                  const overallWeights = document.getElementById('overallWeightsSection');
+                  const groupedCategories = document.getElementById('groupedCategories');
+                  const singleCategory = document.getElementById('singleAssignmentCategory');
+                  
+                  if (overallWeights) {
+                      overallWeights.style.display = groupView ? 'none' : 'flex';
+                      overallWeights.classList.remove('hiding');
+                  }
+                  if (groupedCategories) {
+                      groupedCategories.style.display = groupView ? 'block' : 'none';
+                      groupedCategories.classList.remove('hiding');
+                  }
+                  if (singleCategory) {
+                      singleCategory.style.display = groupView ? 'none' : 'block';
+                      singleCategory.classList.remove('hiding');
+                  }
+              }
+              
+              // Show expanded header with fade-in
+              const assignmentRows = document.querySelectorAll('#assignmentsAssignments .class-input-row');
+              if (expandedHeader && assignmentRows.length > 0) {
+                  expandedHeader.style.display = 'flex';
+                  expandedHeader.style.opacity = '0';
+                  setTimeout(() => {
+                      expandedHeader.style.opacity = '1';
+                  }, 10);
+              }
+              if (condenseViewBtn) condenseViewBtn.style.display = 'block';
+          }, 350);
       }
   }
 </script>
