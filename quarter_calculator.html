@@ -412,18 +412,15 @@
       padding: 1.5rem;
       background-color: var(--secondary-bg);
       margin-bottom: 1.5rem;
-      /* Add smooth transitions for condensed view */
+      /* Enhanced smooth transitions with GPU acceleration */
       opacity: 1;
-      max-height: 5000px;
-      overflow: hidden;
-      transition: opacity 0.35s ease-in-out, max-height 0.35s ease-in-out;
+      transform: translateY(0);
+      transition: opacity 0.35s ease-in-out, transform 0.35s ease-in-out;
+      will-change: opacity, transform;
   }
   .condensed-assignments-container.hiding {
       opacity: 0;
-      max-height: 0;
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-bottom: 0;
+      transform: translateY(-10px);
   }
 
   .condensed-assignments-table {
@@ -479,21 +476,17 @@
   }
 
   /* Add animation classes for expanded view sections */
+  /* Enhanced animation classes for expanded view with GPU acceleration */
   .assignment-section-animated {
       opacity: 1;
-      max-height: 10000px;
-      overflow: visible;
-      transition: opacity 0.35s ease-in-out, max-height 0.35s ease-in-out;
+      transform: translateY(0);
+      transition: opacity 0.35s ease-in-out, transform 0.35s ease-in-out;
+      will-change: opacity, transform;
   }
 
   .assignment-section-animated.hiding {
       opacity: 0;
-      max-height: 0;
-      overflow: hidden;
-      padding-top: 0;
-      padding-bottom: 0;
-      margin-top: 0;
-      margin-bottom: 0;
+      transform: translateY(-10px);
   }
 
   .expanded-assignments-header {
@@ -1733,7 +1726,7 @@
       const condenseViewBtn = document.getElementById('condenseViewBtn');
 
       if (viewType === 'condensed') {
-          // First, hide expanded view with animation
+          // Hide expanded view with animation
           if (expandedContainer) {
               const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #groupedCategories, #singleAssignmentCategory');
               assignmentSections.forEach(section => {
@@ -1742,7 +1735,8 @@
           }
           if (expandedHeader) {
               expandedHeader.style.opacity = '0';
-              expandedHeader.style.transition = 'opacity 0.35s ease-in-out';
+              expandedHeader.style.transform = 'translateY(-10px)';
+              expandedHeader.style.transition = 'opacity 0.35s ease-in-out, transform 0.35s ease-in-out';
           }
           if (condenseViewBtn) condenseViewBtn.style.display = 'none';
 
@@ -1760,11 +1754,13 @@
               // Show condensed with animation
               if (condensedContainer) {
                   condensedContainer.style.display = 'block';
+                  // Force reflow to ensure animation plays
+                  void condensedContainer.offsetWidth;
                   condensedContainer.classList.remove('hiding');
               }
           }, 350);
       } else {
-          // First, hide condensed view with animation
+          // Hide condensed view with animation
           if (condensedContainer) {
               condensedContainer.classList.add('hiding');
           }
@@ -1778,6 +1774,8 @@
                   const checkboxes = expandedContainer.querySelectorAll('.checkbox-option-container');
                   checkboxes.forEach(checkbox => {
                       checkbox.style.display = 'flex';
+                      // Force reflow to ensure animation plays
+                      void checkbox.offsetWidth;
                       checkbox.classList.remove('hiding');
                   });
                   
@@ -1789,14 +1787,17 @@
                   
                   if (overallWeights) {
                       overallWeights.style.display = groupView ? 'none' : 'flex';
+                      if (!groupView) void overallWeights.offsetWidth;
                       overallWeights.classList.remove('hiding');
                   }
                   if (groupedCategories) {
                       groupedCategories.style.display = groupView ? 'block' : 'none';
+                      if (groupView) void groupedCategories.offsetWidth;
                       groupedCategories.classList.remove('hiding');
                   }
                   if (singleCategory) {
                       singleCategory.style.display = groupView ? 'none' : 'block';
+                      if (!groupView) void singleCategory.offsetWidth;
                       singleCategory.classList.remove('hiding');
                   }
               }
@@ -1806,8 +1807,12 @@
               if (expandedHeader && assignmentRows.length > 0) {
                   expandedHeader.style.display = 'flex';
                   expandedHeader.style.opacity = '0';
+                  expandedHeader.style.transform = 'translateY(-10px)';
+                  // Force reflow
+                  void expandedHeader.offsetWidth;
                   setTimeout(() => {
                       expandedHeader.style.opacity = '1';
+                      expandedHeader.style.transform = 'translateY(0)';
                   }, 10);
               }
               if (condenseViewBtn) condenseViewBtn.style.display = 'block';
