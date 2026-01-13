@@ -1076,7 +1076,8 @@
           document.querySelectorAll('#learnerTasksAssignments .class-input-row').forEach(row => {
               const earned = parseFloat(row.querySelector('.assignment-grade-input').value);
               const possible = parseFloat(row.querySelector('.assignment-possible-input').value);
-              if (!isNaN(earned) && !isNaN(possible) && possible > 0) {
+              // Changed condition from possible > 0 to possible >= 0
+              if (!isNaN(earned) && !isNaN(possible) && possible >= 0) {
                   assignments.push({ category: 'Learner Tasks', earned: earned, possible: possible });
               }
           });
@@ -1085,7 +1086,8 @@
           document.querySelectorAll('#assessmentsAssignments .class-input-row').forEach(row => {
               const earned = parseFloat(row.querySelector('.assignment-grade-input').value);
               const possible = parseFloat(row.querySelector('.assignment-possible-input').value);
-              if (!isNaN(earned) && !isNaN(possible) && possible > 0) {
+              // Changed condition from possible > 0 to possible >= 0
+              if (!isNaN(earned) && !isNaN(possible) && possible >= 0) {
                   assignments.push({ category: 'Assessments', earned: earned, possible: possible });
               }
           });
@@ -1095,7 +1097,8 @@
               const earned = parseFloat(row.querySelector('.assignment-grade-input').value);
               const possible = parseFloat(row.querySelector('.assignment-possible-input').value);
               const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
-              if (!isNaN(earned) && !isNaN(possible) && possible > 0 && !isNaN(weight) && weight > 0) {
+              // Changed condition from possible > 0 to possible >= 0
+              if (!isNaN(earned) && !isNaN(possible) && possible >= 0 && !isNaN(weight) && weight > 0) {
                   const customCategory = `Custom_${Math.random()}`;
                   assignments.push({ category: customCategory, earned: earned, possible: possible });
                   weights[customCategory] = weight / 100;
@@ -1115,7 +1118,8 @@
               const type = row.querySelector('.assignment-type-select').value;
               const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
               
-              if (!isNaN(earned) && !isNaN(possible) && possible > 0) {
+              // Changed condition from possible > 0 to possible >= 0
+              if (!isNaN(earned) && !isNaN(possible) && possible >= 0) {
                   if (type === 'Learner Tasks') {
                       assignments.push({ category: 'Learner Tasks', earned: earned, possible: possible });
                   } else if (type === 'Assessments') {
@@ -1136,6 +1140,7 @@
           if (!categoryTotals[a.category]) {
               categoryTotals[a.category] = { earned: 0, possible: 0 };
           }
+          // Add earned and possible points, even if possible is 0
           categoryTotals[a.category].earned += a.earned;
           categoryTotals[a.category].possible += a.possible;
       });
@@ -1145,9 +1150,12 @@
       
       for (const category in weights) {
           if (categoryTotals[category] && weights[category] > 0) {
-              const avg = categoryTotals[category].earned / categoryTotals[category].possible;
-              finalGrade += avg * weights[category];
-              totalWeight += weights[category];
+              if (categoryTotals[category].possible > 0) {
+                  const avg = categoryTotals[category].earned / categoryTotals[category].possible;
+                  finalGrade += avg * weights[category];
+                  totalWeight += weights[category];
+              }
+              // If possible === 0, skip this category in the grade calculation
           }
       }
       
@@ -1160,9 +1168,11 @@
           // Display category averages
           for (const category in categoryTotals) {
               if (weights[category] && weights[category] > 0) {
-                  const categoryAvg = (categoryTotals[category].earned / categoryTotals[category].possible) * 100;
-                  const displayName = category.startsWith('Custom_') ? 'Custom' : category;
-                  resultHtml += `<h3>${displayName} Average: <span>${categoryAvg.toFixed(2)}%</span></h3>`;
+                  if (categoryTotals[category].possible > 0) {
+                      const categoryAvg = (categoryTotals[category].earned / categoryTotals[category].possible) * 100;
+                      const displayName = category.startsWith('Custom_') ? 'Custom' : category;
+                      resultHtml += `<h3>${displayName} Average: <span>${categoryAvg.toFixed(2)}%</span></h3>`;
+                  }
               }
           }
       } else {
@@ -1241,7 +1251,7 @@
       document.querySelectorAll('#learnerTasksAssignments .class-input-row').forEach(row => {
         const earned = parseFloat(row.querySelector('.assignment-grade-input').value);
         const possible = parseFloat(row.querySelector('.assignment-possible-input').value);
-        if (!isNaN(earned) && !isNaN(possible) && possible > 0) {
+        if (!isNaN(earned) && !isNaN(possible) && possible >= 0) {
           ltTotalEarned += earned;
           ltTotalPossible += possible;
         }
@@ -1251,7 +1261,7 @@
       document.querySelectorAll('#assessmentsAssignments .class-input-row').forEach(row => {
         const earned = parseFloat(row.querySelector('.assignment-grade-input').value);
         const possible = parseFloat(row.querySelector('.assignment-possible-input').value);
-        if (!isNaN(earned) && !isNaN(possible) && possible > 0) {
+        if (!isNaN(earned) && !isNaN(possible) && possible >= 0) {
           assessTotalEarned += earned;
           assessTotalPossible += possible;
         }
@@ -1262,6 +1272,7 @@
         const earned = parseFloat(row.querySelector('.assignment-grade-input').value);
         const possible = parseFloat(row.querySelector('.assignment-possible-input').value);
         const weight = parseFloat(row.querySelector('.assignment-weight-input').value);
+        // Changed from possible > 0 to possible >= 0, but only add if possible > 0 for percentage calculation
         if (!isNaN(earned) && !isNaN(possible) && possible > 0 && !isNaN(weight) && weight >= 0) {
           const percentage = (earned / possible) * 100;
           customAssignments.push({ score: percentage, weight: weight });
@@ -1277,7 +1288,7 @@
         const type = row.querySelector('.assignment-type-select').value;
         const customWeight = parseFloat(row.querySelector('.assignment-custom-weight-input').value);
 
-        if (!isNaN(earned) && !isNaN(possible) && possible > 0) {
+        if (!isNaN(earned) && !isNaN(possible) && possible >= 0) {
           if (type === 'Learner Tasks') {
             ltTotalEarned += earned;
             ltTotalPossible += possible;
@@ -1285,7 +1296,8 @@
             assessTotalEarned += earned;
             assessTotalPossible += possible;
           } else if (type === 'Custom') {
-            if (!isNaN(customWeight) && customWeight >= 0) {
+            // Only calculate percentage if possible > 0 to avoid division by zero
+            if (!isNaN(customWeight) && customWeight >= 0 && possible > 0) {
               const percentage = (earned / possible) * 100;
               customAssignments.push({ score: percentage, weight: customWeight });
             }
@@ -1484,19 +1496,15 @@
   }
 
   function parseRow(line) {
-    if (looksLikeHeader(line)) throw new Error("header");
+    const FRACTION = /(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)/g;
+    const PERCENT = /(\d+(?:\.\d+)?)\s*%/;
 
-    const cols = line.split(COL_SPLIT).map(c => c.trim()).filter(c => c.length > 0);
-    if (cols.length === 0) throw new Error("empty");
-
-    const hasDate = DATE_TOKEN.test(cols[0]);
-    let category = "";
-
-    if (hasDate && cols.length >= 2) {
-      category = cols[1];
-    } else if (
-      cols.length >= 2 &&
-      ["learner tasks", "assessment"].includes(cols[0].toLowerCase())
+    let category = "Uncategorized";
+    const cols = line.split(/\t+/);
+    if (
+      cols.length > 1 &&
+      (cols[0].toLowerCase().includes("assess") ||
+        cols[0].toLowerCase().includes("learner"))
     ) {
       category = cols[0];
     } else {
@@ -1525,7 +1533,8 @@
     }
 
     if (earned == null || possible == null) throw new Error("no_score");
-    if (possible <= 0 || earned < 0 || earned > possible * 2)
+    // Changed from possible <= 0 to possible < 0
+    if (possible < 0 || earned < 0 || earned > possible * 2)
       throw new Error("bad_numbers");
 
     return { category, earned, possible };
@@ -1600,7 +1609,7 @@
 
     autofillAssignmentsFromParsed(assignments);
     
-    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
+    statusContainer.innerHTML = '<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>';
     
     setTimeout(() => {
       statusContainer.innerHTML = '';
