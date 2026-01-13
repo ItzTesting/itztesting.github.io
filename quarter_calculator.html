@@ -1609,7 +1609,7 @@
 
     autofillAssignmentsFromParsed(assignments);
     
-    statusContainer.innerHTML = '<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>';
+    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
     
     setTimeout(() => {
       statusContainer.innerHTML = '';
