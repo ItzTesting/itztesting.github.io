@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1457,19 +1456,27 @@
       calculateQuarterGrade(); // Recalculate after clearing and setting initial view
   }
 
-  // Regex patterns for parsing
-  const COL_SPLIT = /\t+|\s{2,}/;
-  const DATE_TOKEN = /^\d{1,2}\/\d{1,2}\/\d{2,4}$/;
-  const FRACTION = /(?<!\d)(\d{1,3}(?:\.\d+)?)\s*\/\s*(\d{1,3}(?:\.\d+)?)(?!\/\d)/g;
-  const PERCENT = /(?<!\d)(\d{1,3}(?:\.\d+)?)\s*%/;
-
+  // ----- Regex -----
+  const COL_SPLIT = /\t+|\s{2,}/g;                     // tabs or 2+ spaces
+  const DATE_TOKEN = /^\d{1,2}\/\d{1,2}\/\d{2,4}$/;     // 10/10/2025
+  // fraction: 9/10 but NOT 10/10/2025 (avoid trailing "/digits")
+  const FRACTION = /(\d{1,3}(?:\.\d+)?)\s*\/\s*(\d{1,3}(?:\.\d+)?)(?!\/\d)/g;
+  const PERCENT  = /(\d{1,3}(?:\.\d+)?)\s*%/;
   const HEADER_HINTS = [
-    "Assignments",
-    "Due Date",
-    "View comments",
-    "Assignment Score Or Flag Last Updated"
+    'Assignments',
+    'Due Date',
+    'View comments',
+    'Assignment Score Or Flag Last Updated'
   ];
 
+  // ----- Precision helpers -----
+  function round7(x) { return Math.round((+x + Number.EPSILON) * 1e7) / 1e7; }
+  function fmtFull(x) {
+    const s = (+x).toFixed(15).replace(/\.?0+$/, '');
+    return s.length ? s : '0';
+  }
+
+  // ----- Header detection -----
   function looksLikeHeader(line) {
     const s = line.trim();
     if (!s) return true;
@@ -1477,47 +1484,65 @@
     return HEADER_HINTS.some(h => low.includes(h.toLowerCase()));
   }
 
-  function fmtFull(x) {
-    if (Number.isNaN(x)) return "NaN";
-    let s = x.toFixed(15);
-    s = s.replace(/0+$/, "").replace(/\.$/, "");
-    return s || "0";
+  /**
+   * Pick score fraction on a line.
+   * If teacher shows: "14/20 (28/40)", we prefer the fraction INSIDE parentheses (28/40).
+   * Fallback: last fraction anywhere on the line.
+   */
+  function pickFractionPreferInsideParens(line) {
+    let lastAny = null;
+    let lastInside = null;
+
+    for (const m of line.matchAll(FRACTION)) {
+      lastAny = m;
+
+      const idx = m.index ?? 0;
+      const before = line.slice(0, idx);
+      const depth = (before.match(/\(/g)?.length ?? 0) - (before.match(/\)/g)?.length ?? 0);
+      const insideParens = depth > 0;
+
+      if (insideParens) lastInside = m;
+    }
+
+    const pick = lastInside || lastAny;
+    if (!pick) return null;
+
+    const earned = parseFloat(pick[1]);
+    const possible = parseFloat(pick[2]);
+    return { earned, possible };
   }
 
+  // ----- Core parsing of a single row -----
   function parseRow(line) {
-    if (looksLikeHeader(line)) throw new Error("header");
+    if (looksLikeHeader(line)) throw new Error('header');
 
-    const cols = line.split(COL_SPLIT).map(c => c.trim()).filter(c => c.length > 0);
-    if (cols.length === 0) throw new Error("empty");
+    const cols = line.split(COL_SPLIT).map(s => s.trim()).filter(Boolean);
+    if (!cols.length) throw new Error('empty');
 
     const hasDate = DATE_TOKEN.test(cols[0]);
-    let category = "";
 
+    // category resolution
+    let category = '';
     if (hasDate && cols.length >= 2) {
       category = cols[1];
-    } else if (
-      cols.length >= 2 &&
-      ["learner tasks", "assessment"].includes(cols[0].toLowerCase())
-    ) {
+    } else if (cols.length >= 1 && ['learner tasks', 'assessment'].includes(cols[0].toLowerCase())) {
       category = cols[0];
     } else {
       const lc = line.toLowerCase();
-      if (lc.includes("assess")) category = "Assessment";
-      else if (lc.includes("learner")) category = "Learner Tasks";
-      else category = "Uncategorized";
+      if (lc.includes('assess')) category = 'Assessment';
+      else if (lc.includes('learner')) category = 'Learner Tasks';
+      else category = 'Uncategorized';
     }
 
-    // find last fraction
-    const fracs = [...line.matchAll(FRACTION)];
-    let earned = null;
-    let possible = null;
+    // ---- score detection (prefer inside parentheses) ----
+    let earned = null, possible = null;
 
-    if (fracs.length > 0) {
-      const m = fracs[fracs.length - 1];
-      earned = parseFloat(m[1]);
-      possible = parseFloat(m[2]);
+    const frac = pickFractionPreferInsideParens(line);
+    if (frac) {
+      earned = frac.earned;
+      possible = frac.possible;
     } else {
-      const mp = PERCENT.exec(line);
+      const mp = line.match(PERCENT);
       if (mp) {
         const pct = parseFloat(mp[1]) / 100.0;
         earned = pct * 100.0;
@@ -1525,24 +1550,21 @@
       }
     }
 
-    if (earned == null || possible == null) throw new Error("no_score");
-    if (possible <= 0 || earned < 0 || earned > possible * 2)
-      throw new Error("bad_numbers");
+    if (earned == null || possible == null) throw new Error('no_score');
+    if (!(possible > 0) || !(earned >= 0) || earned > possible * 2) throw new Error('bad_numbers');
 
-    return { category, earned, possible };
+    return { category, earned, possible, raw: line };
   }
 
+  // ----- Parse all text block -----
   function parseTextBlock(text) {
     const assignments = [];
-    const lines = text.split(/\r?\n/);
-
-    for (const raw of lines) {
-      const line = raw.trim().replace(/\u00A0/g, " ");
+    for (const rawLine of text.split(/\r?\n/)) {
+      const line = rawLine.trim().replace(/\u00A0/g, ' ');
       if (!line) continue;
-
       try {
         const { category, earned, possible } = parseRow(line);
-        assignments.push({ category, earned, possible, raw });
+        assignments.push({ category, earned, possible, raw: rawLine });
       } catch {
         continue;
       }
@@ -1550,34 +1572,31 @@
     return assignments;
   }
 
+  // ----- Summaries (no rounding inside) -----
   function summarize(assignments) {
-    const e = assignments.reduce((sum, a) => sum + a.earned, 0);
-    const p = assignments.reduce((sum, a) => sum + a.possible, 0);
-    const pct = p ? e / p : 0.0;
+    const e = assignments.reduce((s, a) => s + a.earned, 0);
+    const p = assignments.reduce((s, a) => s + a.possible, 0);
+    const pct = p ? (e / p) : 0;
     return { e, p, pct };
   }
 
-  function summarizeWeighted(assignments) {
+  function summarizeWeighted(assignments, weights = { Assessment: 0.8, 'Learner Tasks': 0.2 }) {
     const byCat = {};
     for (const a of assignments) {
-      if (!byCat[a.category]) byCat[a.category] = { e: 0.0, p: 0.0 };
+      if (!byCat[a.category]) byCat[a.category] = { e: 0, p: 0 };
       byCat[a.category].e += a.earned;
       byCat[a.category].p += a.possible;
     }
-
-    const weights = { Assessment: 0.8, "Learner Tasks": 0.2 };
-    let total = 0.0;
+    let total = 0;
     const details = [];
-
     for (const [cat, w] of Object.entries(weights)) {
-      const e = byCat[cat]?.e || 0.0;
-      const p = byCat[cat]?.p || 0.0;
-      const avg = p > 0 ? e / p : 0.0;
-      total += avg * w;
-      details.push({ cat, avg, w });
+      const e = (byCat[cat]?.e) ?? 0;
+      const p = (byCat[cat]?.p) ?? 0;
+      const avg = p ? (e / p) : 0;
+      total += (avg * w);
+      details.push({ category: cat, avg, weight: w });
     }
-
-    return { total, details };
+    return { percent: total, details };
   }
 
   function processPowerSchoolText() {
