@@ -1580,7 +1580,8 @@
     return { e, p, pct };
   }
 
-  function summarizeWeighted(assignments, weights = { Assessment: 0.8, 'Learner Tasks': 0.2 }) {
+  function summarizeWeighted(assignments) {
+    const weights = { Assessment: 0.8, 'Learner Tasks': 0.2 };
     const byCat = {};
     for (const a of assignments) {
       if (!byCat[a.category]) byCat[a.category] = { e: 0, p: 0 };
@@ -1594,9 +1595,9 @@
       const p = (byCat[cat]?.p) ?? 0;
       const avg = p ? (e / p) : 0;
       total += (avg * w);
-      details.push({ category: cat, avg, weight: w });
+      details.push({ cat, avg, w });
     }
-    return { percent: total, details };
+    return { total, details };
   }
 
   function processPowerSchoolText() {
