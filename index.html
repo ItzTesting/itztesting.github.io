@@ -287,6 +287,46 @@ gtag('config', 'G-LNMT1VXJW1');
       color: var(--accent-color);
   }
 
+  /* Always-visible tip pointing users to the precise Quarter Calculator workflow */
+  .tip-prompt {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      background-color: var(--highlight-bg);
+      border-left: 4px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+  }
+
+  .tip-prompt .tip-icon {
+      color: var(--accent-color);
+      font-size: 1.25rem;
+      margin-top: 0.15rem;
+      flex: 0 0 auto;
+  }
+
+  .tip-prompt .tip-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+  }
+
+  .tip-prompt .tip-text strong {
+      color: var(--text-color);
+  }
+
+  /* Accent-green link inside the tip (overrides the global blue link color) */
+  .tip-prompt .tip-text a {
+      color: var(--accent-color);
+      font-weight: 600;
+      text-decoration: underline;
+  }
+
+  .tip-prompt .tip-text a:hover {
+      color: var(--accent-hover);
+  }
+
   /* Banner shown when precise grades are imported from the Quarter Calculator */
   .import-banner {
       display: none;
@@ -1401,6 +1441,18 @@ function clearFields() {
       <div class="card">
           <h2>Final Grade Calculator</h2>
 
+          <!-- Always-visible tip pointing users to the precise Quarter Calculator workflow -->
+          <div class="tip-prompt">
+              <i class="fas fa-lightbulb tip-icon"></i>
+              <div class="tip-text">
+                  <strong>For the most accurate result:</strong> PowerSchool only shows whole-number
+                  quarter grades, so typing those rounded values here makes the final grade slightly off.
+                  Calculate each quarter precisely in the
+                  <a href="quarter_calculator.html">Quarter Calculator</a> first, then send those exact
+                  values over &mdash; they'll auto-fill the fields below.
+              </div>
+          </div>
+
           <!-- Shown when precise grades are imported from the Quarter Calculator -->
           <div id="importBanner" class="import-banner">
               <i class="fas fa-bolt banner-icon"></i>
@@ -1558,10 +1610,10 @@ function clearFields() {
   <div id="featureModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="featureModalTitle">
       <div class="modal-container">
           <div class="modal-header">
-              <h3 id="featureModalTitle">Want to Be Featured Here?</h3>
+              <h3 id="featureModalTitle">New: Import Precise Grades!</h3>
           </div>
           <div class="modal-body">
-              <p style="font-size: 1.1rem;"> If you're part of a club, organization, or have something valuable to share with the school community, this space is for you. Submit your info - events, updates, sign-ups, or anything else - and we'll display it here for everyone to see. </p>
+              <p style="font-size: 1.1rem;"> PowerSchool only shows rounded quarter grades, which makes this calculator's result slightly off. Now you can calculate each quarter exactly in the <strong>Quarter Calculator</strong> and send those precise values straight to this Final Grade Calculator - they'll auto-fill the fields for the most accurate result possible. </p>
               <hr style="margin: 1.5rem 0 1rem 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.2);">
               <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">If you want your content to be featured here, see the <a href="popup-info.html" style="color: var(--primary-color); text-decoration: none;">Popup Info page</a> for more information.</p>
               <button id="featureModalGotIt" class="btn-group" style="margin-top: 1.5rem; width: 100%;">Got it!</button>
