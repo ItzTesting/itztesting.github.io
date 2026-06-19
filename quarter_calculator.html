@@ -707,29 +707,21 @@
 
       // Export to Final Grade Calculator
       document.getElementById('sendToFinalBtn').addEventListener('click', sendGradeToFinalCalc);
-      updateExportAvailability(); // start disabled until a grade is calculated
       renderExportStatus();       // show any slots already queued from a previous session
 
-      // Add event listeners for "Add Assignment" buttons
-      document.getElementById('addLearnerTasksBtn').addEventListener('click', () => addAssignmentInput('learnerTasks'));
-      document.getElementById('addAssessmentsBtn').addEventListener('click', () => addAssignmentInput('assessments'));
-      document.getElementById('addCustomBtn').addEventListener('click', () => addAssignmentInput('custom'));
-      document.getElementById('addAssignmentBtn').addEventListener('click', () => addAssignmentInput('assignments')); // New button for single view
+      // Add event listener for the single-view "Add Assignment" button
+      document.getElementById('addAssignmentBtn').addEventListener('click', () => addAssignmentInput('assignments'));
 
       // Add event listener for the "Show Assignment Names" checkbox
       document.getElementById('showAssignmentNamesCheckbox').addEventListener('change', toggleAssignmentNamesVisibility);
-      // Add event listener for the "Group View" checkbox
-      document.getElementById('groupViewCheckbox').addEventListener('change', (event) => toggleGroupView(event.target.checked));
-      
+
       // Add event listeners for Needed Grades section
       document.getElementById('solveForType').addEventListener('change', toggleNeededGradeInputs);
       document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFutureGrades);
 
-      // Initial visibility check for assignment names and group view
+      // Initial visibility check for assignment names
       document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
-      document.getElementById('groupViewCheckbox').checked = false; // Default to Group View OFF
-      toggleGroupView(false); // Explicitly set group view OFF on page load
-      toggleAssignmentNamesVisibility(); // Re-apply after group view toggle
+      toggleAssignmentNamesVisibility();
       toggleNeededGradeInputs(); // Initial state for needed grades section
 
       // Check if consent has already been given
@@ -779,16 +771,6 @@
   function toggleMenu() {
       const navLinks = document.querySelector('.nav-links');
       navLinks.classList.toggle('active');
-  }
-
-  // Modified toggleGroupView to accept a boolean for explicit control
-  function toggleGroupView(shouldBeGroupView) {
-      currentViewIsGrouped = shouldBeGroupView; // Update the global state
-      document.getElementById('groupedCategories').style.display = shouldBeGroupView ? 'block' : 'none';
-      document.getElementById('singleAssignmentCategory').style.display = shouldBeGroupView ? 'none' : 'block';
-      document.getElementById('overallWeightsSection').style.display = shouldBeGroupView ? 'none' : 'flex'; // Show/hide overall weights
-
-      calculateQuarterGrade(); // Recalculate based on new view
   }
 
   function addAssignmentInput(category) {
@@ -1231,7 +1213,6 @@
       }
 
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
-      updateExportAvailability();
   }
 
   function calculateNeededCategoryAverage(
@@ -1501,12 +1482,8 @@
       };
       
       // Set the Show Assignment Names checkbox state and trigger its toggle function
-      document.getElementById('showAssignmentNamesCheckbox').checked = true; 
-      toggleAssignmentNamesVisibility(); 
-      
-      // Explicitly set group view OFF after clearing
-      document.getElementById('groupViewCheckbox').checked = false;
-      toggleGroupView(false); 
+      document.getElementById('showAssignmentNamesCheckbox').checked = true;
+      toggleAssignmentNamesVisibility();
 
       // Reset assignment view to expanded and clear condensed view
       currentAssignmentView = 'expanded';
@@ -1520,13 +1497,6 @@
 
   // ----- Export to Final Grade Calculator -----
 
-  // Enable the "Send" control only when a valid, full-precision grade is available.
-  function updateExportAvailability() {
-      const btn = document.getElementById('sendToFinalBtn');
-      if (!btn) return;
-      btn.disabled = (currentPreciseQuarterGrade === null || isNaN(currentPreciseQuarterGrade));
-  }
-
   function readFinalGradeImports() {
       try {
           return JSON.parse(localStorage.getItem(FINAL_GRADE_IMPORTS_KEY)) || {};
@@ -1537,7 +1507,16 @@
 
   // Save the current precise grade into the selected slot of the shared bridge.
   function sendGradeToFinalCalc() {
-      if (currentPreciseQuarterGrade === null || isNaN(currentPreciseQuarterGrade)) return;
+      // Always recompute first so the user can send without clicking "Calculate Quarter Grade" themselves.
+      calculateQuarterGrade();
+
+      if (currentPreciseQuarterGrade === null || isNaN(currentPreciseQuarterGrade)) {
+          const statusEl = document.getElementById('exportStatus');
+          if (statusEl) {
+              statusEl.innerHTML = `<p style="color: #f44336;">Enter your assignment grades and weights above, then try sending again.</p>`;
+          }
+          return;
+      }
 
       const slot = document.getElementById('exportSlot').value;
       if (!EXPORT_SLOT_LABELS[slot]) return;
@@ -1749,12 +1728,7 @@
   function autofillAssignmentsFromParsed(assignments) {
     // Clear existing assignments first
     clearQuarterFields();
-    
-    // Determine if we should use group view or single view
-    // For simplicity, we'll use single assignment view since it's more flexible
-    document.getElementById('groupViewCheckbox').checked = false;
-    toggleGroupView(false);
-    
+
     // Set default weights for Learner Tasks and Assessments
     document.getElementById('overallLearnerTaskWeight').value = '20';
     document.getElementById('overallAssessmentWeight').value = '80';
@@ -1867,7 +1841,7 @@
       if (viewType === 'condensed') {
           // Hide expanded view with animation
           if (expandedContainer) {
-              const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #groupedCategories, #singleAssignmentCategory');
+              const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #singleAssignmentCategory');
               assignmentSections.forEach(section => {
                   section.classList.add('hiding');
               });
@@ -1882,7 +1856,7 @@
           // After animation completes, show condensed view
           setTimeout(() => {
               if (expandedContainer) {
-                  const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #groupedCategories, #singleAssignmentCategory');
+                  const assignmentSections = expandedContainer.querySelectorAll('.checkbox-option-container, #overallWeightsSection, #singleAssignmentCategory');
                   assignmentSections.forEach(section => {
                       section.style.display = 'none';
                       section.classList.remove('hiding');
@@ -1918,25 +1892,18 @@
                       checkbox.classList.remove('hiding');
                   });
                   
-                  // Show/hide based on group view state
-                  const groupView = document.getElementById('groupViewCheckbox').checked;
+                  // Restore the single-view sections
                   const overallWeights = document.getElementById('overallWeightsSection');
-                  const groupedCategories = document.getElementById('groupedCategories');
                   const singleCategory = document.getElementById('singleAssignmentCategory');
-                  
+
                   if (overallWeights) {
-                      overallWeights.style.display = groupView ? 'none' : 'flex';
-                      if (!groupView) void overallWeights.offsetWidth;
+                      overallWeights.style.display = 'flex';
+                      void overallWeights.offsetWidth;
                       overallWeights.classList.remove('hiding');
                   }
-                  if (groupedCategories) {
-                      groupedCategories.style.display = groupView ? 'block' : 'none';
-                      if (groupView) void groupedCategories.offsetWidth;
-                      groupedCategories.classList.remove('hiding');
-                  }
                   if (singleCategory) {
-                      singleCategory.style.display = groupView ? 'none' : 'block';
-                      if (!groupView) void singleCategory.offsetWidth;
+                      singleCategory.style.display = 'block';
+                      void singleCategory.offsetWidth;
                       singleCategory.classList.remove('hiding');
                   }
               }
@@ -2072,19 +2039,13 @@
               <h3>All Assignment Details</h3>
           </div>
 
-          <!-- Group View Checkbox (New) -->
-          <div class="checkbox-option-container">
-              <input type="checkbox" id="groupViewCheckbox">
-              <label for="groupViewCheckbox">Group View</label>
-          </div>
-
           <!-- Show Assignment Names Checkbox -->
           <div class="checkbox-option-container">
               <input type="checkbox" id="showAssignmentNamesCheckbox" checked>
               <label for="showAssignmentNamesCheckbox">Show Assignment Names</label>
           </div>
 
-          <!-- Overall Weights Section (visible when Group View is OFF) -->
+          <!-- Overall Weights Section -->
           <div id="overallWeightsSection" class="overall-weights-section">
               <div class="input-group">
                   <label for="overallLearnerTaskWeight">Learner Task Weight (%)</label>
@@ -2093,57 +2054,6 @@
               <div class="input-group">
                   <label for="overallAssessmentWeight">Assessment Weight (%)</label>
                   <input type="number" id="overallAssessmentWeight" min="0" max="100" placeholder="e.g., 80">
-              </div>
-          </div>
-
-          <!-- Grouped Categories Section (Hidden by Default) -->
-          <div id="groupedCategories" style="display: none;">
-              <!-- Learner Tasks Category -->
-              <div class="category-section">
-                  <div class="category-header">
-                      <h3>Learner Tasks</h3>
-                      <div class="input-group">
-                          <label for="learnerTasksWeight">Weight (%)</label>
-                          <input type="number" id="learnerTasksWeight" min="0" max="100" value="20" placeholder="e.g., 20">
-                      </div>
-                  </div>
-                  <div id="learnerTasksAssignments" class="assignment-inputs">
-                      <!-- Learner Tasks assignment inputs will be added here -->
-                  </div>
-                  <button id="addLearnerTasksBtn" style="margin-top: 1rem;">
-                      <i class="fas fa-plus-circle"></i> Add Learner Task Grade
-                  </button>
-              </div>
-
-              <!-- Assessments Category -->
-              <div class="category-section">
-                  <div class="category-header">
-                      <h3>Assessments</h3>
-                      <div class="input-group">
-                          <label for="assessmentsWeight">Weight (%)</label>
-                          <input type="number" id="assessmentsWeight" min="0" max="100" value="80" placeholder="e.g., 80">
-                      </div>
-                  </div>
-                  <div id="assessmentsAssignments" class="assignment-inputs">
-                      <!-- Assessments assignment inputs will be added here -->
-                  </div>
-                  <button id="addAssessmentsBtn" style="margin-top: 1rem;">
-                      <i class="fas fa-plus-circle"></i> Add Assessment Grade
-                  </button>
-              </div>
-
-              <!-- Custom Category -->
-              <div class="category-section">
-                  <div class="category-header">
-                      <h3>Custom</h3>
-                      <!-- Removed the overall weight input for Custom category -->
-                  </div>
-                  <div id="customAssignments" class="assignment-inputs">
-                      <!-- Custom assignment inputs will be added here -->
-                  </div>
-                  <button id="addCustomBtn" style="margin-top: 1rem;">
-                      <i class="fas fa-plus-circle"></i> Add Custom Grade
-                  </button>
               </div>
           </div>
 
@@ -2190,8 +2100,9 @@
           <div class="export-section">
               <h3><i class="fas fa-share"></i> Send to Final Grade Calculator</h3>
               <p style="color: var(--text-secondary); margin-bottom: 1rem;">
-                  Calculate a precise grade above, choose which slot it belongs to, then send it. Repeat for each quarter,
-                  the midterm, and the final &mdash; the Final Grade Calculator will auto-fill every value you send.
+                  Enter your assignment grades above, choose which slot this grade belongs to, then send it &mdash;
+                  we'll calculate it for you automatically. Repeat for each quarter, the midterm, and the final, and the
+                  Final Grade Calculator will auto-fill every value you send.
               </p>
               <div class="input-row">
                   <div class="input-group">
@@ -2206,7 +2117,7 @@
                       </select>
                   </div>
                   <div class="input-group" style="display: flex; align-items: flex-end;">
-                      <button id="sendToFinalBtn" disabled>
+                      <button id="sendToFinalBtn">
                           <i class="fas fa-paper-plane"></i> Send to Final Grade Calculator
                       </button>
                   </div>
