@@ -287,6 +287,78 @@ gtag('config', 'G-LNMT1VXJW1');
       color: var(--accent-color);
   }
 
+  /* Banner shown when precise grades are imported from the Quarter Calculator */
+  .import-banner {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      background-color: var(--highlight-bg);
+      border: 1px solid var(--accent-color);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-color);
+  }
+
+  .import-banner.show {
+      display: flex;
+  }
+
+  .import-banner i.banner-icon {
+      color: var(--accent-color);
+      font-size: 1.2rem;
+  }
+
+  .import-banner .banner-text {
+      flex: 1;
+      font-size: 0.95rem;
+  }
+
+  .import-banner .banner-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 1.1rem;
+      flex: 0 0 auto;
+      min-width: 0;
+      padding: 0;
+  }
+
+  .import-banner .banner-close:hover {
+      color: var(--accent-color);
+      background: none;
+  }
+
+  /* A field auto-filled with a precise value exported from the Quarter Calculator */
+  .input-group.has-precise {
+      position: relative;
+  }
+
+  .input-group.has-precise input.precise-field {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px var(--accent-color);
+  }
+
+  .precise-badge {
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: var(--accent-color);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.1rem 0.4rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+  }
+
+  .input-group.has-precise .precise-badge {
+      display: inline-block;
+  }
+
   a {
       color: var(--link-color);
       text-decoration: none;
@@ -730,7 +802,62 @@ document.addEventListener('DOMContentLoaded', function() {
     toggleFinalField();
     document.getElementById('calculateBtn').addEventListener('click', calculateFinalGrade);
     document.getElementById('clearBtn').addEventListener('click', clearFields);
+
+    // Auto-fill precise grades exported from the Quarter Calculator
+    importPreciseGrades();
+
+    // Demote a field's "precise" marker once the student edits it manually
+    PRECISE_SLOTS.forEach(id => {
+        document.getElementById(id).addEventListener('input', () => demotePreciseField(id));
+    });
+
+    // Dismiss the import banner
+    document.getElementById('importBannerClose').addEventListener('click', function() {
+        document.getElementById('importBanner').classList.remove('show');
+    });
 });
+
+// Slots that can receive a precise value from the Quarter Calculator (match input ids)
+const PRECISE_SLOTS = ['q1', 'q2', 'q3', 'q4', 'midterm', 'final'];
+const FINAL_GRADE_IMPORTS_KEY = 'finalGradeImports';
+
+// Read precise grades the Quarter Calculator queued in localStorage and fill the matching fields.
+function importPreciseGrades() {
+  let imports;
+  try {
+      imports = JSON.parse(localStorage.getItem(FINAL_GRADE_IMPORTS_KEY)) || {};
+  } catch (e) {
+      imports = {};
+  }
+
+  let importedAny = false;
+  PRECISE_SLOTS.forEach(id => {
+      const value = imports[id];
+      if (value === undefined || value === null || isNaN(value)) return;
+      const input = document.getElementById(id);
+      // Trim float noise from the stored value without losing meaningful precision
+      input.value = String(Math.round(value * 1e6) / 1e6);
+      markPreciseField(id);
+      importedAny = true;
+  });
+
+  if (importedAny) {
+      document.getElementById('importBanner').classList.add('show');
+  }
+}
+
+function markPreciseField(id) {
+  const input = document.getElementById(id);
+  input.classList.add('precise-field');
+  input.closest('.input-group').classList.add('has-precise');
+}
+
+function demotePreciseField(id) {
+  const input = document.getElementById(id);
+  if (!input.classList.contains('precise-field')) return;
+  input.classList.remove('precise-field');
+  input.closest('.input-group').classList.remove('has-precise');
+}
 
 function toggleMenu() {
   const navLinks = document.querySelector('.nav-links');
@@ -1215,6 +1342,12 @@ function clearFields() {
   document.getElementById("neededGrade").innerText = "";
   // Hide the grade pairs section
   document.getElementById('gradePairsSection').style.display = 'none';
+
+  // Clear imported precise grades: drop the markers, banner, and the shared bridge
+  // so a reset is a true reset and a later reload won't re-import stale values.
+  PRECISE_SLOTS.forEach(demotePreciseField);
+  document.getElementById('importBanner').classList.remove('show');
+  localStorage.removeItem(FINAL_GRADE_IMPORTS_KEY);
 }
 </script>
 </head>
@@ -1267,10 +1400,20 @@ function clearFields() {
   <div class="container">
       <div class="card">
           <h2>Final Grade Calculator</h2>
-          
+
+          <!-- Shown when precise grades are imported from the Quarter Calculator -->
+          <div id="importBanner" class="import-banner">
+              <i class="fas fa-bolt banner-icon"></i>
+              <span class="banner-text">Imported precise grades from the Quarter Calculator. Fields marked
+                  <strong>Precise</strong> use exact, un-rounded values.</span>
+              <button type="button" class="banner-close" id="importBannerClose" aria-label="Dismiss">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+
           <div class="form-group">
               <label for="desiredGrade">Desired Final Grade (%)</label>
-              <input type="number" id="desiredGrade" min="0" max="100" placeholder="Enter your target grade">
+              <input type="number" id="desiredGrade" min="0" max="100" step="any" placeholder="Enter your target grade">
           </div>
           
           <div class="input-row">
@@ -1293,36 +1436,42 @@ function clearFields() {
           <div class="input-row">
               <div class="input-group">
                   <label for="q1">Quarter 1</label>
-                  <input type="number" id="q1" min="0" max="100" placeholder="Enter grade">
+                  <span class="precise-badge">Precise</span>
+                  <input type="number" id="q1" min="0" max="100" step="any" placeholder="Enter grade">
               </div>
               <div class="input-group">
                   <label for="q2">Quarter 2</label>
-                  <input type="number" id="q2" min="0" max="100" placeholder="Enter grade">
+                  <span class="precise-badge">Precise</span>
+                  <input type="number" id="q2" min="0" max="100" step="any" placeholder="Enter grade">
               </div>
           </div>
-          
+
           <div class="input-row">
               <div class="input-group">
                   <label for="midterm">Midterm</label>
-                  <input type="number" id="midterm" min="0" max="100" placeholder="Enter grade">
+                  <span class="precise-badge">Precise</span>
+                  <input type="number" id="midterm" min="0" max="100" step="any" placeholder="Enter grade">
               </div>
           </div>
-          
+
           <div class="input-row">
               <div class="input-group">
                   <label for="q3">Quarter 3</label>
-                  <input type="number" id="q3" min="0" max="100" placeholder="Enter grade">
+                  <span class="precise-badge">Precise</span>
+                  <input type="number" id="q3" min="0" max="100" step="any" placeholder="Enter grade">
               </div>
               <div class="input-group">
                   <label for="q4">Quarter 4</label>
-                  <input type="number" id="q4" min="0" max="100" placeholder="Enter grade">
+                  <span class="precise-badge">Precise</span>
+                  <input type="number" id="q4" min="0" max="100" step="any" placeholder="Enter grade">
               </div>
           </div>
-          
+
           <div class="input-row">
               <div class="input-group" id="finalField">
                   <label for="final">Final Exam (CP/Honors only)</label>
-                  <input type="number" id="final" min="0" max="100" placeholder="Enter grade">
+                  <span class="precise-badge">Precise</span>
+                  <input type="number" id="final" min="0" max="100" step="any" placeholder="Enter grade">
               </div>
           </div>
           

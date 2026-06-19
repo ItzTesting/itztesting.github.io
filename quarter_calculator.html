@@ -257,6 +257,24 @@
       color: var(--accent-color);
   }
 
+  .export-section {
+      background-color: var(--secondary-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      border: 1px solid var(--border-color);
+  }
+
+  .export-section h3 {
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      color: var(--accent-color);
+  }
+
+  #exportStatus {
+      margin-top: 0.5rem;
+  }
+
   .footer {
       text-align: center;
       padding: 1rem 0;
@@ -644,14 +662,31 @@
   };
 
   // Global variable to track the current view state
-  let currentViewIsGrouped = false; 
+  let currentViewIsGrouped = false;
   let currentAssignmentView = 'expanded'; // 'condensed' or 'expanded'
+
+  // Holds the most recent full-precision quarter grade (null until a valid calculation).
+  // Used by the "Send to Final Grade Calculator" export so we transfer the exact value, not the rounded display.
+  let currentPreciseQuarterGrade = null;
+
+  // Shared bridge: localStorage key holding { q1, q2, q3, q4, midterm, final } -> precise number.
+  // index.html reads this on load to auto-fill the Final Grade Calculator.
+  const FINAL_GRADE_IMPORTS_KEY = 'finalGradeImports';
+  const EXPORT_SLOT_LABELS = {
+      q1: 'Quarter 1', q2: 'Quarter 2', q3: 'Quarter 3', q4: 'Quarter 4',
+      midterm: 'Midterm', final: 'Final Exam'
+  };
 
 
   document.addEventListener('DOMContentLoaded', function() {
       // Add event listeners for Quarter Calculator
       document.getElementById('calculateQuarterBtn').addEventListener('click', calculateQuarterGrade);
       document.getElementById('clearQuarterFieldsBtn').addEventListener('click', clearQuarterFields);
+
+      // Export to Final Grade Calculator
+      document.getElementById('sendToFinalBtn').addEventListener('click', sendGradeToFinalCalc);
+      updateExportAvailability(); // start disabled until a grade is calculated
+      renderExportStatus();       // show any slots already queued from a previous session
 
       // Add event listeners for "Add Assignment" buttons
       document.getElementById('addLearnerTasksBtn').addEventListener('click', () => addAssignmentInput('learnerTasks'));
@@ -1156,7 +1191,10 @@
       if (totalWeight > 0) {
           const quarterGrade = (finalGrade / totalWeight) * 100;
           resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">${quarterGrade.toFixed(2)}%</span></h3>`;
-          
+
+          // Store the un-rounded grade so the export sends full precision (not the .toFixed(2) display value)
+          currentPreciseQuarterGrade = quarterGrade;
+
           // Display category averages
           for (const category in categoryTotals) {
               if (weights[category] && weights[category] > 0) {
@@ -1167,9 +1205,11 @@
           }
       } else {
           resultHtml += `<h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>`;
+          currentPreciseQuarterGrade = null;
       }
-      
+
       document.getElementById('quarterResultsContainer').innerHTML = resultHtml;
+      updateExportAvailability();
   }
 
   function calculateNeededCategoryAverage(
@@ -1454,6 +1494,62 @@
       document.getElementById('condensedAssignmentsTableBody').innerHTML = ''; // Clear table
       
       calculateQuarterGrade(); // Recalculate after clearing and setting initial view
+  }
+
+  // ----- Export to Final Grade Calculator -----
+
+  // Enable the "Send" control only when a valid, full-precision grade is available.
+  function updateExportAvailability() {
+      const btn = document.getElementById('sendToFinalBtn');
+      if (!btn) return;
+      btn.disabled = (currentPreciseQuarterGrade === null || isNaN(currentPreciseQuarterGrade));
+  }
+
+  function readFinalGradeImports() {
+      try {
+          return JSON.parse(localStorage.getItem(FINAL_GRADE_IMPORTS_KEY)) || {};
+      } catch (e) {
+          return {};
+      }
+  }
+
+  // Save the current precise grade into the selected slot of the shared bridge.
+  function sendGradeToFinalCalc() {
+      if (currentPreciseQuarterGrade === null || isNaN(currentPreciseQuarterGrade)) return;
+
+      const slot = document.getElementById('exportSlot').value;
+      if (!EXPORT_SLOT_LABELS[slot]) return;
+
+      const imports = readFinalGradeImports();
+      imports[slot] = currentPreciseQuarterGrade; // store full precision; index.html normalizes for display
+      localStorage.setItem(FINAL_GRADE_IMPORTS_KEY, JSON.stringify(imports));
+
+      renderExportStatus(slot);
+  }
+
+  // Render confirmation + the list of slots currently queued, with a link to the Final Grade Calculator.
+  function renderExportStatus(justSentSlot) {
+      const statusEl = document.getElementById('exportStatus');
+      if (!statusEl) return;
+
+      const imports = readFinalGradeImports();
+      const queuedSlots = Object.keys(EXPORT_SLOT_LABELS).filter(s => imports[s] !== undefined);
+
+      let html = '';
+      if (justSentSlot && imports[justSentSlot] !== undefined) {
+          html += `<p style="color: var(--accent-color); font-weight: 600; margin-bottom: 0.5rem;">`
+                + `<i class="fas fa-check-circle"></i> Quarter grade (${imports[justSentSlot].toFixed(3)}%) sent to ${EXPORT_SLOT_LABELS[justSentSlot]}.</p>`;
+      }
+
+      if (queuedSlots.length > 0) {
+          const list = queuedSlots
+              .map(s => `${EXPORT_SLOT_LABELS[s]} (${imports[s].toFixed(3)}%)`)
+              .join(', ');
+          html += `<p style="color: var(--text-secondary); margin-bottom: 0.5rem;">Queued for the Final Grade Calculator: ${list}</p>`;
+          html += `<a href="index.html"><i class="fas fa-arrow-right"></i> Open Final Grade Calculator</a>`;
+      }
+
+      statusEl.innerHTML = html;
   }
 
   // ----- Regex -----
@@ -2066,6 +2162,34 @@
                   <!-- CHANGE: Initial state with placeholder text -->
                   <h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>
               </div>
+          </div>
+
+          <!-- Export the precise (un-rounded) grade into the Final Grade Calculator -->
+          <div class="export-section">
+              <h3><i class="fas fa-share"></i> Send to Final Grade Calculator</h3>
+              <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                  Calculate a precise grade above, choose which slot it belongs to, then send it. Repeat for each quarter,
+                  the midterm, and the final &mdash; the Final Grade Calculator will auto-fill every value you send.
+              </p>
+              <div class="input-row">
+                  <div class="input-group">
+                      <label for="exportSlot">Send this grade as</label>
+                      <select id="exportSlot">
+                          <option value="q1">Quarter 1</option>
+                          <option value="q2">Quarter 2</option>
+                          <option value="q3">Quarter 3</option>
+                          <option value="q4">Quarter 4</option>
+                          <option value="midterm">Midterm</option>
+                          <option value="final">Final Exam</option>
+                      </select>
+                  </div>
+                  <div class="input-group" style="display: flex; align-items: flex-end;">
+                      <button id="sendToFinalBtn" disabled>
+                          <i class="fas fa-paper-plane"></i> Send to Final Grade Calculator
+                      </button>
+                  </div>
+              </div>
+              <div id="exportStatus"></div>
           </div>
       </div>
   </div>
