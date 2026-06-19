@@ -275,6 +275,28 @@
       margin-top: 0.5rem;
   }
 
+  /* "Open Final Grade Calculator" link styled as an outlined accent button
+     (overrides the global blue link color so it matches the green export section) */
+  .export-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      margin-top: 0.75rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--accent-color);
+      border-radius: 5px;
+      color: var(--accent-color);
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .export-link:hover {
+      background-color: var(--accent-color);
+      color: #fff;
+      text-decoration: none;
+  }
+
   .footer {
       text-align: center;
       padding: 1rem 0;
@@ -1546,7 +1568,7 @@
               .map(s => `${EXPORT_SLOT_LABELS[s]} (${imports[s].toFixed(3)}%)`)
               .join(', ');
           html += `<p style="color: var(--text-secondary); margin-bottom: 0.5rem;">Queued for the Final Grade Calculator: ${list}</p>`;
-          html += `<a href="index.html"><i class="fas fa-arrow-right"></i> Open Final Grade Calculator</a>`;
+          html += `<a href="index.html" class="export-link"><i class="fas fa-arrow-right"></i> Open Final Grade Calculator</a>`;
       }
 
       statusEl.innerHTML = html;
