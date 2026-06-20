@@ -483,12 +483,20 @@
             "F": 0.0
         };
 
-        // Weight bump by course level
-        const levelBump = {
-            "AP": 0.67,
-            "Honors": 0.33,
-            "CP": 0.0
+        // Weight bump by course level — configurable via the GPA Weighting Scale selector.
+        const GPA_SCALES = {
+            "default":    { bumps: { "AP": 0.67, "Honors": 0.33, "CP": 0.0 } },
+            "standard":   { bumps: { "AP": 1.0,  "Honors": 0.5,  "CP": 0.0 } },
+            "unweighted": { bumps: { "AP": 0.0,  "Honors": 0.0,  "CP": 0.0 } }
         };
+        let currentGpaScale = "default";
+        let levelBump = GPA_SCALES[currentGpaScale].bumps;
+        function applyGpaScale(scaleKey) {
+            if (GPA_SCALES[scaleKey]) {
+                currentGpaScale = scaleKey;
+                levelBump = GPA_SCALES[scaleKey].bumps;
+            }
+        }
 
         let classCounter = 0; // To ensure unique IDs for dynamically added classes
 
@@ -527,6 +535,8 @@
             document.getElementById('calculateGpaBtn').addEventListener('click', calculateAllGPAs);
             document.getElementById('clearGpaFieldsBtn').addEventListener('click', clearGpaFields);
             document.getElementById('showClassNamesCheckbox').addEventListener('change', toggleClassNamesVisibility);
+            const gpaScaleSelect = document.getElementById('gpaScaleSelect');
+            if (gpaScaleSelect) gpaScaleSelect.addEventListener('change', calculateAllGPAs);
 
             // Initial check for class names visibility
             toggleClassNamesVisibility();
@@ -749,20 +759,26 @@
                 totalCredits += credit;
             }
 
+            // Max possible weighted GPA on the active scale (4.0 + the AP bump): 4.67 / 5.0 / 4.0.
+            const maxScale = 4.0 + (levelBump["AP"] || 0);
+
             if (totalCredits === 0) {
-                return { gpa4_67: 0.0, gpa5_0: 0.0 };
+                return { gpa4_67: 0.0, gpa5_0: 0.0, maxScale: maxScale };
             }
 
             const gpa4_67 = totalQualityPoints / totalCredits;
-            const gpa5_0 = (gpa4_67 / 4.67) * 5.0; // Convert to 5.0 scale
+            const gpa5_0 = (gpa4_67 / maxScale) * 5.0; // Normalize the native scale onto a 5.0 ceiling
 
             return {
                 gpa4_67: parseFloat(gpa4_67.toFixed(3)),
-                gpa5_0: parseFloat(gpa5_0.toFixed(3))
+                gpa5_0: parseFloat(gpa5_0.toFixed(3)),
+                maxScale: maxScale
             };
         }
 
         function calculateAllGPAs() {
+            const scaleSelect = document.getElementById('gpaScaleSelect');
+            if (scaleSelect) applyGpaScale(scaleSelect.value);
             const classRows = document.querySelectorAll('.class-input-row');
             
             let unweightedTotalGpaPoints = 0;
@@ -809,6 +825,8 @@
 
             // Calculate Weighted GPA
             const weightedResult = calculateWeightedGPA(weightedClasses);
+            const scaleLabel = document.getElementById('weightedScaleLabel');
+            if (scaleLabel) scaleLabel.innerText = weightedResult.maxScale.toFixed(2);
             document.getElementById('weightedGpa4_67Result').innerText = weightedResult.gpa4_67.toFixed(2);
             document.getElementById('weightedGpa5_0Result').innerText = weightedResult.gpa5_0.toFixed(2);
         }
@@ -882,7 +900,16 @@
               <label for="numClasses">Number of Classes to Generate</label>
               <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
           </div>
-          
+
+          <div class="form-group">
+              <label for="gpaScaleSelect">GPA Weighting Scale</label>
+              <select id="gpaScaleSelect">
+                  <option value="default">Default &mdash; AP +0.67 / Honors +0.33 (4.67 max)</option>
+                  <option value="standard">Standard &mdash; AP +1.0 / Honors +0.5 (5.0 max)</option>
+                  <option value="unweighted">Unweighted only &mdash; no level bonus (4.0 max)</option>
+              </select>
+          </div>
+
           <div class="btn-group">
               <button id="generateInputsBtn">
                   <i class="fas fa-plus-circle"></i> Generate Class Inputs
@@ -913,7 +940,7 @@
           
           <div class="result-section">
               <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
-              <h3>Your Weighted GPA (4.67 scale): <span id="weightedGpa4_67Result"></span></h3>
+              <h3>Your Weighted GPA (<span id="weightedScaleLabel">4.67</span> scale): <span id="weightedGpa4_67Result"></span></h3>
               <h3>Your Weighted GPA (5.0 scale): <span id="weightedGpa5_0Result"></span></h3>
           </div>
       </div>
@@ -964,6 +991,76 @@
       navLinks.classList.remove('active');
     }
   });
+})();
+</script>
+<script>
+/* Accessibility pass: hide decorative icons, give modals dialog semantics, trap focus, Escape-to-close. */
+(function(){
+  // 1) Hide decorative Font Awesome icons from assistive technology.
+  document.querySelectorAll('i[class*="fa-"]').forEach(function(ic){
+    ic.setAttribute('aria-hidden', 'true');
+    ic.setAttribute('focusable', 'false');
+  });
+
+  // 2) Give the consent gate proper dialog semantics.
+  var consent = document.getElementById('consentPopup');
+  var consentBox = consent ? (consent.querySelector('.consent-container') || consent) : null;
+  if (consentBox) {
+    consentBox.setAttribute('role', 'dialog');
+    consentBox.setAttribute('aria-modal', 'true');
+    consentBox.setAttribute('aria-label', 'Terms and Privacy Consent');
+  }
+  function consentOpen(){ return !!consent && !consent.classList.contains('hidden'); }
+
+  // 3) Homepage welcome/feature modals (absent on other pages — handled gracefully).
+  var welcome = document.getElementById('welcomeModalBackdrop');
+  var feature = document.getElementById('featureModalBackdrop');
+  function shown(el){ return !!el && el.classList.contains('show'); }
+
+  // The topmost open modal that should trap focus.
+  function activeModal(){
+    if (shown(feature)) return feature;
+    if (shown(welcome)) return welcome;
+    if (consentOpen()) return consentBox;
+    return null;
+  }
+  function focusable(container){
+    return Array.prototype.slice.call(container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function(el){ return el.offsetWidth || el.offsetHeight || el === document.activeElement; });
+  }
+
+  document.addEventListener('keydown', function(e){
+    var modal = activeModal();
+    if (!modal) return;
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      // The consent gate must NOT be escapable; the informational modals may be.
+      if (shown(feature)) { e.preventDefault(); feature.click(); }
+      else if (shown(welcome)) { e.preventDefault(); welcome.click(); }
+      return;
+    }
+    if (e.key === 'Tab') {
+      var f = focusable(modal);
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      else if (f.indexOf(document.activeElement) === -1) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  // 4) When the consent gate is up on load, move focus into it (after the head script reveals it).
+  function focusConsentIfOpen(){
+    if (consentOpen()) {
+      var fc = consentBox.querySelector('input, button:not([disabled]), a[href]');
+      if (fc) { try { fc.focus(); } catch (_e) {} }
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', focusConsentIfOpen);
+  } else {
+    focusConsentIfOpen();
+  }
 })();
 </script>
 </body>

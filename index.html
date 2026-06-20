@@ -1659,5 +1659,76 @@ function clearFields() {
           </div>
       </div>
   </div>
+<script>
+/* Accessibility pass: hide decorative icons, give modals dialog semantics, trap focus, Escape-to-close. */
+(function(){
+  // 1) Hide decorative Font Awesome icons from assistive technology.
+  document.querySelectorAll('i[class*="fa-"]').forEach(function(ic){
+    ic.setAttribute('aria-hidden', 'true');
+    ic.setAttribute('focusable', 'false');
+  });
+
+  // 2) Give the consent gate proper dialog semantics.
+  var consent = document.getElementById('consentPopup');
+  var consentBox = consent ? (consent.querySelector('.consent-container') || consent) : null;
+  if (consentBox) {
+    consentBox.setAttribute('role', 'dialog');
+    consentBox.setAttribute('aria-modal', 'true');
+    consentBox.setAttribute('aria-label', 'Terms and Privacy Consent');
+  }
+  function consentOpen(){ return !!consent && !consent.classList.contains('hidden'); }
+
+  // 3) Homepage welcome/feature modals (already have role/aria-modal in markup; absent elsewhere).
+  var welcome = document.getElementById('welcomeModalBackdrop');
+  var feature = document.getElementById('featureModalBackdrop');
+  function shown(el){ return !!el && el.classList.contains('show'); }
+
+  // The topmost open modal that should trap focus.
+  function activeModal(){
+    if (shown(feature)) return feature;
+    if (shown(welcome)) return welcome;
+    if (consentOpen()) return consentBox;
+    return null;
+  }
+  function focusable(container){
+    return Array.prototype.slice.call(container.querySelectorAll(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    )).filter(function(el){ return el.offsetWidth || el.offsetHeight || el === document.activeElement; });
+  }
+
+  document.addEventListener('keydown', function(e){
+    var modal = activeModal();
+    if (!modal) return;
+    if (e.key === 'Escape' || e.key === 'Esc') {
+      // The consent gate must NOT be escapable; the informational modals may be.
+      // Reuse each modal's existing backdrop-click handler to preserve the welcome -> feature sequence.
+      if (shown(feature)) { e.preventDefault(); feature.click(); }
+      else if (shown(welcome)) { e.preventDefault(); welcome.click(); }
+      return;
+    }
+    if (e.key === 'Tab') {
+      var f = focusable(modal);
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      else if (f.indexOf(document.activeElement) === -1) { e.preventDefault(); first.focus(); }
+    }
+  });
+
+  // 4) When the consent gate is up on load, move focus into it (after the head script reveals it).
+  function focusConsentIfOpen(){
+    if (consentOpen()) {
+      var fc = consentBox.querySelector('input, button:not([disabled]), a[href]');
+      if (fc) { try { fc.focus(); } catch (_e) {} }
+    }
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', focusConsentIfOpen);
+  } else {
+    focusConsentIfOpen();
+  }
+})();
+</script>
 </body>
 </html>
