@@ -860,8 +860,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     featureModalGotItButton.addEventListener('click', function() {
-        hideModal(featureModalBackdrop, 'shownFeaturePopup_v2');
-        checkAndStartAnimation();
+        featureModalGotItButton.disabled = true;
+        featureModalGotItButton.textContent = 'Please wait...';
+
+        setTimeout(function() {
+            hideModal(featureModalBackdrop, 'shownFeaturePopup_v2');
+            checkAndStartAnimation();
+        }, 2000); // 2-second forced delay so users read the feature message
     });
 
     featureModalBackdrop.addEventListener('click', function(event) {
