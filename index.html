@@ -33,7 +33,6 @@ gtag('config', 'G-LNMT1VXJW1');
       --card-bg: #333333;
       --nav-bg: #222222;
       --highlight-bg: rgba(76, 175, 80, 0.15);
-      --primary-color: #64B5F6; /* Added primary color for link styling */
       --warning-color: #e57373; /* Error / "not possible" message color */
   }
 
@@ -327,6 +326,98 @@ gtag('config', 'G-LNMT1VXJW1');
 
   .tip-prompt .tip-text a:hover {
       color: var(--accent-hover);
+  }
+
+  /* "Which calculator?" landing explainer */
+  .explainer {
+      padding: 1.5rem 2rem;
+  }
+  .explainer > summary {
+      cursor: pointer;
+      list-style: none;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+  }
+  .explainer > summary::-webkit-details-marker { display: none; }
+  .explainer > summary .chevron {
+      margin-left: auto;
+      color: var(--text-secondary);
+      transition: transform 0.2s ease;
+      font-size: 0.9rem;
+  }
+  .explainer[open] > summary .chevron { transform: rotate(180deg); }
+  .explainer .explainer-intro {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 1rem 0 1.25rem;
+  }
+  .calc-guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+  }
+  .calc-guide-item {
+      background-color: var(--highlight-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      display: block;
+      text-decoration: none;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .calc-guide-item:hover {
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+  }
+  .calc-guide-item .calc-guide-title {
+      color: var(--text-color);
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.4rem;
+  }
+  .calc-guide-item .calc-guide-title i { color: var(--accent-color); }
+  .calc-guide-item .calc-guide-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.45;
+  }
+  .pipeline {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 1rem;
+      background-color: var(--bg-secondary, rgba(0,0,0,0.15));
+      border-radius: 8px;
+  }
+  .pipeline-step {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.5rem 0.85rem;
+      color: var(--text-color);
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-align: center;
+  }
+  .pipeline-arrow {
+      color: var(--accent-color);
+      font-size: 1rem;
+  }
+  @media (max-width: 768px) {
+      .pipeline { flex-direction: column; }
+      .pipeline-arrow { transform: rotate(90deg); }
+      .explainer { padding: 1.25rem; }
   }
 
   /* Banner shown when precise grades are imported from the Quarter Calculator */
@@ -1026,8 +1117,8 @@ function calculateFinalGrade() {
       let q3Grade = parseFloat(document.getElementById("q3").value) || 0;
       let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
       
-      let currentWeightedSum = (q1Grade * 20) + (q2Grade * 20) + (q3Grade * 20) + (midtermGrade * 10);
-      let remainingWeight = 20 + 10; // Q4 (20%) + Final Exam (10%)
+      let currentWeightedSum = (q1Grade * quarterWeights) + (q2Grade * quarterWeights) + (q3Grade * quarterWeights) + (midtermGrade * midtermWeight);
+      let remainingWeight = quarterWeights + finalExamWeight; // Q4 + Final Exam
       
       // Calculate the minimum average needed for the remaining components
       let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
@@ -1108,8 +1199,8 @@ function calculateFinalGrade() {
       let q3Grade = parseFloat(document.getElementById("q3").value) || 0;
       let midtermGrade = parseFloat(document.getElementById("midterm").value) || 0;
       
-      let currentWeightedSum = (q1Grade * 20) + (q2Grade * 20) + (q3Grade * 20) + (midtermGrade * 10);
-      let remainingWeight = 20 + 10; // Q4 (20%) + Final Exam (10%)
+      let currentWeightedSum = (q1Grade * quarterWeights) + (q2Grade * quarterWeights) + (q3Grade * quarterWeights) + (midtermGrade * midtermWeight);
+      let remainingWeight = quarterWeights + finalExamWeight; // Q4 + Final Exam
       
       // Calculate the minimum average needed for the remaining components
       let minAvgNeeded = (desiredGrade * 100 - currentWeightedSum) / remainingWeight;
@@ -1397,6 +1488,7 @@ function toggleFinalField() {
   } else {
       finalField.style.display = "block";
       apFinalOption.style.display = "none";
+      document.querySelector('label[for="final"]').innerText = "Final Exam (CP/Honors only)";
   }
 }
 
@@ -1477,6 +1569,45 @@ function clearFields() {
 </div>
 
   <div class="container">
+      <details class="card explainer" open>
+          <summary>
+              <i class="fas fa-compass" aria-hidden="true"></i>
+              New here? Which calculator should I use?
+              <i class="fas fa-chevron-down chevron" aria-hidden="true"></i>
+          </summary>
+          <p class="explainer-intro">
+              Four calculators, each for a different stage of figuring out your grades. Most students
+              start in the <strong>Quarter Calculator</strong> for a precise quarter grade, carry that
+              into a <strong>Half-Year</strong> or <strong>Full-Year</strong> projection, and use the
+              <strong>GPA Calculator</strong> at the end of the term.
+          </p>
+          <div class="calc-guide-grid">
+              <a class="calc-guide-item" href="quarter_calculator.html">
+                  <div class="calc-guide-title"><i class="fas fa-percent" aria-hidden="true"></i> Quarter Calculator</div>
+                  <div class="calc-guide-desc">Compute one quarter precisely from individual assignments &mdash; paste your PowerSchool gradebook to auto-fill, and reverse-solve the scores you still need.</div>
+              </a>
+              <a class="calc-guide-item" href="half_semester_calculator.html">
+                  <div class="calc-guide-title"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Half-Year Calculator</div>
+                  <div class="calc-guide-desc">For semester/half-year courses: combine Quarter 1, Quarter 2, and a final exam into your overall grade.</div>
+              </a>
+              <a class="calc-guide-item" href="index.html">
+                  <div class="calc-guide-title"><i class="fas fa-home" aria-hidden="true"></i> Full-Year Calculator</div>
+                  <div class="calc-guide-desc">You're here. Combine all four quarters plus midterm and final (CP/Honors or AP weighting) into a year-end grade.</div>
+              </a>
+              <a class="calc-guide-item" href="unweighted_gpa_calculator.html">
+                  <div class="calc-guide-title"><i class="fas fa-graduation-cap" aria-hidden="true"></i> GPA Calculator</div>
+                  <div class="calc-guide-desc">Turn your final class grades and course levels into unweighted and weighted GPAs.</div>
+              </a>
+          </div>
+          <div class="pipeline" aria-label="Typical workflow: Quarter Calculator, then Half-Year or Full-Year Calculator, then GPA Calculator">
+              <span class="pipeline-step">Quarter Calculator</span>
+              <i class="fas fa-arrow-right pipeline-arrow" aria-hidden="true"></i>
+              <span class="pipeline-step">Half-Year / Full-Year</span>
+              <i class="fas fa-arrow-right pipeline-arrow" aria-hidden="true"></i>
+              <span class="pipeline-step">GPA Calculator</span>
+          </div>
+      </details>
+
       <div class="card">
           <h2>Final Grade Calculator</h2>
 
@@ -1654,7 +1785,7 @@ function clearFields() {
           <div class="modal-body">
               <p style="font-size: 1.1rem;"> PowerSchool only shows rounded quarter grades, which makes this calculator's result slightly off. Now you can calculate each quarter exactly in the <strong>Quarter Calculator</strong> and send those precise values straight to this Final Grade Calculator - they'll auto-fill the fields for the most accurate result possible. </p>
               <hr style="margin: 1.5rem 0 1rem 0; border: none; border-top: 1px solid rgba(255, 255, 255, 0.2);">
-              <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">If you want your content to be featured here, see the <a href="popup-info.html" style="color: var(--primary-color); text-decoration: none;">Popup Info page</a> for more information.</p>
+              <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-secondary);">If you want your content to be featured here, see the <a href="popup-info.html" style="color: var(--link-color); text-decoration: none;">Popup Info page</a> for more information.</p>
               <button id="featureModalGotIt" class="btn-group" style="margin-top: 1.5rem; width: 100%;">Got it!</button>
           </div>
       </div>

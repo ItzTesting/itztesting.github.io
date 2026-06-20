@@ -502,8 +502,10 @@ gtag('config', 'G-LNMT1VXJW1');
         let hasQ2 = !isNaN(quarter2) && document.getElementById("q2").value !== "";
         let hasFinalExam = !isNaN(finalExam) && document.getElementById("finalExam").value !== "";
         
-        let resultText = "";
-        
+        // Build the result as structured lines ({ text, warning }) and render them as
+        // DOM nodes (textContent), avoiding innerHTML string concatenation entirely.
+        let resultLines = [];
+
         // If we have at least one quarter, calculate current grade
         if (hasQ1 || hasQ2 || hasFinalExam) {
             let totalWeight = 0;
@@ -526,7 +528,7 @@ gtag('config', 'G-LNMT1VXJW1');
             
             // Calculate current grade based on provided components
             let currentGrade = totalWeight > 0 ? weightedSum / totalWeight : 0;
-            resultText = "Current Grade: " + currentGrade.toFixed(3) + "%";
+            resultLines.push({ text: "Current Grade: " + currentGrade.toFixed(3) + "%" });
             
             // If desired grade is provided, calculate needed final exam grade
             if (!isNaN(desiredGrade) && desiredGrade > 0) {
@@ -536,11 +538,11 @@ gtag('config', 'G-LNMT1VXJW1');
                     let neededFinalExam = ((desiredGrade - currentWeighted) / 0.2);
                     
                     if (neededFinalExam >= 999.99) {
-                        resultText += "<br><span style='color:#e57373;'>Unfortunately, it's not possible to achieve your desired grade.</span>";
+                        resultLines.push({ text: "Unfortunately, it's not possible to achieve your desired grade.", warning: true });
                     } else if (neededFinalExam < 0) {
-                        resultText += "<br>You have already achieved your desired grade!";
+                        resultLines.push({ text: "You have already achieved your desired grade!" });
                     } else {
-                        resultText += "<br>You need a " + neededFinalExam.toFixed(3) + "% on the Final Exam.";
+                        resultLines.push({ text: "You need a " + neededFinalExam.toFixed(3) + "% on the Final Exam." });
                     }
                 }
                 // If we're missing some quarters, calculate the average needed
@@ -549,19 +551,19 @@ gtag('config', 'G-LNMT1VXJW1');
                     let neededAvg = remainingWeight > 0 ? ((desiredGrade - weightedSum) / remainingWeight) : 0;
                     
                     if (neededAvg >= 999.99) {
-                        resultText += "<br><span style='color:#e57373;'>Unfortunately, it's not possible to achieve your desired grade.</span>";
+                        resultLines.push({ text: "Unfortunately, it's not possible to achieve your desired grade.", warning: true });
                     } else if (neededAvg < 0) {
-                        resultText += "<br>You have already achieved your desired grade!";
+                        resultLines.push({ text: "You have already achieved your desired grade!" });
                     } else {
-                        resultText += "<br>You need an average of " + neededAvg.toFixed(3) + "% on the remaining components.";
+                        resultLines.push({ text: "You need an average of " + neededAvg.toFixed(3) + "% on the remaining components." });
                     }
                 }
             }
         } else if (!isNaN(desiredGrade) && desiredGrade > 0) {
             // If only desired grade is provided
-            resultText = "Please enter at least one quarter grade to calculate.";
+            resultLines.push({ text: "Please enter at least one quarter grade to calculate." });
         } else {
-            resultText = "Please enter at least one grade to calculate.";
+            resultLines.push({ text: "Please enter at least one grade to calculate." });
         }
         
         // Check if we should show the grade pairs section for half-year calculator
@@ -579,7 +581,19 @@ gtag('config', 'G-LNMT1VXJW1');
             gradePairsSection.style.display = 'none';
         }
         
-        document.getElementById("result").innerHTML = resultText;
+        const resultEl = document.getElementById("result");
+        resultEl.textContent = "";
+        resultLines.forEach(function(line, i) {
+            if (i > 0) resultEl.appendChild(document.createElement("br"));
+            if (line.warning) {
+                const span = document.createElement("span");
+                span.style.color = "#e57373";
+                span.textContent = line.text;
+                resultEl.appendChild(span);
+            } else {
+                resultEl.appendChild(document.createTextNode(line.text));
+            }
+        });
     }
 
     function calculateOptimalHalfYearStrategies(q1Grade, desiredGrade) {
@@ -631,7 +645,7 @@ gtag('config', 'G-LNMT1VXJW1');
         document.getElementById("q2").value = "";
         document.getElementById("finalExam").value = "";
         document.getElementById("desiredGrade").value = "";
-        document.getElementById("result").innerHTML = "";
+        document.getElementById("result").textContent = "";
         // Hide the grade pairs section
         document.getElementById('gradePairsSection').style.display = 'none';
     }
