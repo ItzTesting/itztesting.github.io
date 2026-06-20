@@ -193,6 +193,20 @@
             border-color: var(--accent-color);
         }
 
+        /* Highlight a field that was entered but failed validation (kept out of the GPA). */
+        .input-error {
+            border-color: #e57373 !important;
+            background-color: rgba(244, 67, 54, 0.12);
+        }
+
+        /* "N classes skipped" notice shown beneath the GPA results. */
+        #gpaCalcNote {
+            margin-top: 0.75rem;
+            margin-bottom: 0;
+            color: #e57373;
+            font-weight: 500;
+        }
+
         .input-row {
             display: flex;
             flex-wrap: wrap;
@@ -540,6 +554,15 @@
 
             // Initial check for class names visibility
             toggleClassNamesVisibility();
+
+            // Recalculate live as the user types a grade or changes a level/credit, so the
+            // results never go stale waiting for the "Calculate GPA" button to be pressed.
+            const liveContainer = document.getElementById('gradeInputsContainer');
+            liveContainer.addEventListener('input', calculateAllGPAs);
+            liveContainer.addEventListener('change', calculateAllGPAs);
+
+            // Start with one ready-to-fill class row so the page isn't blank on arrival.
+            addClassInput();
         });
 
         function toggleMenu() {
@@ -652,6 +675,8 @@
             document.getElementById('gpaResult').innerText = ''; // Clear previous unweighted result
             document.getElementById('weightedGpa4_67Result').innerText = ''; // Clear previous weighted result
             document.getElementById('weightedGpa5_0Result').innerText = ''; // Clear previous weighted result
+            const genNote = document.getElementById('gpaCalcNote');
+            if (genNote) genNote.style.display = 'none';
             classCounter = 0; // Reset class counter before generating new ones
 
             if (isNaN(numClasses) || numClasses <= 0) {
@@ -781,29 +806,50 @@
             if (scaleSelect) applyGpaScale(scaleSelect.value);
             const classRows = document.querySelectorAll('.class-input-row');
             
+            const calcNote = document.getElementById('gpaCalcNote');
+
             let unweightedTotalGpaPoints = 0;
             let unweightedNumValidGrades = 0;
             let weightedClasses = [];
+            let attemptedCount = 0;   // rows where the user actually entered a grade
+            let skippedCount = 0;     // attempted rows that failed validation
 
             if (classRows.length === 0) {
                 document.getElementById('gpaResult').innerText = '0.00';
                 document.getElementById('weightedGpa4_67Result').innerText = '0.00';
                 document.getElementById('weightedGpa5_0Result').innerText = '0.00';
+                if (calcNote) calcNote.style.display = 'none';
                 return;
             }
 
             classRows.forEach((row) => {
-                const percentage = parseFloat(row.querySelector('.class-grade-input').value);
+                const gradeInput = row.querySelector('.class-grade-input');
+                const creditInput = row.querySelector('.class-credit-input');
+                const rawGrade = (gradeInput.value || '').trim();
+                const percentage = parseFloat(rawGrade);
                 const level = row.querySelector('.class-level-select').value;
-                const credit = parseFloat(row.querySelector('.class-credit-input').value);
+                const credit = parseFloat(creditInput.value);
 
-                // Validate inputs
+                // Clear any prior error highlight before re-validating this row.
+                gradeInput.classList.remove('input-error');
+                creditInput.classList.remove('input-error');
+
+                // A blank grade just means an untouched row — ignore it silently (no warning).
+                if (rawGrade === '') {
+                    return;
+                }
+
+                attemptedCount++;
+
+                // Validate inputs; flag the offending field instead of dropping the row silently.
                 if (isNaN(percentage) || percentage < 0 || percentage > 110) {
-                    // Skip invalid percentage for calculation
-                    return; 
+                    gradeInput.classList.add('input-error');
+                    skippedCount++;
+                    return;
                 }
                 if (isNaN(credit) || credit <= 0) {
-                    // Skip invalid credit for calculation
+                    creditInput.classList.add('input-error');
+                    skippedCount++;
                     return;
                 }
 
@@ -829,6 +875,24 @@
             if (scaleLabel) scaleLabel.innerText = weightedResult.maxScale.toFixed(2);
             document.getElementById('weightedGpa4_67Result').innerText = weightedResult.gpa4_67.toFixed(2);
             document.getElementById('weightedGpa5_0Result').innerText = weightedResult.gpa5_0.toFixed(2);
+
+            // The normalized 5.0 line just duplicates the weighted line when the active scale
+            // already tops out at 5.0 — hide it then so the same number isn't shown twice.
+            const line5_0 = document.getElementById('weightedGpa5_0Line');
+            if (line5_0) line5_0.style.display = (weightedResult.maxScale === 5.0) ? 'none' : '';
+
+            // Surface any classes that were entered but left out of the calculation.
+            if (calcNote) {
+                if (skippedCount > 0) {
+                    const included = attemptedCount - skippedCount;
+                    calcNote.textContent = 'Calculated from ' + included + ' of ' + attemptedCount +
+                        ' entered classes — ' + skippedCount + ' skipped (check the highlighted field' +
+                        (skippedCount === 1 ? '' : 's') + ').';
+                    calcNote.style.display = 'block';
+                } else {
+                    calcNote.style.display = 'none';
+                }
+            }
         }
 
         function clearGpaFields() {
@@ -837,6 +901,8 @@
             document.getElementById('gpaResult').innerText = '';
             document.getElementById('weightedGpa4_67Result').innerText = '';
             document.getElementById('weightedGpa5_0Result').innerText = '';
+            const clearNote = document.getElementById('gpaCalcNote');
+            if (clearNote) clearNote.style.display = 'none';
             classCounter = 0; // Reset class counter
             document.getElementById('showClassNamesCheckbox').checked = false; // Reset checkbox
             toggleClassNamesVisibility(); // Update visibility
@@ -941,7 +1007,8 @@
           <div class="result-section">
               <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
               <h3>Your Weighted GPA (<span id="weightedScaleLabel">4.67</span> scale): <span id="weightedGpa4_67Result"></span></h3>
-              <h3>Your Weighted GPA (5.0 scale): <span id="weightedGpa5_0Result"></span></h3>
+              <h3 id="weightedGpa5_0Line">Your Weighted GPA (5.0 scale): <span id="weightedGpa5_0Result"></span></h3>
+              <p id="gpaCalcNote" style="display: none;"></p>
           </div>
       </div>
   </div>
