@@ -392,5 +392,15 @@ function toggleMenu() {
   });
 })();
 </script>
+<script>
+/* Tier 4 accessibility pass: mark decorative icons and add dialog semantics to the consent popup */
+(function(){
+  document.querySelectorAll('i.fas, i.far, i.fab').forEach(function(ic){
+    if (!ic.hasAttribute('aria-hidden')) ic.setAttribute('aria-hidden', 'true');
+  });
+  var cp = document.getElementById('consentPopup');
+  if (cp){ cp.setAttribute('role', 'dialog'); cp.setAttribute('aria-modal', 'true'); cp.setAttribute('aria-label', 'Terms and Privacy Consent'); }
+})();
+</script>
 </body>
 </html>

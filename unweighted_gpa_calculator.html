@@ -472,6 +472,80 @@
         .consent-decline:hover {
             background-color: #d32f2f;
         }
+
+        /* ---- Tier 4 enhancement styles ---- */
+        .btn-secondary {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+        }
+        .btn-secondary:hover {
+            background-color: var(--border-color);
+        }
+        .tools-row {
+            align-items: center;
+        }
+        .save-status {
+            color: var(--accent-color);
+            font-weight: 600;
+            font-size: 0.95rem;
+            align-self: center;
+        }
+        .trend-badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .trend-up { color: var(--accent-color); }
+        .trend-down { color: #e57373; }
+        .trend-flat { color: var(--text-secondary); }
+
+        .import-banner {
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: var(--highlight-bg);
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+        }
+        .import-banner.show { display: flex; }
+        .import-banner .banner-icon { color: var(--accent-color); font-size: 1.2rem; }
+        .import-banner .banner-text { flex: 1; font-size: 0.95rem; }
+        .import-banner .banner-action {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 0.4rem 0.9rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            flex: 0 0 auto;
+            min-width: 0;
+        }
+        .import-banner .banner-action:hover { background-color: var(--accent-hover); }
+        .import-banner .banner-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            flex: 0 0 auto;
+            min-width: 0;
+            padding: 0;
+        }
+        .import-banner .banner-close:hover { color: var(--accent-color); background: none; }
+
+        @media print {
+            .navbar, .footer, .consent-popup, .btn-group, .checkbox-option-container,
+            .import-banner, #gpaScaleSelect, .form-group label[for="numClasses"],
+            .remove-class-btn { display: none !important; }
+            body { background: #fff; color: #000; }
+            .card, .result-section { background: #fff; box-shadow: none; border: 1px solid #ccc; }
+            .result-section h3, h2 { color: #000; }
+        }
     </style>
     <script>
         // Base GPA points for each letter grade
@@ -483,12 +557,22 @@
             "F": 0.0
         };
 
-        // Weight bump by course level
-        const levelBump = {
-            "AP": 0.67,
-            "Honors": 0.33,
-            "CP": 0.0
+        // Weight bump by course level. Mutable so the GPA scale selector (Tier 4) can swap schemes.
+        // Default scheme preserves the original site behavior exactly (AP +0.67 / Honors +0.33).
+        const GPA_SCALES = {
+            "default": { label: "Default (AP +0.67 / Honors +0.33)", bumps: { "AP": 0.67, "Honors": 0.33, "CP": 0.0 } },
+            "standard": { label: "Standard (AP +1.0 / Honors +0.5)", bumps: { "AP": 1.0, "Honors": 0.5, "CP": 0.0 } },
+            "unweighted": { label: "Unweighted only (no level bump)", bumps: { "AP": 0.0, "Honors": 0.0, "CP": 0.0 } }
         };
+        let currentGpaScale = "default";
+        let levelBump = GPA_SCALES[currentGpaScale].bumps;
+
+        function applyGpaScale(scaleKey) {
+            if (GPA_SCALES[scaleKey]) {
+                currentGpaScale = scaleKey;
+                levelBump = GPA_SCALES[scaleKey].bumps;
+            }
+        }
 
         let classCounter = 0; // To ensure unique IDs for dynamically added classes
 
@@ -749,22 +833,31 @@
                 totalCredits += credit;
             }
 
+            // Max weighted value depends on the selected scale (4.0 base + the AP level bump).
+            const maxScale = 4.0 + (levelBump["AP"] || 0);
+
             if (totalCredits === 0) {
-                return { gpa4_67: 0.0, gpa5_0: 0.0 };
+                return { gpa4_67: 0.0, gpa5_0: 0.0, maxScale: maxScale };
             }
 
             const gpa4_67 = totalQualityPoints / totalCredits;
-            const gpa5_0 = (gpa4_67 / 4.67) * 5.0; // Convert to 5.0 scale
+            // Normalize the weighted GPA onto a 5.0 scale relative to its own maximum.
+            const gpa5_0 = (gpa4_67 / maxScale) * 5.0;
 
             return {
                 gpa4_67: parseFloat(gpa4_67.toFixed(3)),
-                gpa5_0: parseFloat(gpa5_0.toFixed(3))
+                gpa5_0: parseFloat(gpa5_0.toFixed(3)),
+                maxScale: maxScale
             };
         }
 
         function calculateAllGPAs() {
+            // Apply the selected GPA weighting scale (Tier 4) before computing.
+            const scaleSelect = document.getElementById('gpaScaleSelect');
+            if (scaleSelect) applyGpaScale(scaleSelect.value);
+
             const classRows = document.querySelectorAll('.class-input-row');
-            
+
             let unweightedTotalGpaPoints = 0;
             let unweightedNumValidGrades = 0;
             let weightedClasses = [];
@@ -811,6 +904,13 @@
             const weightedResult = calculateWeightedGPA(weightedClasses);
             document.getElementById('weightedGpa4_67Result').innerText = weightedResult.gpa4_67.toFixed(2);
             document.getElementById('weightedGpa5_0Result').innerText = weightedResult.gpa5_0.toFixed(2);
+
+            // Update the weighted-scale label to reflect the active scale (e.g., 4.67, 5.00, 4.00).
+            const scaleLabelEl = document.getElementById('weightedScaleLabel');
+            if (scaleLabelEl) scaleLabelEl.innerText = weightedResult.maxScale.toFixed(2);
+
+            // Tier 4: show how this unweighted GPA compares to the last calculation.
+            if (window.__updateTrend) window.__updateTrend(unweightedGPA);
         }
 
         function clearGpaFields() {
@@ -877,7 +977,17 @@
           <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
               Calculate your unweighted and weighted GPA based on your percentage grades, class level, and credits.
           </p>
-          
+
+          <!-- Tier 4: banner shown when grades are sent here from another calculator -->
+          <div id="gpaImportBanner" class="import-banner">
+              <i class="fas fa-graduation-cap banner-icon" aria-hidden="true"></i>
+              <span class="banner-text" id="gpaImportBannerText"></span>
+              <button type="button" class="banner-action" id="gpaImportAddBtn">Add as classes</button>
+              <button type="button" class="banner-close" id="gpaImportDismissBtn" aria-label="Dismiss">
+                  <i class="fas fa-times" aria-hidden="true"></i>
+              </button>
+          </div>
+
           <div class="form-group">
               <label for="numClasses">Number of Classes to Generate</label>
               <input type="number" id="numClasses" min="1" placeholder="e.g., 5">
@@ -901,20 +1011,41 @@
           
           <div class="btn-group">
               <button id="addClassBtn">
-                  <i class="fas fa-plus-circle"></i> Add Class
+                  <i class="fas fa-plus-circle" aria-hidden="true"></i> Add Class
               </button>
               <button id="calculateGpaBtn">
-                  <i class="fas fa-calculator"></i> Calculate GPA
+                  <i class="fas fa-calculator" aria-hidden="true"></i> Calculate GPA
               </button>
               <button class="btn-clear" id="clearGpaFieldsBtn">
-                  <i class="fas fa-trash-alt"></i> Clear All Fields
+                  <i class="fas fa-trash-alt" aria-hidden="true"></i> Clear All Fields
               </button>
           </div>
-          
+
+          <!-- Tier 4: configurable GPA weighting scale -->
+          <div class="form-group">
+              <label for="gpaScaleSelect">Weighting Scale</label>
+              <select id="gpaScaleSelect">
+                  <option value="default">Default (AP +0.67 / Honors +0.33)</option>
+                  <option value="standard">Standard (AP +1.0 / Honors +0.5)</option>
+                  <option value="unweighted">Unweighted only (no level bump)</option>
+              </select>
+          </div>
+
+          <!-- Tier 4: save / load this calculator's inputs -->
+          <div class="btn-group tools-row">
+              <button type="button" id="saveInputsBtn" class="btn-secondary"><i class="fas fa-save" aria-hidden="true"></i> Save Inputs</button>
+              <button type="button" id="loadInputsBtn" class="btn-secondary"><i class="fas fa-folder-open" aria-hidden="true"></i> Load Saved</button>
+              <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
+          </div>
+
           <div class="result-section">
-              <h3>Your Unweighted GPA: <span id="gpaResult"></span></h3>
-              <h3>Your Weighted GPA (4.67 scale): <span id="weightedGpa4_67Result"></span></h3>
+              <h3>Your Unweighted GPA: <span id="gpaResult"></span> <span id="trendBadge" class="trend-badge"></span></h3>
+              <h3>Your Weighted GPA (<span id="weightedScaleLabel">4.67</span> scale): <span id="weightedGpa4_67Result"></span></h3>
               <h3>Your Weighted GPA (5.0 scale): <span id="weightedGpa5_0Result"></span></h3>
+              <div class="result-tools btn-group" style="margin-bottom:0;">
+                  <button type="button" id="copyResultBtn" class="btn-secondary"><i class="fas fa-copy" aria-hidden="true"></i> Copy Result</button>
+                  <button type="button" id="printResultBtn" class="btn-secondary"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
+              </div>
           </div>
       </div>
   </div>
@@ -963,6 +1094,186 @@
         !navLinks.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
       navLinks.classList.remove('active');
     }
+  });
+})();
+</script>
+<script>
+/* ===== Tier 4 enhancements: save/load, copy/print, trend, scale recalc, pipeline import, a11y ===== */
+(function(){
+  var SAVE_KEY = 'gradecalc_saved_gpa';
+  var TREND_KEY = 'gradecalc_last_gpa';
+  var GPA_PENDING_KEY = 'gpaPendingClasses';
+
+  function flashStatus(msg){
+    var el = document.getElementById('saveStatus');
+    if (!el) return;
+    el.textContent = msg;
+    clearTimeout(el.__t);
+    el.__t = setTimeout(function(){ el.textContent = ''; }, 2500);
+  }
+
+  // ---- Trend vs last calculation (defined immediately so calculateAllGPAs can call it) ----
+  window.__updateTrend = function(value){
+    var badge = document.getElementById('trendBadge');
+    if (!badge) return;
+    var prev = parseFloat(localStorage.getItem(TREND_KEY));
+    if (!isNaN(prev)){
+      var delta = Math.round((value - prev) * 100) / 100;
+      if (Math.abs(delta) < 0.005){
+        badge.textContent = '(no change vs last)';
+        badge.className = 'trend-badge trend-flat';
+      } else {
+        badge.textContent = '(' + (delta > 0 ? '+' : '') + delta.toFixed(2) + ' vs last)';
+        badge.className = 'trend-badge ' + (delta > 0 ? 'trend-up' : 'trend-down');
+      }
+    } else {
+      badge.textContent = '';
+      badge.className = 'trend-badge';
+    }
+    localStorage.setItem(TREND_KEY, String(value));
+  };
+
+  // ---- Save / load inputs ----
+  function collectState(){
+    var classes = [];
+    document.querySelectorAll('.class-input-row').forEach(function(row){
+      var nameInput = row.querySelector('.class-name-input');
+      classes.push({
+        name: nameInput ? nameInput.value : '',
+        grade: row.querySelector('.class-grade-input').value,
+        level: row.querySelector('.class-level-select').value,
+        credit: row.querySelector('.class-credit-input').value
+      });
+    });
+    var scaleSel = document.getElementById('gpaScaleSelect');
+    return {
+      scale: scaleSel ? scaleSel.value : 'default',
+      showNames: document.getElementById('showClassNamesCheckbox').checked,
+      classes: classes
+    };
+  }
+
+  function restoreState(state){
+    if (!state || !Array.isArray(state.classes)) return;
+    var scaleSel = document.getElementById('gpaScaleSelect');
+    if (scaleSel && state.scale) scaleSel.value = state.scale;
+    document.getElementById('showClassNamesCheckbox').checked = !!state.showNames;
+    document.getElementById('gradeInputsContainer').innerHTML = '';
+    classCounter = 0;
+    state.classes.forEach(function(c){
+      addClassInput();
+      var rows = document.querySelectorAll('.class-input-row');
+      var row = rows[rows.length - 1];
+      var nameInput = row.querySelector('.class-name-input');
+      if (nameInput) nameInput.value = c.name || '';
+      row.querySelector('.class-grade-input').value = c.grade || '';
+      if (c.level) row.querySelector('.class-level-select').value = c.level;
+      row.querySelector('.class-credit-input').value = (c.credit !== undefined && c.credit !== '') ? c.credit : '1.0';
+    });
+    toggleClassNamesVisibility();
+    calculateAllGPAs();
+  }
+
+  function saveInputs(){
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify(collectState())); flashStatus('Saved ✓'); }
+    catch(e){ flashStatus('Could not save'); }
+  }
+  function loadInputs(){
+    try {
+      var raw = localStorage.getItem(SAVE_KEY);
+      if (!raw){ flashStatus('No saved data'); return; }
+      restoreState(JSON.parse(raw));
+      flashStatus('Loaded ✓');
+    } catch(e){ flashStatus('Could not load'); }
+  }
+
+  // ---- Copy / print result ----
+  function resultText(){
+    var lines = [];
+    document.querySelectorAll('.result-section h3').forEach(function(h){
+      var t = h.textContent.replace(/\s+/g, ' ').trim();
+      if (t) lines.push(t);
+    });
+    return lines.join('\n');
+  }
+  function fallbackCopy(txt){
+    try {
+      var ta = document.createElement('textarea');
+      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+      flashStatus('Copied ✓');
+    } catch(e){ flashStatus('Copy failed'); }
+  }
+  function copyResult(){
+    var txt = resultText();
+    if (!txt || txt.indexOf('GPA:') === -1){ flashStatus('Calculate first'); return; }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ flashStatus('Copied ✓'); }, function(){ fallbackCopy(txt); });
+    } else { fallbackCopy(txt); }
+  }
+
+  // ---- Pipeline import (grades sent from other calculators) ----
+  function readPending(){
+    try { return JSON.parse(localStorage.getItem(GPA_PENDING_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function showImportBanner(){
+    var pending = readPending();
+    var banner = document.getElementById('gpaImportBanner');
+    if (!banner) return;
+    if (pending.length){
+      document.getElementById('gpaImportBannerText').textContent =
+        pending.length + ' grade' + (pending.length > 1 ? 's' : '') + ' sent from other calculators are ready to add.';
+      banner.classList.add('show');
+    } else {
+      banner.classList.remove('show');
+    }
+  }
+  function addPendingAsClasses(){
+    var pending = readPending();
+    if (!pending.length) return;
+    document.getElementById('showClassNamesCheckbox').checked = true;
+    pending.forEach(function(item){
+      addClassInput();
+      var rows = document.querySelectorAll('.class-input-row');
+      var row = rows[rows.length - 1];
+      var nameInput = row.querySelector('.class-name-input');
+      if (nameInput && item.label) nameInput.value = item.label;
+      var g = parseFloat(item.grade);
+      if (!isNaN(g)) row.querySelector('.class-grade-input').value = Math.round(g * 1e6) / 1e6;
+      if (item.level && ['CP','Honors','AP'].indexOf(item.level) !== -1){
+        row.querySelector('.class-level-select').value = item.level;
+      }
+    });
+    toggleClassNamesVisibility();
+    localStorage.removeItem(GPA_PENDING_KEY);
+    showImportBanner();
+    calculateAllGPAs();
+    flashStatus('Added ✓');
+  }
+
+  // ---- a11y: mark decorative Font Awesome icons ----
+  document.querySelectorAll('i.fas, i.far, i.fab').forEach(function(ic){
+    if (!ic.hasAttribute('aria-hidden')) ic.setAttribute('aria-hidden', 'true');
+  });
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var b;
+    if ((b = document.getElementById('saveInputsBtn'))) b.addEventListener('click', saveInputs);
+    if ((b = document.getElementById('loadInputsBtn'))) b.addEventListener('click', loadInputs);
+    if ((b = document.getElementById('copyResultBtn'))) b.addEventListener('click', copyResult);
+    if ((b = document.getElementById('printResultBtn'))) b.addEventListener('click', function(){ window.print(); });
+    if ((b = document.getElementById('gpaImportAddBtn'))) b.addEventListener('click', addPendingAsClasses);
+    if ((b = document.getElementById('gpaImportDismissBtn'))) b.addEventListener('click', function(){
+      localStorage.removeItem(GPA_PENDING_KEY); showImportBanner();
+    });
+    var scaleSel = document.getElementById('gpaScaleSelect');
+    if (scaleSel) scaleSel.addEventListener('change', function(){
+      // Recalculate live if results are already on screen.
+      if (document.getElementById('gpaResult').innerText.trim() !== '') calculateAllGPAs();
+    });
+    showImportBanner();
   });
 })();
 </script>
