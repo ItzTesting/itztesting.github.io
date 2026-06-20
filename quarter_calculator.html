@@ -1585,29 +1585,63 @@
   /**
    * Pick score fraction on a line.
    * If teacher shows: "14/20 (28/40)", we prefer the fraction INSIDE parentheses (28/40).
-   * Fallback: last fraction anywhere on the line.
+   * Fallback (no parenthetical fraction at all): last fraction anywhere on the line —
+   * PowerSchool rows lead with a date token that can itself look like a fraction
+   * (e.g. "10/13/2025"), and the real score always trails it, so "last" is still
+   * the right heuristic when there's nothing inside parens to prefer.
+   *
+   * Scoped to a single parenthetical group: if the line carries more than one
+   * "(...)" group (or one group with more than one fraction inside it), that's
+   * ambiguous — we still have to pick something, so we take the first parenthetical
+   * candidate encountered left-to-right (not the last), but flag `ambiguous: true`
+   * so the caller can warn the user instead of silently trusting a guess.
    */
   function pickFractionPreferInsideParens(line) {
-    let lastAny = null;
-    let lastInside = null;
+    const matches = [...line.matchAll(FRACTION)];
+    if (!matches.length) return null;
 
-    for (const m of line.matchAll(FRACTION)) {
-      lastAny = m;
-
-      const idx = m.index ?? 0;
-      const before = line.slice(0, idx);
-      const depth = (before.match(/\(/g)?.length ?? 0) - (before.match(/\)/g)?.length ?? 0);
-      const insideParens = depth > 0;
-
-      if (insideParens) lastInside = m;
+    // Map each character index to the start index of the innermost '(' that is
+    // still open at that point (or null if not inside any parens).
+    const openAt = new Array(line.length).fill(null);
+    const stack = [];
+    for (let i = 0; i < line.length; i++) {
+      if (line[i] === '(') {
+        stack.push(i);
+      } else if (line[i] === ')') {
+        stack.pop();
+      }
+      openAt[i] = stack.length ? stack[stack.length - 1] : null;
     }
 
-    const pick = lastInside || lastAny;
+    const insideGroups = new Map(); // group open-paren index -> { first, count }
+    let lastAny = null;
+
+    for (const m of matches) {
+      lastAny = m;
+      const idx = m.index ?? 0;
+      const groupStart = openAt[idx];
+      if (groupStart !== null) {
+        if (!insideGroups.has(groupStart)) insideGroups.set(groupStart, { first: m, count: 0 });
+        insideGroups.get(groupStart).count++;
+      }
+    }
+
+    let pick, ambiguous;
+    if (insideGroups.size > 0) {
+      const groups = [...insideGroups.values()];
+      pick = groups[0].first; // first parenthetical group wins, not the last
+      const totalInsideCount = groups.reduce((sum, g) => sum + g.count, 0);
+      ambiguous = groups.length > 1 || totalInsideCount > 1;
+    } else {
+      pick = lastAny; // unchanged fallback — no parens on the line at all
+      ambiguous = false;
+    }
+
     if (!pick) return null;
 
     const earned = parseFloat(pick[1]);
     const possible = parseFloat(pick[2]);
-    return { earned, possible };
+    return { earned, possible, ambiguous };
   }
 
   // ----- Core parsing of a single row -----
@@ -1633,12 +1667,13 @@
     }
 
     // ---- score detection (prefer inside parentheses) ----
-    let earned = null, possible = null;
+    let earned = null, possible = null, ambiguous = false;
 
     const frac = pickFractionPreferInsideParens(line);
     if (frac) {
       earned = frac.earned;
       possible = frac.possible;
+      ambiguous = !!frac.ambiguous;
     } else {
       const mp = line.match(PERCENT);
       if (mp) {
@@ -1651,7 +1686,7 @@
     if (earned == null || possible == null) throw new Error('no_score');
     if (!(possible > 0) || !(earned >= 0) || earned > possible * 2) throw new Error('bad_numbers');
 
-    return { category, earned, possible, raw: line };
+    return { category, earned, possible, ambiguous, raw: line };
   }
 
   // ----- Parse all text block -----
@@ -1661,8 +1696,8 @@
       const line = rawLine.trim().replace(/\u00A0/g, ' ');
       if (!line) continue;
       try {
-        const { category, earned, possible } = parseRow(line);
-        assignments.push({ category, earned, possible, raw: rawLine });
+        const { category, earned, possible, ambiguous } = parseRow(line);
+        assignments.push({ category, earned, possible, ambiguous, raw: rawLine });
       } catch {
         continue;
       }
@@ -1718,12 +1753,17 @@
     }
 
     autofillAssignmentsFromParsed(assignments);
-    
-    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
-    
+
+    const ambiguousCount = assignments.filter(a => a.ambiguous).length;
+    let statusHtml = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
+    if (ambiguousCount > 0) {
+      statusHtml += `<p style="color: #f44336;">⚠ ${ambiguousCount} assignment${ambiguousCount !== 1 ? 's' : ''} had more than one possible score on the same line (e.g. multiple parenthetical scores). The first one found was used — please double-check the row${ambiguousCount !== 1 ? 's' : ''} marked ⚠ below.</p>`;
+    }
+    statusContainer.innerHTML = statusHtml;
+
     setTimeout(() => {
       statusContainer.innerHTML = '';
-    }, 3000);
+    }, ambiguousCount > 0 ? 8000 : 3000);
   }
 
   function autofillAssignmentsFromParsed(assignments) {
@@ -1819,14 +1859,19 @@
           // Points
           const pointsCell = document.createElement('td');
           pointsCell.textContent = `${assignment.earned} / ${assignment.possible}`;
+          if (assignment.ambiguous) {
+              pointsCell.textContent += ' ⚠';
+              pointsCell.style.color = '#f44336';
+              pointsCell.title = 'Multiple possible scores were found on this line (e.g. more than one parenthetical score). The first one found was used — double-check against the original text.';
+          }
           row.appendChild(pointsCell);
-          
+
           // Percentage
           const percentCell = document.createElement('td');
           const percentage = (assignment.earned / assignment.possible * 100).toFixed(2);
           percentCell.textContent = `${percentage}%`;
           row.appendChild(percentCell);
-          
+
           tableBody.appendChild(row);
       });
   }
