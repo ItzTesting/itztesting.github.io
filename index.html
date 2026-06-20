@@ -13,6 +13,7 @@ gtag('config', 'G-LNMT1VXJW1');
 
 <!-- Replaced Google AdSense script with meta tag -->
 <meta name="google-adsense-account" content="ca-pub-5732988604780633">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='73' font-size='62' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold'>%25</text></svg>">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +34,7 @@ gtag('config', 'G-LNMT1VXJW1');
       --nav-bg: #222222;
       --highlight-bg: rgba(76, 175, 80, 0.15);
       --primary-color: #64B5F6; /* Added primary color for link styling */
+      --warning-color: #e57373; /* Error / "not possible" message color */
   }
 
   * {
@@ -719,6 +721,10 @@ gtag('config', 'G-LNMT1VXJW1');
   .consent-decline:hover {
       background-color: #d32f2f;
   }
+
+  .result-warning {
+      color: var(--warning-color) !important;
+  }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -741,14 +747,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function startTypingAnimation() {
         const typingElement = document.getElementById('typing-text');
-        if (typingElement) {
+        if (typingElement && window.innerWidth > 768) {
             typingElement.classList.add('typewriter');
         }
     }
 
     function checkAndStartAnimation() {
         const welcomeDismissed = sessionStorage.getItem('shownWelcomePopup') === 'true';
-        const featureDismissed = sessionStorage.getItem('shownFeaturePopup') === 'true';
+        const featureDismissed = sessionStorage.getItem('shownFeaturePopup_v2') === 'true';
 
         if (welcomeDismissed && featureDismissed) {
             startTypingAnimation();
@@ -761,7 +767,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
             showModal(welcomeModalBackdrop);
-        } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+        } else if (sessionStorage.getItem('shownFeaturePopup_v2') !== 'true') {
             showModal(featureModalBackdrop);
         } else {
             // Start typing animation immediately if no popups need to show
@@ -788,22 +794,54 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (sessionStorage.getItem('shownWelcomePopup') !== 'true') {
             showModal(welcomeModalBackdrop);
-        } else if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+        } else if (sessionStorage.getItem('shownFeaturePopup_v2') !== 'true') {
             showModal(featureModalBackdrop);
         } else {
             checkAndStartAnimation();
         }
     });
 
-    // Decline button functionality
+    // Decline button functionality — consent is required, so keep the modal up instead of leaving the site.
     document.getElementById('declineButton').addEventListener('click', function() {
-        window.location.href = 'https://example.com/rejected.html';
+        document.getElementById('consentPopup').classList.remove('hidden');
+        let declineNotice = document.getElementById('declineNotice');
+        if (!declineNotice) {
+            declineNotice = document.createElement('p');
+            declineNotice.id = 'declineNotice';
+            declineNotice.style.color = 'var(--warning-color, #e57373)';
+            declineNotice.style.marginTop = '12px';
+            declineNotice.style.fontWeight = 'bold';
+            declineNotice.textContent = 'You must accept the Terms of Service and Privacy Policy to use this site.';
+            document.getElementById('declineButton').parentNode.appendChild(declineNotice);
+        }
+    });
+
+    // Privacy Settings (footer link) — let users revoke consent and re-open the popup.
+    const privacySettingsLink = document.getElementById('privacySettingsLink');
+    if (privacySettingsLink) {
+        privacySettingsLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('consentAccepted');
+            const existingNotice = document.getElementById('declineNotice');
+            if (existingNotice) existingNotice.remove();
+            document.getElementById('consentPopup').classList.remove('hidden');
+        });
+    }
+
+    // Close the mobile nav when clicking outside of it (mirrors modal backdrop behavior).
+    document.addEventListener('click', function(e) {
+        const navLinks = document.querySelector('.nav-links');
+        const menuBtn = document.querySelector('.mobile-menu-btn');
+        if (navLinks && navLinks.classList.contains('active') &&
+            !navLinks.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
+            navLinks.classList.remove('active');
+        }
     });
 
     // Modal event listeners
     welcomeModalGotItButton.addEventListener('click', function() {
         hideModal(welcomeModalBackdrop, 'shownWelcomePopup');
-        if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+        if (sessionStorage.getItem('shownFeaturePopup_v2') !== 'true') {
             showModal(featureModalBackdrop);
         } else {
             checkAndStartAnimation();
@@ -813,7 +851,7 @@ document.addEventListener('DOMContentLoaded', function() {
     welcomeModalBackdrop.addEventListener('click', function(event) {
         if (event.target === welcomeModalBackdrop) {
             hideModal(welcomeModalBackdrop, 'shownWelcomePopup');
-            if (sessionStorage.getItem('shownFeaturePopup') !== 'true') {
+            if (sessionStorage.getItem('shownFeaturePopup_v2') !== 'true') {
                 showModal(featureModalBackdrop);
             } else {
                 checkAndStartAnimation();
@@ -822,18 +860,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     featureModalGotItButton.addEventListener('click', function() {
-        featureModalGotItButton.disabled = true;
-        featureModalGotItButton.textContent = 'Please wait...';
-        
-        setTimeout(function() {
-            hideModal(featureModalBackdrop, 'shownFeaturePopup');
-            checkAndStartAnimation();
-        }, 2000); // Changed delay from 3000ms to 2000ms (2 seconds)
+        hideModal(featureModalBackdrop, 'shownFeaturePopup_v2');
+        checkAndStartAnimation();
     });
 
     featureModalBackdrop.addEventListener('click', function(event) {
         if (event.target === featureModalBackdrop) {
-            hideModal(featureModalBackdrop, 'shownFeaturePopup');
+            hideModal(featureModalBackdrop, 'shownFeaturePopup_v2');
             checkAndStartAnimation();
         }
     });
@@ -1162,7 +1195,9 @@ function calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, 
       }
   }
   
-  document.getElementById("neededGrade").innerText = resultText;
+  const neededGradeEl = document.getElementById("neededGrade");
+  neededGradeEl.innerText = resultText;
+  neededGradeEl.classList.toggle("result-warning", resultText.indexOf("not possible") !== -1);
 }
 
 function calculateOptimalCombinations(currentWeightedSum, desiredGrade, isAPWithFinal = false) {
@@ -1406,7 +1441,6 @@ function clearFields() {
               <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
               <li><a href="quarter_calculator.html"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
               <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
-              <li><a href="popup-info.html"><i class="fas fa-info-circle"></i> Popup Info</a></li>
               <li><a href="terms-of-service.html"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
               <li><a href="privacy-policy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
           </ul>
@@ -1587,7 +1621,7 @@ function clearFields() {
   </div>
   <footer class="footer">
       <div class="container">
-          <p>Advaith S: Founder<br>Prahaladhan R: Operations Lead<br>Created 2025 | <a href="terms-of-service.html">Terms of Service</a> | <a href="privacy-policy.html">Privacy Policy</a></p>
+          <p>Advaith S: Founder<br>Prahaladhan R: Operations Lead<br>Created 2025 | <a href="terms-of-service.html">Terms of Service</a> | <a href="privacy-policy.html">Privacy Policy</a> | <a href="popup-info.html">Popup Info</a> | <a href="#" id="privacySettingsLink">Privacy Settings</a></p>
       </div>
   </footer>
 

@@ -13,6 +13,7 @@
 
 <!-- Replaced Google AdSense script with meta tag -->
 <meta name="google-adsense-account" content="ca-pub-5732988604780633">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234CAF50'/><text x='50' y='73' font-size='62' text-anchor='middle' fill='white' font-family='Arial,sans-serif' font-weight='bold'>%25</text></svg>">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -749,7 +750,7 @@
 
       // Decline button functionality
       document.getElementById('declineButton').addEventListener('click', function() {
-          window.location.href = 'https://example.com/rejected.html';
+          window.__handleConsentDecline();
       });
 
       // Add PowerSchool parser button listener
@@ -1966,8 +1967,6 @@
           <li><a href="half_semester_calculator.html"><i class="fas fa-calendar-alt"></i> Half-Year Calculator</a></li>
           <li><a href="quarter_calculator.html" class="active"><i class="fas fa-percent"></i> Quarter Calculator</a></li>
           <li><a href="unweighted_gpa_calculator.html"><i class="fas fa-graduation-cap"></i> GPA Calculator</a></li>
-          <!-- Added Popup Info page between GPA Calculator and Terms of Service -->
-          <li><a href="popup-info.html"><i class="fas fa-info-circle"></i> Popup Info</a></li>
           <li><a href="terms-of-service.html"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
           <li><a href="privacy-policy.html"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
       </ul>
@@ -2170,8 +2169,51 @@
 <footer class="footer">
   <div class="container">
       <!-- Added Terms of Service and Privacy Policy links to footer -->
-      <p>Advaith S: Founder<br>Prahaladhan R: Operations Lead<br>Created 2025 | <a href="terms-of-service.html">Terms of Service</a> | <a href="privacy-policy.html">Privacy Policy</a></p>
+      <p>Advaith S: Founder<br>Prahaladhan R: Operations Lead<br>Created 2025 | <a href="terms-of-service.html">Terms of Service</a> | <a href="privacy-policy.html">Privacy Policy</a> | <a href="popup-info.html">Popup Info</a> | <a href="#" id="privacySettingsLink">Privacy Settings</a></p>
   </div>
 </footer>
+<script>
+(function(){
+  // Consent decline — keep users on-site with the consent modal up instead of leaving.
+  window.__handleConsentDecline = function(){
+    var cp = document.getElementById('consentPopup');
+    if (cp) cp.classList.remove('hidden');
+    var declineBtn = document.getElementById('declineButton');
+    if (declineBtn && !document.getElementById('declineNotice')) {
+      var note = document.createElement('p');
+      note.id = 'declineNotice';
+      note.style.color = '#e57373';
+      note.style.marginTop = '12px';
+      note.style.fontWeight = 'bold';
+      note.textContent = 'You must accept the Terms of Service and Privacy Policy to use this site.';
+      declineBtn.parentNode.appendChild(note);
+    }
+  };
+  // Privacy Settings (footer) — revoke consent and re-open the popup (or return home).
+  var psLink = document.getElementById('privacySettingsLink');
+  if (psLink) {
+    psLink.addEventListener('click', function(e){
+      e.preventDefault();
+      localStorage.removeItem('consentAccepted');
+      var cp = document.getElementById('consentPopup');
+      if (cp) {
+        var n = document.getElementById('declineNotice'); if (n) n.remove();
+        cp.classList.remove('hidden');
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  }
+  // Close the mobile nav when clicking outside of it.
+  document.addEventListener('click', function(e){
+    var navLinks = document.querySelector('.nav-links');
+    var menuBtn = document.querySelector('.mobile-menu-btn');
+    if (navLinks && navLinks.classList.contains('active') &&
+        !navLinks.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
+      navLinks.classList.remove('active');
+    }
+  });
+})();
+</script>
 </body>
 </html>
