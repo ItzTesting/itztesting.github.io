@@ -484,32 +484,6 @@ gtag('config', 'G-LNMT1VXJW1');
     .consent-decline:hover {
         background-color: #d32f2f;
     }
-
-    /* ---- Tier 4 enhancement styles ---- */
-    .btn-secondary {
-        background-color: var(--input-bg);
-        border: 1px solid var(--border-color);
-    }
-    .btn-secondary:hover { background-color: var(--border-color); }
-    .tools-row { align-items: center; }
-    .save-status {
-        color: var(--accent-color);
-        font-weight: 600;
-        font-size: 0.95rem;
-        align-self: center;
-    }
-    .trend-badge { font-size: 0.85rem; font-weight: 600; margin-left: 0.5rem; }
-    .trend-up { color: var(--accent-color); }
-    .trend-down { color: #e57373; }
-    .trend-flat { color: var(--text-secondary); }
-
-    @media print {
-        .navbar, .footer, .consent-popup, .btn-group { display: none !important; }
-        body { background: #fff; color: #000; }
-        .card, .result-section, .grade-pairs-section { background: #fff; box-shadow: none; border: 1px solid #ccc; }
-        .result-section h3, h2, h3, h4 { color: #000 !important; }
-        .optimal-combo { background: #fff; border: 1px solid #ccc; }
-    }
 </style>
 <script>
     function toggleMenu() {
@@ -518,7 +492,6 @@ gtag('config', 'G-LNMT1VXJW1');
     }
 
     function calculateFinalGrade() {
-        window.__halfYearGrade = null; // Tier 4: reset; set below only when a grade is computed
         let quarter1 = parseFloat(document.getElementById("q1").value) || 0;
         let quarter2 = parseFloat(document.getElementById("q2").value) || 0;
         let finalExam = parseFloat(document.getElementById("finalExam").value) || 0;
@@ -554,10 +527,6 @@ gtag('config', 'G-LNMT1VXJW1');
             // Calculate current grade based on provided components
             let currentGrade = totalWeight > 0 ? weightedSum / totalWeight : 0;
             resultText = "Current Grade: " + currentGrade.toFixed(3) + "%";
-
-            // Tier 4: expose the precise current grade and update the trend badge.
-            window.__halfYearGrade = currentGrade;
-            if (window.__updateTrend) window.__updateTrend(currentGrade);
             
             // If desired grade is provided, calculate needed final exam grade
             if (!isNaN(desiredGrade) && desiredGrade > 0) {
@@ -772,27 +741,15 @@ gtag('config', 'G-LNMT1VXJW1');
         
         <div class="btn-group">
             <button onclick="calculateFinalGrade()">
-                <i class="fas fa-calculator" aria-hidden="true"></i> Calculate Grade
+                <i class="fas fa-calculator"></i> Calculate Grade
             </button>
             <button class="btn-clear" onclick="clearFields()">
-                <i class="fas fa-trash-alt" aria-hidden="true"></i> Clear All Fields
+                <i class="fas fa-trash-alt"></i> Clear All Fields
             </button>
         </div>
-
-        <!-- Tier 4: save / load this calculator's inputs -->
-        <div class="btn-group tools-row">
-            <button type="button" id="saveInputsBtn" class="btn-secondary"><i class="fas fa-save" aria-hidden="true"></i> Save Inputs</button>
-            <button type="button" id="loadInputsBtn" class="btn-secondary"><i class="fas fa-folder-open" aria-hidden="true"></i> Load Saved</button>
-            <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
-        </div>
-
+        
         <div class="result-section">
-            <h3>Result: <span id="result"></span> <span id="trendBadge" class="trend-badge"></span></h3>
-            <div class="result-tools btn-group" style="margin-bottom:0;">
-                <button type="button" id="copyResultBtn" class="btn-secondary"><i class="fas fa-copy" aria-hidden="true"></i> Copy Result</button>
-                <button type="button" id="printResultBtn" class="btn-secondary"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
-                <button type="button" id="sendToGpaBtn" class="btn-secondary"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Send to GPA</button>
-            </div>
+            <h3>Result: <span id="result"></span></h3>
         </div>
 
         <!-- Grade Pairs Section -->
@@ -886,111 +843,6 @@ gtag('config', 'G-LNMT1VXJW1');
         !navLinks.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
       navLinks.classList.remove('active');
     }
-  });
-})();
-</script>
-<script>
-/* ===== Tier 4 enhancements: save/load, copy/print, trend, send-to-GPA, a11y ===== */
-(function(){
-  var SAVE_KEY = 'gradecalc_saved_halfyear';
-  var TREND_KEY = 'gradecalc_last_halfyear';
-  var GPA_PENDING_KEY = 'gpaPendingClasses';
-  var FIELDS = ['q1', 'q2', 'finalExam', 'desiredGrade'];
-
-  function flashStatus(msg){
-    var el = document.getElementById('saveStatus');
-    if (!el) return;
-    el.textContent = msg;
-    clearTimeout(el.__t);
-    el.__t = setTimeout(function(){ el.textContent = ''; }, 2500);
-  }
-
-  window.__updateTrend = function(value){
-    var badge = document.getElementById('trendBadge');
-    if (!badge) return;
-    var prev = parseFloat(localStorage.getItem(TREND_KEY));
-    if (!isNaN(prev)){
-      var delta = Math.round((value - prev) * 100) / 100;
-      if (Math.abs(delta) < 0.005){
-        badge.textContent = '(no change vs last)';
-        badge.className = 'trend-badge trend-flat';
-      } else {
-        badge.textContent = '(' + (delta > 0 ? '+' : '') + delta.toFixed(2) + '% vs last)';
-        badge.className = 'trend-badge ' + (delta > 0 ? 'trend-up' : 'trend-down');
-      }
-    } else {
-      badge.textContent = '';
-      badge.className = 'trend-badge';
-    }
-    localStorage.setItem(TREND_KEY, String(value));
-  };
-
-  function saveInputs(){
-    try {
-      var state = {};
-      FIELDS.forEach(function(id){ state[id] = document.getElementById(id).value; });
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-      flashStatus('Saved ✓');
-    } catch(e){ flashStatus('Could not save'); }
-  }
-  function loadInputs(){
-    try {
-      var raw = localStorage.getItem(SAVE_KEY);
-      if (!raw){ flashStatus('No saved data'); return; }
-      var state = JSON.parse(raw);
-      FIELDS.forEach(function(id){ if (state[id] !== undefined) document.getElementById(id).value = state[id]; });
-      calculateFinalGrade();
-      flashStatus('Loaded ✓');
-    } catch(e){ flashStatus('Could not load'); }
-  }
-
-  function copyResult(){
-    var resultEl = document.getElementById('result');
-    var txt = resultEl ? resultEl.textContent.replace(/\s+/g, ' ').trim() : '';
-    if (!txt){ flashStatus('Calculate first'); return; }
-    txt = 'Half-Year Result: ' + txt;
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(function(){ flashStatus('Copied ✓'); }, function(){ fallbackCopy(txt); });
-    } else { fallbackCopy(txt); }
-  }
-  function fallbackCopy(txt){
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      flashStatus('Copied ✓');
-    } catch(e){ flashStatus('Copy failed'); }
-  }
-
-  function sendToGpa(){
-    if (window.__halfYearGrade === null || window.__halfYearGrade === undefined || isNaN(window.__halfYearGrade)){
-      calculateFinalGrade();
-    }
-    var grade = window.__halfYearGrade;
-    if (grade === null || grade === undefined || isNaN(grade)){
-      flashStatus('Enter grades first');
-      return;
-    }
-    var pending;
-    try { pending = JSON.parse(localStorage.getItem(GPA_PENDING_KEY)) || []; } catch(e){ pending = []; }
-    pending.push({ grade: Math.round(grade * 1e6) / 1e6, level: 'Honors', label: 'From Half-Year Calc' });
-    localStorage.setItem(GPA_PENDING_KEY, JSON.stringify(pending));
-    flashStatus('Sent to GPA ✓');
-  }
-
-  // a11y: mark decorative icons
-  document.querySelectorAll('i.fas, i.far, i.fab').forEach(function(ic){
-    if (!ic.hasAttribute('aria-hidden')) ic.setAttribute('aria-hidden', 'true');
-  });
-
-  document.addEventListener('DOMContentLoaded', function(){
-    var b;
-    if ((b = document.getElementById('saveInputsBtn'))) b.addEventListener('click', saveInputs);
-    if ((b = document.getElementById('loadInputsBtn'))) b.addEventListener('click', loadInputs);
-    if ((b = document.getElementById('copyResultBtn'))) b.addEventListener('click', copyResult);
-    if ((b = document.getElementById('printResultBtn'))) b.addEventListener('click', function(){ window.print(); });
-    if ((b = document.getElementById('sendToGpaBtn'))) b.addEventListener('click', sendToGpa);
   });
 })();
 </script>

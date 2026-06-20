@@ -675,33 +675,6 @@
   .consent-decline:hover {
       background-color: #d32f2f;
   }
-
-  /* ---- Tier 4 enhancement styles ---- */
-  .btn-secondary {
-      background-color: var(--input-bg);
-      border: 1px solid var(--border-color);
-  }
-  .btn-secondary:hover { background-color: var(--border-color); }
-  .tools-row { align-items: center; }
-  .save-status {
-      color: var(--accent-color);
-      font-weight: 600;
-      font-size: 0.95rem;
-      align-self: center;
-  }
-  .trend-badge { font-size: 0.85rem; font-weight: 600; }
-  .trend-up { color: var(--accent-color); }
-  .trend-down { color: #e57373; }
-  .trend-flat { color: var(--text-secondary); }
-
-  @media print {
-      .navbar, .footer, .consent-popup, .btn-group, .checkbox-option-container,
-      .export-section, #neededGradesSection, .view-toggle-btn,
-      .card:first-of-type { display: none !important; }
-      body { background: #fff; color: #000; }
-      .card, .result-section { background: #fff; box-shadow: none; border: 1px solid #ccc; }
-      .result-section h3, h2, h3 { color: #000 !important; }
-  }
 </style>
 <script>
   let categoryCounters = {
@@ -1227,9 +1200,6 @@
           // Store the un-rounded grade so the export sends full precision (not the .toFixed(2) display value)
           currentPreciseQuarterGrade = quarterGrade;
 
-          // Tier 4: update the trend badge vs the last calculation.
-          if (window.__updateTrend) window.__updateTrend(quarterGrade);
-
           // Display category averages
           for (const category in categoryTotals) {
               if (weights[category] && weights[category] > 0) {
@@ -1747,68 +1717,13 @@
       return;
     }
 
-    // Tier 4: show a preview and require confirmation before autofilling the brittle parser output.
-    showParsePreview(assignments);
-  }
-
-  // Holds rows awaiting the user's confirmation in the parse preview.
-  let pendingParsedAssignments = null;
-
-  function classifyParsedType(category) {
-    const c = (category || '').toLowerCase();
-    if (c.includes('learner')) return 'Learner Task';
-    if (c.includes('assess')) return 'Assessment';
-    return 'Custom';
-  }
-
-  function showParsePreview(assignments) {
-    pendingParsedAssignments = assignments;
-    const preview = document.getElementById('powerschoolPreview');
-    const status = document.getElementById('powerschoolStatus');
-    if (status) status.innerHTML = '';
-
-    // Fallback to the original immediate behavior if the preview container is missing.
-    if (!preview) {
-      autofillAssignmentsFromParsed(assignments);
-      return;
-    }
-
-    const rows = assignments.map((a, i) => {
-      const pct = a.possible ? (a.earned / a.possible * 100).toFixed(2) : '0.00';
-      return `<tr><td>${i + 1}</td><td>${classifyParsedType(a.category)}</td><td>${a.earned} / ${a.possible}</td><td>${pct}%</td></tr>`;
-    }).join('');
-
-    preview.innerHTML =
-      `<p style="color: var(--text-secondary); margin-bottom: 0.5rem; font-size: 0.9rem;">Review ${assignments.length} parsed assignment${assignments.length !== 1 ? 's' : ''} before filling. Filling replaces any assignments currently entered.</p>` +
-      `<table class="condensed-assignments-table"><thead><tr><th>#</th><th>Type</th><th>Points</th><th>Percentage</th></tr></thead><tbody>${rows}</tbody></table>` +
-      `<div class="btn-group" style="margin-top: 0.75rem;">` +
-      `<button id="confirmParseBtn"><i class="fas fa-check" aria-hidden="true"></i> Confirm &amp; Fill</button>` +
-      `<button id="cancelParseBtn" class="btn-clear"><i class="fas fa-times" aria-hidden="true"></i> Cancel</button>` +
-      `</div>`;
-    preview.style.display = 'block';
-    document.getElementById('confirmParseBtn').addEventListener('click', confirmParseAndFill);
-    document.getElementById('cancelParseBtn').addEventListener('click', cancelParse);
-  }
-
-  function confirmParseAndFill() {
-    const preview = document.getElementById('powerschoolPreview');
-    const status = document.getElementById('powerschoolStatus');
-    if (pendingParsedAssignments && pendingParsedAssignments.length) {
-      const n = pendingParsedAssignments.length;
-      autofillAssignmentsFromParsed(pendingParsedAssignments);
-      if (status) {
-        status.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${n} assignment${n !== 1 ? 's' : ''}!</p>`;
-        setTimeout(() => { status.innerHTML = ''; }, 3000);
-      }
-    }
-    if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
-    pendingParsedAssignments = null;
-  }
-
-  function cancelParse() {
-    const preview = document.getElementById('powerschoolPreview');
-    if (preview) { preview.style.display = 'none'; preview.innerHTML = ''; }
-    pendingParsedAssignments = null;
+    autofillAssignmentsFromParsed(assignments);
+    
+    statusContainer.innerHTML = `<p style="color: var(--accent-color);">✓ Successfully imported ${assignments.length} assignment${assignments.length !== 1 ? 's' : ''}!</p>`;
+    
+    setTimeout(() => {
+      statusContainer.innerHTML = '';
+    }, 3000);
   }
 
   function autofillAssignmentsFromParsed(assignments) {
@@ -2083,8 +1998,6 @@
       <!-- Hidden output display, will show brief success message instead -->
       <div id="powerschoolOutput" style="display: none;"></div>
       <div id="powerschoolStatus" style="margin-top: 0.5rem; text-align: center; font-size: 0.9rem;"></div>
-      <!-- Tier 4: parse preview shown before autofill -->
-      <div id="powerschoolPreview" style="display: none; margin-top: 0.75rem;"></div>
   </div>
 
   <div class="card">
@@ -2168,29 +2081,17 @@
           
           <div class="btn-group">
               <button id="calculateQuarterBtn">
-                  <i class="fas fa-calculator" aria-hidden="true"></i> Calculate Quarter Grade
+                  <i class="fas fa-calculator"></i> Calculate Quarter Grade
               </button>
               <button class="btn-clear" id="clearQuarterFieldsBtn">
-                  <i class="fas fa-trash-alt" aria-hidden="true"></i> Clear All Fields
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
               </button>
           </div>
-
-          <!-- Tier 4: save / load this calculator's inputs -->
-          <div class="btn-group tools-row">
-              <button type="button" id="saveInputsBtn" class="btn-secondary"><i class="fas fa-save" aria-hidden="true"></i> Save Inputs</button>
-              <button type="button" id="loadInputsBtn" class="btn-secondary"><i class="fas fa-folder-open" aria-hidden="true"></i> Load Saved</button>
-              <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
-          </div>
-
+          
           <div class="result-section">
               <div id="quarterResultsContainer">
                   <!-- CHANGE: Initial state with placeholder text -->
                   <h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>
-              </div>
-              <div style="margin-top: 0.5rem;"><span id="trendBadge" class="trend-badge"></span></div>
-              <div class="result-tools btn-group" style="margin-bottom:0;">
-                  <button type="button" id="copyResultBtn" class="btn-secondary"><i class="fas fa-copy" aria-hidden="true"></i> Copy Result</button>
-                  <button type="button" id="printResultBtn" class="btn-secondary"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
               </div>
           </div>
 
@@ -2311,139 +2212,6 @@
         !navLinks.contains(e.target) && menuBtn && !menuBtn.contains(e.target)) {
       navLinks.classList.remove('active');
     }
-  });
-})();
-</script>
-<script>
-/* ===== Tier 4 enhancements: save/load, copy/print, trend, a11y ===== */
-(function(){
-  var SAVE_KEY = 'gradecalc_saved_quarter';
-  var TREND_KEY = 'gradecalc_last_quarter';
-
-  function flashStatus(msg){
-    var el = document.getElementById('saveStatus');
-    if (!el) return;
-    el.textContent = msg;
-    clearTimeout(el.__t);
-    el.__t = setTimeout(function(){ el.textContent = ''; }, 2500);
-  }
-
-  window.__updateTrend = function(value){
-    var badge = document.getElementById('trendBadge');
-    if (!badge) return;
-    var prev = parseFloat(localStorage.getItem(TREND_KEY));
-    if (!isNaN(prev)){
-      var delta = Math.round((value - prev) * 100) / 100;
-      if (Math.abs(delta) < 0.005){
-        badge.textContent = '(no change vs last)';
-        badge.className = 'trend-badge trend-flat';
-      } else {
-        badge.textContent = '(' + (delta > 0 ? '+' : '') + delta.toFixed(2) + '% vs last)';
-        badge.className = 'trend-badge ' + (delta > 0 ? 'trend-up' : 'trend-down');
-      }
-    } else {
-      badge.textContent = '';
-      badge.className = 'trend-badge';
-    }
-    localStorage.setItem(TREND_KEY, String(value));
-  };
-
-  // ---- Save / load (single-assignment view) ----
-  function collectState(){
-    var rows = [];
-    document.querySelectorAll('#assignmentsAssignments .class-input-row').forEach(function(row){
-      var nameInput = row.querySelector('.assignment-name-input');
-      var typeSel = row.querySelector('.assignment-type-select');
-      var customW = row.querySelector('.assignment-custom-weight-input');
-      rows.push({
-        name: nameInput ? nameInput.value : '',
-        earned: row.querySelector('.assignment-grade-input').value,
-        possible: row.querySelector('.assignment-possible-input').value,
-        type: typeSel ? typeSel.value : 'Learner Tasks',
-        customWeight: customW ? customW.value : '100'
-      });
-    });
-    return {
-      ltWeight: document.getElementById('overallLearnerTaskWeight').value,
-      assessWeight: document.getElementById('overallAssessmentWeight').value,
-      showNames: document.getElementById('showAssignmentNamesCheckbox').checked,
-      rows: rows
-    };
-  }
-
-  function restoreState(state){
-    if (!state || !Array.isArray(state.rows)) return;
-    clearQuarterFields(); // resets counters, rows, and view to expanded
-    document.getElementById('overallLearnerTaskWeight').value = state.ltWeight || '';
-    document.getElementById('overallAssessmentWeight').value = state.assessWeight || '';
-    document.getElementById('showAssignmentNamesCheckbox').checked = state.showNames !== false;
-    state.rows.forEach(function(r){
-      addAssignmentInput('assignments');
-      var allRows = document.querySelectorAll('#assignmentsAssignments .class-input-row');
-      var row = allRows[allRows.length - 1];
-      var nameInput = row.querySelector('.assignment-name-input');
-      if (nameInput) nameInput.value = r.name || '';
-      row.querySelector('.assignment-grade-input').value = r.earned || '';
-      row.querySelector('.assignment-possible-input').value = r.possible || '';
-      var typeSel = row.querySelector('.assignment-type-select');
-      if (typeSel && r.type){
-        typeSel.value = r.type;
-        toggleCustomWeightInput(row, r.type);
-      }
-      if (r.type === 'Custom'){
-        var cw = row.querySelector('.assignment-custom-weight-input');
-        if (cw) cw.value = r.customWeight || '100';
-      }
-    });
-    toggleAssignmentNamesVisibility();
-    calculateQuarterGrade();
-  }
-
-  function saveInputs(){
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify(collectState())); flashStatus('Saved ✓'); }
-    catch(e){ flashStatus('Could not save'); }
-  }
-  function loadInputs(){
-    try {
-      var raw = localStorage.getItem(SAVE_KEY);
-      if (!raw){ flashStatus('No saved data'); return; }
-      restoreState(JSON.parse(raw));
-      flashStatus('Loaded ✓');
-    } catch(e){ flashStatus('Could not load'); }
-  }
-
-  // ---- Copy / print ----
-  function copyResult(){
-    var c = document.getElementById('quarterResultsContainer');
-    var txt = c ? c.textContent.replace(/\s+/g, ' ').trim() : '';
-    if (!txt || txt.indexOf('Please enter') !== -1){ flashStatus('Calculate first'); return; }
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(function(){ flashStatus('Copied ✓'); }, function(){ fallbackCopy(txt); });
-    } else { fallbackCopy(txt); }
-  }
-  function fallbackCopy(txt){
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      flashStatus('Copied ✓');
-    } catch(e){ flashStatus('Copy failed'); }
-  }
-
-  // ---- a11y ----
-  document.querySelectorAll('i.fas, i.far, i.fab').forEach(function(ic){
-    if (!ic.hasAttribute('aria-hidden')) ic.setAttribute('aria-hidden', 'true');
-  });
-  var cp = document.getElementById('consentPopup');
-  if (cp){ cp.setAttribute('role', 'dialog'); cp.setAttribute('aria-modal', 'true'); cp.setAttribute('aria-label', 'Terms and Privacy Consent'); }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    var b;
-    if ((b = document.getElementById('saveInputsBtn'))) b.addEventListener('click', saveInputs);
-    if ((b = document.getElementById('loadInputsBtn'))) b.addEventListener('click', loadInputs);
-    if ((b = document.getElementById('copyResultBtn'))) b.addEventListener('click', copyResult);
-    if ((b = document.getElementById('printResultBtn'))) b.addEventListener('click', function(){ window.print(); });
   });
 })();
 </script>

@@ -725,33 +725,6 @@ gtag('config', 'G-LNMT1VXJW1');
   .result-warning {
       color: var(--warning-color) !important;
   }
-
-  /* ---- Tier 4 enhancement styles ---- */
-  .btn-secondary {
-      background-color: var(--input-bg);
-      border: 1px solid var(--border-color);
-  }
-  .btn-secondary:hover { background-color: var(--border-color); }
-  .tools-row { align-items: center; }
-  .save-status {
-      color: var(--accent-color);
-      font-weight: 600;
-      font-size: 0.95rem;
-      align-self: center;
-  }
-  .trend-badge { font-size: 0.85rem; font-weight: 600; margin-left: 0.5rem; }
-  .trend-up { color: var(--accent-color); }
-  .trend-down { color: var(--warning-color); }
-  .trend-flat { color: var(--text-secondary); }
-
-  @media print {
-      .navbar, .footer, .modal-backdrop, .consent-popup, .btn-group,
-      .tip-prompt, .import-banner { display: none !important; }
-      body { background: #fff; color: #000; }
-      .card, .result-section, .grade-pairs-section { background: #fff; box-shadow: none; border: 1px solid #ccc; }
-      .result-section h3, h2, h3, h4 { color: #000 !important; }
-      .optimal-combo { background: #fff; border: 1px solid #ccc; }
-  }
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1035,11 +1008,7 @@ function calculateFinalGrade() {
   }
 
   document.getElementById("result").innerText = finalGrade.toFixed(3) + "%";
-
-  // Tier 4: expose the precise final grade and update the trend badge.
-  window.__fullYearGrade = (totalWeight > 0) ? finalGrade : null;
-  if (window.__updateTrend && totalWeight > 0) window.__updateTrend(finalGrade);
-
+  
   calculateNeededGrade(numQuarters, classType, weightedSum, totalWeight, desiredGrade, midtermWeight, finalExamWeight, quarterWeights, apHasFinal);
   
   // Check if we should show the grade pairs section
@@ -1599,28 +1568,16 @@ function clearFields() {
           
           <div class="btn-group">
               <button id="calculateBtn">
-                  <i class="fas fa-calculator" aria-hidden="true"></i> Calculate Final Grade
+                  <i class="fas fa-calculator"></i> Calculate Final Grade
               </button>
               <button class="btn-clear" id="clearBtn">
-                  <i class="fas fa-trash-alt" aria-hidden="true"></i> Clear All Fields
+                  <i class="fas fa-trash-alt"></i> Clear All Fields
               </button>
           </div>
-
-          <!-- Tier 4: save / load this calculator's inputs -->
-          <div class="btn-group tools-row">
-              <button type="button" id="saveInputsBtn" class="btn-secondary"><i class="fas fa-save" aria-hidden="true"></i> Save Inputs</button>
-              <button type="button" id="loadInputsBtn" class="btn-secondary"><i class="fas fa-folder-open" aria-hidden="true"></i> Load Saved</button>
-              <span id="saveStatus" class="save-status" role="status" aria-live="polite"></span>
-          </div>
-
+          
           <div class="result-section">
-              <h3>Final Grade: <span id="result"></span> <span id="trendBadge" class="trend-badge"></span></h3>
+              <h3>Final Grade: <span id="result"></span></h3>
               <h3 id="neededGrade"></h3>
-              <div class="result-tools btn-group" style="margin-bottom:0;">
-                  <button type="button" id="copyResultBtn" class="btn-secondary"><i class="fas fa-copy" aria-hidden="true"></i> Copy Result</button>
-                  <button type="button" id="printResultBtn" class="btn-secondary"><i class="fas fa-print" aria-hidden="true"></i> Print</button>
-                  <button type="button" id="sendToGpaBtn" class="btn-secondary"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Send to GPA</button>
-              </div>
           </div>
           <!-- Grade Pairs Section -->
           <div id="gradePairsSection" class="grade-pairs-section">
@@ -1702,127 +1659,5 @@ function clearFields() {
           </div>
       </div>
   </div>
-<script>
-/* ===== Tier 4 enhancements: save/load, copy/print, trend, send-to-GPA, a11y ===== */
-(function(){
-  var SAVE_KEY = 'gradecalc_saved_fullyear';
-  var TREND_KEY = 'gradecalc_last_fullyear';
-  var GPA_PENDING_KEY = 'gpaPendingClasses';
-  var NUM_FIELDS = ['q1', 'q2', 'q3', 'q4', 'midterm', 'final', 'desiredGrade'];
-
-  function flashStatus(msg){
-    var el = document.getElementById('saveStatus');
-    if (!el) return;
-    el.textContent = msg;
-    clearTimeout(el.__t);
-    el.__t = setTimeout(function(){ el.textContent = ''; }, 2500);
-  }
-
-  window.__updateTrend = function(value){
-    var badge = document.getElementById('trendBadge');
-    if (!badge) return;
-    var prev = parseFloat(localStorage.getItem(TREND_KEY));
-    if (!isNaN(prev)){
-      var delta = Math.round((value - prev) * 100) / 100;
-      if (Math.abs(delta) < 0.005){
-        badge.textContent = '(no change vs last)';
-        badge.className = 'trend-badge trend-flat';
-      } else {
-        badge.textContent = '(' + (delta > 0 ? '+' : '') + delta.toFixed(2) + '% vs last)';
-        badge.className = 'trend-badge ' + (delta > 0 ? 'trend-up' : 'trend-down');
-      }
-    } else {
-      badge.textContent = '';
-      badge.className = 'trend-badge';
-    }
-    localStorage.setItem(TREND_KEY, String(value));
-  };
-
-  function saveInputs(){
-    try {
-      var state = { classType: document.getElementById('classType').value,
-                    apHasFinal: document.getElementById('apHasFinal').checked };
-      NUM_FIELDS.forEach(function(id){ state[id] = document.getElementById(id).value; });
-      localStorage.setItem(SAVE_KEY, JSON.stringify(state));
-      flashStatus('Saved ✓');
-    } catch(e){ flashStatus('Could not save'); }
-  }
-  function loadInputs(){
-    try {
-      var raw = localStorage.getItem(SAVE_KEY);
-      if (!raw){ flashStatus('No saved data'); return; }
-      var state = JSON.parse(raw);
-      if (state.classType){ document.getElementById('classType').value = state.classType; }
-      toggleFinalField();
-      document.getElementById('apHasFinal').checked = !!state.apHasFinal;
-      if (state.classType === 'AP') updateAPFinalField();
-      NUM_FIELDS.forEach(function(id){ if (state[id] !== undefined) document.getElementById(id).value = state[id]; });
-      calculateFinalGrade();
-      flashStatus('Loaded ✓');
-    } catch(e){ flashStatus('Could not load'); }
-  }
-
-  function copyResult(){
-    var result = document.getElementById('result').textContent.trim();
-    if (!result){ flashStatus('Calculate first'); return; }
-    var needed = document.getElementById('neededGrade').textContent.trim();
-    var txt = 'Full-Year Final Grade: ' + result + (needed ? '\n' + needed : '');
-    if (navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(txt).then(function(){ flashStatus('Copied ✓'); }, function(){ fallbackCopy(txt); });
-    } else { fallbackCopy(txt); }
-  }
-  function fallbackCopy(txt){
-    try {
-      var ta = document.createElement('textarea');
-      ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
-      document.body.appendChild(ta); ta.select();
-      document.execCommand('copy'); document.body.removeChild(ta);
-      flashStatus('Copied ✓');
-    } catch(e){ flashStatus('Copy failed'); }
-  }
-
-  function sendToGpa(){
-    if (window.__fullYearGrade === null || window.__fullYearGrade === undefined || isNaN(window.__fullYearGrade)){
-      calculateFinalGrade();
-    }
-    var grade = window.__fullYearGrade;
-    if (grade === null || grade === undefined || isNaN(grade)){
-      flashStatus('Enter grades first');
-      return;
-    }
-    var level = document.getElementById('classType').value === 'AP' ? 'AP' : 'Honors';
-    var pending;
-    try { pending = JSON.parse(localStorage.getItem(GPA_PENDING_KEY)) || []; } catch(e){ pending = []; }
-    pending.push({ grade: Math.round(grade * 1e6) / 1e6, level: level, label: 'From Full-Year Calc' });
-    localStorage.setItem(GPA_PENDING_KEY, JSON.stringify(pending));
-    flashStatus('Sent to GPA ✓');
-  }
-
-  // a11y: decorative icons, consent dialog semantics, Escape closes the welcome/feature modals
-  document.querySelectorAll('i.fas, i.far, i.fab').forEach(function(ic){
-    if (!ic.hasAttribute('aria-hidden')) ic.setAttribute('aria-hidden', 'true');
-  });
-  var cp = document.getElementById('consentPopup');
-  if (cp){ cp.setAttribute('role', 'dialog'); cp.setAttribute('aria-modal', 'true'); cp.setAttribute('aria-label', 'Terms and Privacy Consent'); }
-
-  document.addEventListener('keydown', function(e){
-    if (e.key !== 'Escape' && e.key !== 'Esc') return;
-    var fm = document.getElementById('featureModalBackdrop');
-    var wm = document.getElementById('welcomeModalBackdrop');
-    // Reuse the existing backdrop-click handlers (event.target === backdrop) to keep the modal sequence intact.
-    if (fm && fm.classList.contains('show')) fm.click();
-    else if (wm && wm.classList.contains('show')) wm.click();
-  });
-
-  document.addEventListener('DOMContentLoaded', function(){
-    var b;
-    if ((b = document.getElementById('saveInputsBtn'))) b.addEventListener('click', saveInputs);
-    if ((b = document.getElementById('loadInputsBtn'))) b.addEventListener('click', loadInputs);
-    if ((b = document.getElementById('copyResultBtn'))) b.addEventListener('click', copyResult);
-    if ((b = document.getElementById('printResultBtn'))) b.addEventListener('click', function(){ window.print(); });
-    if ((b = document.getElementById('sendToGpaBtn'))) b.addEventListener('click', sendToGpa);
-  });
-})();
-</script>
 </body>
 </html>
