@@ -852,6 +852,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Collapse the "New here?" explainer by default after the first visit
+    const explainerCard = document.getElementById('explainerCard');
+    if (explainerCard) {
+        if (localStorage.getItem('explainerSeen') === 'true') {
+            explainerCard.open = false;
+        } else {
+            localStorage.setItem('explainerSeen', 'true');
+        }
+    }
+
     // Check if consent has already been given
     if (!localStorage.getItem('consentAccepted')) {
         document.getElementById('consentPopup').classList.remove('hidden');
@@ -1569,7 +1579,7 @@ function clearFields() {
 </div>
 
   <div class="container">
-      <details class="card explainer" open>
+      <details class="card explainer" id="explainerCard" open>
           <summary>
               <i class="fas fa-compass" aria-hidden="true"></i>
               New here? Which calculator should I use?
