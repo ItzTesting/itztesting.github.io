@@ -1406,7 +1406,9 @@
       document.getElementById('expandedAssignmentsContainer').style.display = 'block';
       document.getElementById('expandedAssignmentsHeader').style.display = 'none'; // Hide header if no assignments
       document.getElementById('condensedAssignmentsTableBody').innerHTML = ''; // Clear table
-      
+
+      document.getElementById('powerschoolStatus').innerHTML = ''; // Drop any persistent skipped-rows warning
+
       calculateQuarterGrade(); // Recalculate after clearing and setting initial view
   }
 
@@ -1558,6 +1560,17 @@
     return { earned, possible, ambiguous };
   }
 
+  // Best-effort assignment name/date for display when a row can't be parsed —
+  // not used for grading, only so a skipped-row warning can name the assignment.
+  function guessDisplayInfo(cols, hasDate) {
+    const date = hasDate ? cols[0] : '';
+    let name = '';
+    if (hasDate && cols.length >= 3) name = cols[2];
+    else if (cols.length >= 2) name = cols[1];
+    else if (cols.length >= 1) name = cols[0];
+    return { date, name };
+  }
+
   // ----- Core parsing of a single row -----
   function parseRow(line) {
     if (looksLikeHeader(line)) throw new Error('header');
@@ -1583,13 +1596,19 @@
     // ---- score detection (prefer inside parentheses) ----
     let earned = null, possible = null, ambiguous = false;
 
-    const frac = pickFractionPreferInsideParens(line);
+    // Exclude the leading date column from fraction-matching: a MM/DD/YYYY token
+    // can otherwise be split into spurious fraction-shaped fragments (e.g.
+    // "10/15/2025" backtracking into "10/1" + "5/202") when no real score
+    // exists elsewhere on the line, fabricating a fake score instead of
+    // correctly falling through to 'no_score'.
+    const scoreSearchText = hasDate ? cols.slice(1).join('\t') : line;
+    const frac = pickFractionPreferInsideParens(scoreSearchText);
     if (frac) {
       earned = frac.earned;
       possible = frac.possible;
       ambiguous = !!frac.ambiguous;
     } else {
-      const mp = line.match(PERCENT);
+      const mp = scoreSearchText.match(PERCENT);
       if (mp) {
         const pct = parseFloat(mp[1]) / 100.0;
         earned = pct * 100.0;
@@ -1597,26 +1616,41 @@
       }
     }
 
-    if (earned == null || possible == null) throw new Error('no_score');
-    if (!(possible > 0) || !(earned >= 0) || earned > possible * 2) throw new Error('bad_numbers');
+    if (earned == null || possible == null) {
+      const err = new Error('no_score');
+      err.detail = guessDisplayInfo(cols, hasDate);
+      throw err;
+    }
+    if (!(possible > 0) || !(earned >= 0) || earned > possible * 2) {
+      const err = new Error('bad_numbers');
+      err.detail = { ...guessDisplayInfo(cols, hasDate), earned, possible };
+      throw err;
+    }
 
     return { category, earned, possible, ambiguous, raw: line };
   }
 
+  const SKIP_REASON_LABELS = { no_score: 'no score found', bad_numbers: 'score looked invalid' };
+
   // ----- Parse all text block -----
   function parseTextBlock(text) {
     const assignments = [];
+    const skipped = [];
     for (const rawLine of text.split(/\r?\n/)) {
       const line = rawLine.trim().replace(/\u00A0/g, ' ');
       if (!line) continue;
       try {
         const { category, earned, possible, ambiguous } = parseRow(line);
         assignments.push({ category, earned, possible, ambiguous, raw: rawLine });
-      } catch {
+      } catch (e) {
+        const reason = e && e.message;
+        if (reason === 'no_score' || reason === 'bad_numbers') {
+          skipped.push({ reason, detail: e.detail });
+        }
         continue;
       }
     }
-    return assignments;
+    return { assignments, skipped };
   }
 
   // ----- Summaries (no rounding inside) -----
@@ -1659,10 +1693,11 @@
       return;
     }
 
-    const assignments = parseTextBlock(inputText);
+    const { assignments, skipped } = parseTextBlock(inputText);
 
     if (!assignments.length) {
       statusContainer.innerHTML = '<p style="color: #f44336;">No valid scores found.</p>';
+      renderSkippedRows(statusContainer, skipped);
       return;
     }
 
@@ -1673,11 +1708,70 @@
     if (ambiguousCount > 0) {
       statusHtml += `<p style="color: #f44336;">⚠ ${ambiguousCount} assignment${ambiguousCount !== 1 ? 's' : ''} had more than one possible score on the same line (e.g. multiple parenthetical scores). The first one found was used — please double-check the row${ambiguousCount !== 1 ? 's' : ''} marked ⚠ below.</p>`;
     }
-    statusContainer.innerHTML = statusHtml;
+    statusContainer.innerHTML = `<div class="ps-status-transient">${statusHtml}</div>`;
+    renderSkippedRows(statusContainer, skipped);
 
     setTimeout(() => {
-      statusContainer.innerHTML = '';
+      const transient = statusContainer.querySelector('.ps-status-transient');
+      if (transient) transient.remove();
     }, ambiguousCount > 0 ? 8000 : 3000);
+  }
+
+  const SKIPPED_ROW_MAX_CHARS = 80;
+  const SKIPPED_ROWS_MAX_SHOWN = 8;
+
+  // Renders a persistent (non-auto-dismissing) list of rows the PowerSchool
+  // parser couldn't read, so a dropped assignment isn't invisible to the
+  // student. Built via createElement/textContent, never innerHTML — `detail`
+  // and `raw` originate from pasted gradebook text and must not be treated
+  // as trusted markup.
+  function renderSkippedRows(statusContainer, skipped) {
+    if (!skipped || !skipped.length) return;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'ps-status-skipped';
+
+    const heading = document.createElement('p');
+    heading.style.color = '#f44336';
+    heading.style.marginBottom = '0.25rem';
+    heading.textContent = skipped.length === 1
+      ? `⚠ 1 line couldn't be read — this was skipped (add it manually with "Add Assignment Grade" below):`
+      : `⚠ ${skipped.length} lines couldn't be read — these were skipped (add them manually with "Add Assignment Grade" below):`;
+    wrapper.appendChild(heading);
+
+    const list = document.createElement('ul');
+    list.style.textAlign = 'left';
+    list.style.display = 'inline-block';
+    list.style.margin = '0';
+    list.style.paddingLeft = '1.25rem';
+    list.style.fontSize = '0.85rem';
+    list.style.color = '#f44336';
+
+    skipped.slice(0, SKIPPED_ROWS_MAX_SHOWN).forEach(({ reason, detail }) => {
+      const li = document.createElement('li');
+      const reasonLabel = SKIP_REASON_LABELS[reason] || 'could not be parsed';
+      const name = detail.name.length > SKIPPED_ROW_MAX_CHARS
+        ? detail.name.slice(0, SKIPPED_ROW_MAX_CHARS) + '…'
+        : detail.name;
+      const datePart = detail.date ? ` (${detail.date})` : '';
+      const scorePart = (reason === 'bad_numbers' && detail.possible != null)
+        ? `: ${detail.earned}/${detail.possible}`
+        : '';
+      li.textContent = `${name}${datePart}${scorePart} — ${reasonLabel}`;
+      list.appendChild(li);
+    });
+    wrapper.appendChild(list);
+
+    if (skipped.length > SKIPPED_ROWS_MAX_SHOWN) {
+      const more = document.createElement('p');
+      more.style.margin = '0.25rem 0 0';
+      more.style.fontSize = '0.8rem';
+      more.style.color = '#f44336';
+      more.textContent = `+${skipped.length - SKIPPED_ROWS_MAX_SHOWN} more`;
+      wrapper.appendChild(more);
+    }
+
+    statusContainer.appendChild(wrapper);
   }
 
   function autofillAssignmentsFromParsed(assignments) {
