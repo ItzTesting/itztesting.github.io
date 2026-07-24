@@ -282,6 +282,47 @@
             text-decoration: underline;
         }
 
+        .scale-converter {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .scale-converter h3 {
+            margin-top: 0;
+        }
+
+        .converter-hint {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .converter-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 1rem;
+        }
+
+        .converter-field {
+            flex: 1;
+        }
+
+        .converter-arrows {
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            padding-bottom: 0.9rem;
+        }
+
+        .converter-note {
+            margin-top: 0.75rem;
+            margin-bottom: 0;
+            color: #e57373;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
         @media (max-width: 768px) {
             .nav-links {
                 display: none;
@@ -308,6 +349,17 @@
 
             .mobile-menu-btn {
                 display: block;
+            }
+
+            .converter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .converter-arrows {
+                align-self: center;
+                padding-bottom: 0;
+                transform: rotate(90deg);
             }
         }
 
@@ -581,6 +633,12 @@
             document.getElementById('showCreditsCheckbox').addEventListener('change', toggleCreditsVisibility);
             const gpaScaleSelect = document.getElementById('gpaScaleSelect');
             if (gpaScaleSelect) gpaScaleSelect.addEventListener('change', calculateAllGPAs);
+
+            // Quick GPA scale converter — standalone, independent of the main GPA calculation.
+            const convert4_67Input = document.getElementById('convert4_67Input');
+            const convert5_0Input = document.getElementById('convert5_0Input');
+            if (convert4_67Input) convert4_67Input.addEventListener('input', function() { syncConverter('convert4_67Input'); });
+            if (convert5_0Input) convert5_0Input.addEventListener('input', function() { syncConverter('convert5_0Input'); });
 
             // Initial check for class names / credits visibility
             toggleClassNamesVisibility();
@@ -866,6 +924,51 @@
             };
         }
 
+        // --- Standalone 4.67 <-> 5.0 GPA scale converter (independent of the weighting-scale
+        // selector / applyGpaScale / levelBump; a fixed proportional utility). ---
+        const SCALE_4_67 = 4.67, SCALE_5_0 = 5.0;
+
+        function convertGpaScale(value, fromMax, toMax) {
+            return (value / fromMax) * toMax;
+        }
+
+        function syncConverter(sourceId) {
+            const sourceEl = document.getElementById(sourceId);
+            const targetId = sourceId === 'convert4_67Input' ? 'convert5_0Input' : 'convert4_67Input';
+            const targetEl = document.getElementById(targetId);
+            const note = document.getElementById('converterNote');
+            const sourceMax = sourceId === 'convert4_67Input' ? SCALE_4_67 : SCALE_5_0;
+            const targetMax = sourceId === 'convert4_67Input' ? SCALE_5_0 : SCALE_4_67;
+
+            const raw = sourceEl.value.trim();
+
+            if (raw === '') {
+                sourceEl.classList.remove('input-error');
+                targetEl.value = '';
+                if (note) note.style.display = 'none';
+                return;
+            }
+
+            const numeric = parseFloat(raw);
+
+            if (isNaN(numeric) || numeric < 0 || numeric > sourceMax) {
+                sourceEl.classList.add('input-error');
+                targetEl.value = '';
+                if (note) {
+                    note.textContent = 'Enter a GPA between 0 and ' + sourceMax + '.';
+                    note.style.display = 'block';
+                }
+                return;
+            }
+
+            sourceEl.classList.remove('input-error');
+            // The target now holds a freshly computed, valid value — drop any stale error
+            // highlight left over from when the user was typing into that field.
+            targetEl.classList.remove('input-error');
+            targetEl.value = convertGpaScale(numeric, sourceMax, targetMax).toFixed(2);
+            if (note) note.style.display = 'none';
+        }
+
         function calculateAllGPAs() {
             const scaleSelect = document.getElementById('gpaScaleSelect');
             if (scaleSelect) applyGpaScale(scaleSelect.value);
@@ -995,6 +1098,14 @@
             // Re-seed a single empty row so the page never sits blank (mirrors initial load).
             addClassInput();
             calculateAllGPAs(); // Reset results to the empty-state placeholder
+
+            // Reset the standalone GPA scale converter.
+            const convert4_67Input = document.getElementById('convert4_67Input');
+            const convert5_0Input = document.getElementById('convert5_0Input');
+            if (convert4_67Input) { convert4_67Input.value = ''; convert4_67Input.classList.remove('input-error'); }
+            if (convert5_0Input) { convert5_0Input.value = ''; convert5_0Input.classList.remove('input-error'); }
+            const converterNote = document.getElementById('converterNote');
+            if (converterNote) converterNote.style.display = 'none';
         }
     </script>
 </head>
@@ -1050,6 +1161,23 @@
               Calculate your unweighted and weighted GPA based on your percentage grades, class level, and credits.
           </p>
           
+          <div class="scale-converter">
+              <h3>Quick GPA Scale Converter</h3>
+              <p class="converter-hint">Already know your GPA? Convert between the 4.67 and 5.0 scales.</p>
+              <div class="converter-row">
+                  <div class="converter-field">
+                      <label for="convert4_67Input">4.67 scale</label>
+                      <input type="number" id="convert4_67Input" step="0.01" min="0" max="4.67" placeholder="e.g., 3.90">
+                  </div>
+                  <span class="converter-arrows" aria-hidden="true"><i class="fas fa-right-left"></i></span>
+                  <div class="converter-field">
+                      <label for="convert5_0Input">5.0 scale</label>
+                      <input type="number" id="convert5_0Input" step="0.01" min="0" max="5" placeholder="e.g., 4.18">
+                  </div>
+              </div>
+              <p id="converterNote" class="converter-note" style="display:none;"></p>
+          </div>
+
           <div class="form-group">
               <label for="gpaScaleSelect">GPA Weighting Scale</label>
               <select id="gpaScaleSelect">
