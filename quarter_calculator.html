@@ -1330,20 +1330,8 @@
     let html = '';
     const categoryName = type === 'learnerTask' ? 'Learner Task' : 'Assessment';
 
-    // Display for Needed Category Average
-    if (categoryAverage > 100) {
-      html += `<h3>Needed ${categoryName} Average: <span style="color: #f44336;">Not Possible</span></h3>
-               <p style="color: var(--text-secondary);">You need to achieve an average of ${categoryAverage.toFixed(2)}% in the ${categoryName} category, which is not achievable.</p>`;
-    } else if (categoryAverage < 0) {
-      html += `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-               <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
-    } else {
-      html += `<h3>Needed ${categoryName} Average: <span style="color: var(--accent-color);">${categoryAverage.toFixed(2)}%</span></h3>
-               <p style="color: var(--text-secondary);">You need to achieve this average in the ${categoryName} category to reach your desired quarter grade.</p>`;
-    }
-
     if (singleAssignmentScore !== null) {
-      html += `<h3 style="margin-top: 1rem;">On your ${assignmentPoints}-point assignment, you need: `;
+      html += `<h3>On your ${assignmentPoints}-point assignment, you need: `;
       if (singleAssignmentScore > 100) {
         html += `<span style="color: #f44336;">Not Possible</span></h3>
                  <p style="color: var(--text-secondary);">You would need to score ${pointsNeeded.toFixed(1)} points (${singleAssignmentScore.toFixed(2)}%), which is not achievable.</p>`;
@@ -1355,6 +1343,20 @@
                  <p style="color: var(--text-secondary);">You need to earn ${pointsNeeded.toFixed(1)} out of ${assignmentPoints} points on this assignment.</p>`;
       }
     }
+
+    // Display for Needed Category Average
+    const catGap = singleAssignmentScore !== null ? ' style="margin-top: 1rem;"' : '';
+    if (categoryAverage > 100) {
+      html += `<h3${catGap}>Needed ${categoryName} Average: <span style="color: #f44336;">Not Possible</span></h3>
+               <p style="color: var(--text-secondary);">You need to achieve an average of ${categoryAverage.toFixed(2)}% in the ${categoryName} category, which is not achievable.</p>`;
+    } else if (categoryAverage < 0) {
+      html += `<h3${catGap}>Needed ${categoryName} Average: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+               <p style="color: var(--text-secondary);">You have already reached or surpassed your desired grade.</p>`;
+    } else {
+      html += `<h3${catGap}>Needed ${categoryName} Average: <span style="color: var(--accent-color);">${categoryAverage.toFixed(2)}%</span></h3>
+               <p style="color: var(--text-secondary);">You need to achieve this average in the ${categoryName} category to reach your desired quarter grade.</p>`;
+    }
+
     container.innerHTML = html;
   }
 
