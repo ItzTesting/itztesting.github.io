@@ -1367,7 +1367,7 @@
   }
 
   // Rounding: points to ask a teacher for (added to earned only, possible unchanged)
-  // so the quarter grade reaches targetGrade - 0.5, i.e. rounds to targetGrade.
+  // so the quarter grade rounds up to targetGrade, and separately so it reaches targetGrade exactly.
   // Uses the same normalization as calculateQuarterGrade (only categories with data and weight > 0).
   function calculateRoundingPoints() {
     const targetGrade = parseFloat(document.getElementById('roundingTargetGrade').value);
@@ -1429,28 +1429,32 @@
 
     // Rounding precision follows the target: 92 -> nearest whole number (>= 91.5), 92.5 -> one decimal (>= 92.45)
     const decimals = Math.min(((String(targetGrade).split('.')[1]) || '').length, 4);
-    const threshold = Number((targetGrade - 0.5 * Math.pow(10, -decimals)).toFixed(decimals + 1));
+    const roundThreshold = Number((targetGrade - 0.5 * Math.pow(10, -decimals)).toFixed(decimals + 1));
     const precisionLabel = decimals === 0 ? 'the nearest whole number' : `${decimals} decimal place${decimals === 1 ? '' : 's'}`;
     const quarterGradeAt = (e) => (otherWeighted + (e / possible) * 100 * weight) / totalWeight;
+    const fmt = (n) => Number(n.toFixed(2)).toString();
 
-    if (currentGrade >= threshold - 1e-9) {
-      container.innerHTML = `<h3>Points to ask for: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
-        <p style="color: var(--text-secondary);">Your quarter grade of ${currentGrade.toFixed(2)}% already rounds to ${targetGrade}% or higher (rounded to ${precisionLabel}). You don't need to ask for any points.</p>`;
-      return;
-    }
+    // Points to add to earned so the quarter grade reaches goalGrade, as an HTML block
+    const buildGoalHtml = (heading, goalGrade, note, isFirst) => {
+      const gap = isFirst ? '' : ' style="margin-top: 1rem;"';
+      if (currentGrade >= goalGrade - 1e-9) {
+        return `<h3${gap}>${heading} <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+          <p style="color: var(--text-secondary);">Your quarter grade of ${currentGrade.toFixed(2)}% is already at or above ${goalGrade}%. You don't need to ask for any points.</p>`;
+      }
+      // Solve (otherWeighted + (E + x)/P * 100 * w) / W = goalGrade for x, then round up to 0.01 points
+      const exactPoints = possible * (goalGrade * totalWeight - otherWeighted) / (100 * weight) - earned;
+      const pointsToAsk = Math.ceil(exactPoints * 100 - 1e-6) / 100;
+      const newEarned = earned + pointsToAsk;
+      const unit = pointsToAsk === 1 ? 'point' : 'points';
+      return `<h3${gap}>${heading} <span style="color: var(--accent-color);">${fmt(pointsToAsk)} ${unit}</span></h3>
+        <p style="color: var(--text-secondary);">Ask your teacher to add ${fmt(pointsToAsk)} ${unit} to your ${categoryName} total. That moves it from ${fmt(earned)}/${fmt(possible)} (${currentCategoryAvg.toFixed(2)}%) to ${fmt(newEarned)}/${fmt(possible)} (${((newEarned / possible) * 100).toFixed(2)}%), and your quarter grade from ${currentGrade.toFixed(2)}% to ${quarterGradeAt(newEarned).toFixed(2)}%. ${note}</p>`;
+    };
 
-    // Solve (otherWeighted + (E + x)/P * 100 * w) / W = threshold for x, then round up to 0.01 points
-    const exactPoints = possible * (threshold * totalWeight - otherWeighted) / (100 * weight) - earned;
-    const pointsToAsk = Math.ceil(exactPoints * 100 - 1e-6) / 100;
-    const newEarned = earned + pointsToAsk;
-    const newCategoryAvg = (newEarned / possible) * 100;
-    const newGrade = quarterGradeAt(newEarned);
-    const pointsLabel = Number(pointsToAsk.toFixed(2)).toString();
-
-    container.innerHTML = `<h3>Ask for: <span style="color: var(--accent-color);">${pointsLabel} ${pointsToAsk === 1 ? 'point' : 'points'}</span></h3>
-      <p style="color: var(--text-secondary);">Ask your teacher to add ${pointsLabel} ${pointsToAsk === 1 ? 'point' : 'points'} to your ${categoryName} total. That moves it from ${Number(earned.toFixed(2))}/${Number(possible.toFixed(2))} (${currentCategoryAvg.toFixed(2)}%) to ${Number(newEarned.toFixed(2))}/${Number(possible.toFixed(2))} (${newCategoryAvg.toFixed(2)}%).</p>
-      <h3 style="margin-top: 1rem;">Quarter Grade: <span style="color: var(--accent-color);">${currentGrade.toFixed(2)}% &rarr; ${newGrade.toFixed(2)}%</span></h3>
-      <p style="color: var(--text-secondary);">A quarter grade of ${threshold}% or higher rounds to ${targetGrade}% (rounded to ${precisionLabel}).</p>`;
+    container.innerHTML =
+      buildGoalHtml(`To round up to ${targetGrade}%, ask for:`, roundThreshold,
+        `A quarter grade of ${roundThreshold}% or higher rounds to ${targetGrade}% (rounded to ${precisionLabel}).`, true) +
+      buildGoalHtml(`To get exactly ${targetGrade}%, ask for:`, targetGrade,
+        `This gets your quarter grade to ${targetGrade}% or just above it.`, false);
   }
 
   function toggleNeededGradeInputs() {
@@ -2322,11 +2326,11 @@
       <div id="roundingSection" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
           <h2>Rounding</h2>
           <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
-              Find out how many points to ask your teacher for so your quarter grade rounds up to a specific grade.
+              Find out how many points to ask your teacher for so your quarter grade rounds up to, or exactly reaches, a specific grade.
           </p>
 
           <div class="form-group">
-              <label for="roundingTargetGrade">Grade You Want It Rounded To (%)</label>
+              <label for="roundingTargetGrade">Grade You Want (%)</label>
               <input type="number" id="roundingTargetGrade" min="0" max="100" step="any" placeholder="e.g., 90 or 92.5">
               <small style="color: var(--text-secondary);">Whole number (90) = rounded to the nearest whole number. With a decimal (92.5) = rounded to that many decimal places.</small>
           </div>
