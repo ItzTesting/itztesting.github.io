@@ -720,6 +720,12 @@
       document.getElementById('solveForType').addEventListener('change', toggleNeededGradeInputs);
       document.getElementById('calculateNeededGradesBtn').addEventListener('click', calculateNeededFutureGrades);
 
+      // Add event listeners for Rounding section
+      document.getElementById('roundingSolveForType').addEventListener('change', () => {
+          document.getElementById('roundingResults').innerHTML = '';
+      });
+      document.getElementById('calculateRoundingBtn').addEventListener('click', calculateRoundingPoints);
+
       // Initial visibility check for assignment names
       document.getElementById('showAssignmentNamesCheckbox').checked = true; // Default to Show Assignment Names ON
       toggleAssignmentNamesVisibility();
@@ -1360,6 +1366,90 @@
     container.innerHTML = html;
   }
 
+  // Rounding: points to ask a teacher for (added to earned only, possible unchanged)
+  // so the quarter grade reaches targetGrade - 0.5, i.e. rounds to targetGrade.
+  // Uses the same normalization as calculateQuarterGrade (only categories with data and weight > 0).
+  function calculateRoundingPoints() {
+    const targetGrade = parseFloat(document.getElementById('roundingTargetGrade').value);
+    const solveForType = document.getElementById('roundingSolveForType').value;
+    const container = document.getElementById('roundingResults');
+    container.innerHTML = '';
+
+    if (isNaN(targetGrade) || targetGrade < 0 || targetGrade > 100) {
+      container.innerHTML = '<p style="color: #f44336;">Please enter a valid grade to round to (0-100%).</p>';
+      return;
+    }
+    if (!solveForType) {
+      container.innerHTML = '<p style="color: #f44336;">Please select which points you want to ask for.</p>';
+      return;
+    }
+
+    const {
+      ltTotalEarned,
+      ltTotalPossible,
+      assessTotalEarned,
+      assessTotalPossible,
+      ltOverallWeight,
+      assessOverallWeight,
+      customAssignments
+    } = getQuarterGradeComponentsForNeededCalculation();
+
+    const categoryName = solveForType === 'learnerTask' ? 'Learner Task' : 'Assessment';
+    const earned = solveForType === 'learnerTask' ? ltTotalEarned : assessTotalEarned;
+    const possible = solveForType === 'learnerTask' ? ltTotalPossible : assessTotalPossible;
+    const weight = solveForType === 'learnerTask' ? ltOverallWeight : assessOverallWeight;
+
+    if (possible <= 0) {
+      container.innerHTML = `<p style="color: #f44336;">Add at least one ${categoryName} assignment with points first.</p>`;
+      return;
+    }
+    if (weight <= 0) {
+      container.innerHTML = `<p style="color: #f44336;">The weight for ${categoryName}s is 0%, so extra points there won't change your grade.</p>`;
+      return;
+    }
+
+    // Weighted sum (in percent * weight) of every other category that has data
+    let otherWeighted = 0;
+    let totalWeight = weight;
+    const addOther = (e, p, w) => {
+      if (p > 0 && w > 0) {
+        otherWeighted += (e / p) * 100 * w;
+        totalWeight += w;
+      }
+    };
+    if (solveForType === 'learnerTask') {
+      addOther(assessTotalEarned, assessTotalPossible, assessOverallWeight);
+    } else {
+      addOther(ltTotalEarned, ltTotalPossible, ltOverallWeight);
+    }
+    customAssignments.forEach(({ score, weight: w }) => addOther(score, 100, w));
+
+    const currentCategoryAvg = (earned / possible) * 100;
+    const currentGrade = (otherWeighted + currentCategoryAvg * weight) / totalWeight;
+
+    const threshold = targetGrade - 0.5;
+    const quarterGradeAt = (e) => (otherWeighted + (e / possible) * 100 * weight) / totalWeight;
+
+    if (currentGrade >= threshold - 1e-9) {
+      container.innerHTML = `<h3>Points to ask for: <span style="color: var(--accent-color);">Already Achieved!</span></h3>
+        <p style="color: var(--text-secondary);">Your quarter grade of ${currentGrade.toFixed(2)}% already rounds to ${targetGrade}% or higher. You don't need to ask for any points.</p>`;
+      return;
+    }
+
+    // Solve (otherWeighted + (E + x)/P * 100 * w) / W = threshold for x, then round up to 0.01 points
+    const exactPoints = possible * (threshold * totalWeight - otherWeighted) / (100 * weight) - earned;
+    const pointsToAsk = Math.ceil(exactPoints * 100 - 1e-6) / 100;
+    const newEarned = earned + pointsToAsk;
+    const newCategoryAvg = (newEarned / possible) * 100;
+    const newGrade = quarterGradeAt(newEarned);
+    const pointsLabel = Number(pointsToAsk.toFixed(2)).toString();
+
+    container.innerHTML = `<h3>Ask for: <span style="color: var(--accent-color);">${pointsLabel} ${pointsToAsk === 1 ? 'point' : 'points'}</span></h3>
+      <p style="color: var(--text-secondary);">Ask your teacher to add ${pointsLabel} ${pointsToAsk === 1 ? 'point' : 'points'} to your ${categoryName} total. That moves it from ${Number(earned.toFixed(2))}/${Number(possible.toFixed(2))} (${currentCategoryAvg.toFixed(2)}%) to ${Number(newEarned.toFixed(2))}/${Number(possible.toFixed(2))} (${newCategoryAvg.toFixed(2)}%).</p>
+      <h3 style="margin-top: 1rem;">Quarter Grade: <span style="color: var(--accent-color);">${currentGrade.toFixed(2)}% &rarr; ${newGrade.toFixed(2)}%</span></h3>
+      <p style="color: var(--text-secondary);">A quarter grade of ${threshold}% or higher rounds to ${targetGrade}%.</p>`;
+  }
+
   function toggleNeededGradeInputs() {
       const solveForType = document.getElementById('solveForType').value;
       // Clear results when changing selection
@@ -1387,6 +1477,11 @@
       // Clear the assignment points input field
       document.getElementById('assignmentPoints').value = '';
       toggleNeededGradeInputs(); // Reset visibility
+
+      // Clear rounding section inputs and results
+      document.getElementById('roundingTargetGrade').value = '';
+      document.getElementById('roundingSolveForType').value = '';
+      document.getElementById('roundingResults').innerHTML = '';
 
       // Clear results container
       document.getElementById('quarterResultsContainer').innerHTML = '<h3>Your Quarter Grade: <span id="quarterResultValue">Please enter grades and weights to calculate.</span></h3>';
@@ -2217,6 +2312,40 @@
       <div class="result-section">
           <div id="neededGradesResults">
               <!-- Needed grades results will be displayed here -->
+          </div>
+      </div>
+
+      <!-- Rounding: how many points to ask a teacher for to round up to a target grade -->
+      <div id="roundingSection" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--border-color);">
+          <h2>Rounding</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+              Find out how many points to ask your teacher for so your quarter grade rounds up to a specific grade.
+          </p>
+
+          <div class="form-group">
+              <label for="roundingTargetGrade">Grade You Want It Rounded To (%)</label>
+              <input type="number" id="roundingTargetGrade" min="0" max="100" placeholder="e.g., 90">
+          </div>
+
+          <div class="form-group">
+              <label for="roundingSolveForType">Ask for points in:</label>
+              <select id="roundingSolveForType">
+                  <option value="">Select...</option>
+                  <option value="learnerTask">Learner Task Points</option>
+                  <option value="assessment">Assessment Points</option>
+              </select>
+          </div>
+
+          <div class="btn-group">
+              <button id="calculateRoundingBtn">
+                  <i class="fas fa-calculator"></i> Calculate Rounding
+              </button>
+          </div>
+
+          <div class="result-section">
+              <div id="roundingResults">
+                  <!-- Rounding results will be displayed here -->
+              </div>
           </div>
       </div>
   </div>
